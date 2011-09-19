@@ -121,10 +121,13 @@
   <data name="ico_folder_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ico_folder_32.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ico_xor" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ico_xor.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ico_disk_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ico_disk_32.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ico_xor" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ico_xor.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="key" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\key.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

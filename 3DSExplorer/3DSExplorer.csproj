@@ -114,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />
+    <None Include="Resources\key.png" />
     <None Include="Resources\ico_xor.png" />
     <None Include="Resources\ico_disk_32.png" />
     <None Include="Resources\ico_folder_32.png" />

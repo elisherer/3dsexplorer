@@ -26,6 +26,11 @@ namespace _3DSExplorer
             return (buf[0] == 'D' && buf[1] == 'I' && buf[2] == 'F' && buf[3] == 'I');
         }
 
+        public static Boolean isDisaMagic(char[] buf)
+        {
+            return (buf[0] == 'D' && buf[1] == 'I' && buf[2] == 'S' && buf[3] == 'A');
+        }
+
         public static Boolean isSaveMagic(char[] buf)
         {
             return (buf[0] == 'S' && buf[1] == 'A' && buf[2] == 'V' && buf[3] == 'E');
