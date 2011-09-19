@@ -23,6 +23,10 @@ namespace _3DSExplorer
         public int JournalMagic = 0x080D6CE0;
         public uint SaveFSEMagic = 0xD57B1100;
 
+        public byte[] Key;
+
+        public int DisaOffset;
+
         public int BlockmapLength;
         public int JournalSize;
         public SFHeader fileHeader;

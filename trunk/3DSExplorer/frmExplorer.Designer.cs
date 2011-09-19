@@ -31,10 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
             this.toolStrip = new System.Windows.Forms.ToolStrip();
-            this.btnOpen = new System.Windows.Forms.ToolStripButton();
             this.btnSep0 = new System.Windows.Forms.ToolStripSeparator();
-            this.btnSaveExeFS = new System.Windows.Forms.ToolStripButton();
-            this.btnXOR = new System.Windows.Forms.ToolStripButton();
             this.lblCopyright = new System.Windows.Forms.ToolStripLabel();
             this.lblBrew = new System.Windows.Forms.ToolStripLabel();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -46,11 +43,13 @@
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.treeView = new System.Windows.Forms.TreeView();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
-            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.btnSaveRomFS = new System.Windows.Forms.ToolStripButton();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.lvFileSystem = new System.Windows.Forms.ListView();
             this.imlFS = new System.Windows.Forms.ImageList(this.components);
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.btnOpen = new System.Windows.Forms.ToolStripButton();
+            this.btnXOR = new System.Windows.Forms.ToolStripButton();
+            this.btnSaveKey = new System.Windows.Forms.ToolStripButton();
             this.toolStrip.SuspendLayout();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -66,8 +65,7 @@
             this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnOpen,
             this.btnSep0,
-            this.btnSaveExeFS,
-            this.btnSaveRomFS,
+            this.btnSaveKey,
             this.btnXOR,
             this.lblCopyright,
             this.lblBrew});
@@ -77,41 +75,10 @@
             this.toolStrip.TabIndex = 0;
             this.toolStrip.Text = "toolStrip1";
             // 
-            // btnOpen
-            // 
-            this.btnOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnOpen.Image = global::_3DSExplorer.Properties.Resources.ico_folder_32;
-            this.btnOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Size = new System.Drawing.Size(36, 36);
-            this.btnOpen.Text = "Open File...";
-            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
-            // 
             // btnSep0
             // 
             this.btnSep0.Name = "btnSep0";
             this.btnSep0.Size = new System.Drawing.Size(6, 39);
-            // 
-            // btnSaveExeFS
-            // 
-            this.btnSaveExeFS.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnSaveExeFS.Enabled = false;
-            this.btnSaveExeFS.Image = global::_3DSExplorer.Properties.Resources.ico_disk_32;
-            this.btnSaveExeFS.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnSaveExeFS.Name = "btnSaveExeFS";
-            this.btnSaveExeFS.Size = new System.Drawing.Size(36, 36);
-            this.btnSaveExeFS.Text = "Save ExeFS to File...";
-            this.btnSaveExeFS.Click += new System.EventHandler(this.btnSaveExeFS_Click);
-            // 
-            // btnXOR
-            // 
-            this.btnXOR.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnXOR.Image = global::_3DSExplorer.Properties.Resources.ico_xor;
-            this.btnXOR.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnXOR.Name = "btnXOR";
-            this.btnXOR.Size = new System.Drawing.Size(36, 36);
-            this.btnXOR.Text = "XOR 2 Files";
-            this.btnXOR.Click += new System.EventHandler(this.btnXOR_Click);
             // 
             // lblCopyright
             // 
@@ -207,22 +174,6 @@
             this.imageList.TransparentColor = System.Drawing.Color.Transparent;
             this.imageList.Images.SetKeyName(0, "bullet_black.png");
             // 
-            // saveFileDialog
-            // 
-            this.saveFileDialog.DefaultExt = "ExeFS";
-            this.saveFileDialog.Filter = "ExeFS files (*.ExeFS)|*.ExeFS";
-            // 
-            // btnSaveRomFS
-            // 
-            this.btnSaveRomFS.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnSaveRomFS.Enabled = false;
-            this.btnSaveRomFS.Image = global::_3DSExplorer.Properties.Resources.ico_disk_32;
-            this.btnSaveRomFS.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnSaveRomFS.Name = "btnSaveRomFS";
-            this.btnSaveRomFS.Size = new System.Drawing.Size(36, 36);
-            this.btnSaveRomFS.Text = "Save RomFS to File...";
-            this.btnSaveRomFS.Click += new System.EventHandler(this.btnSaveRomFS_Click);
-            // 
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -260,6 +211,37 @@
             this.imlFS.TransparentColor = System.Drawing.Color.Transparent;
             this.imlFS.Images.SetKeyName(0, "page_white_text.png");
             // 
+            // btnOpen
+            // 
+            this.btnOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnOpen.Image = global::_3DSExplorer.Properties.Resources.ico_folder_32;
+            this.btnOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnOpen.Name = "btnOpen";
+            this.btnOpen.Size = new System.Drawing.Size(36, 36);
+            this.btnOpen.Text = "Open File...";
+            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+            // 
+            // btnXOR
+            // 
+            this.btnXOR.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnXOR.Image = global::_3DSExplorer.Properties.Resources.ico_xor;
+            this.btnXOR.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnXOR.Name = "btnXOR";
+            this.btnXOR.Size = new System.Drawing.Size(36, 36);
+            this.btnXOR.Text = "XOR 2 Files";
+            this.btnXOR.Click += new System.EventHandler(this.btnXOR_Click);
+            // 
+            // btnSaveKey
+            // 
+            this.btnSaveKey.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnSaveKey.Image = global::_3DSExplorer.Properties.Resources.key;
+            this.btnSaveKey.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSaveKey.Name = "btnSaveKey";
+            this.btnSaveKey.Size = new System.Drawing.Size(36, 36);
+            this.btnSaveKey.Text = "Save key file";
+            this.btnSaveKey.Visible = false;
+            this.btnSaveKey.Click += new System.EventHandler(this.btnSaveKey_Click);
+            // 
             // frmExplorer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -269,7 +251,7 @@
             this.Controls.Add(this.toolStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmExplorer";
-            this.Text = "3DS Explorer by elisherer";
+            this.Text = "3DS Explorer (v0.5) by elisherer";
             this.toolStrip.ResumeLayout(false);
             this.toolStrip.PerformLayout();
             this.splitContainer.Panel1.ResumeLayout(false);
@@ -297,15 +279,14 @@
         private System.Windows.Forms.TreeView treeView;
         private System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.ToolStripSeparator btnSep0;
-        private System.Windows.Forms.ToolStripButton btnSaveExeFS;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
         private System.Windows.Forms.ToolStripLabel lblCopyright;
         private System.Windows.Forms.ToolStripButton btnXOR;
         private System.Windows.Forms.ToolStripLabel lblBrew;
-        private System.Windows.Forms.ToolStripButton btnSaveRomFS;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ListView lvFileSystem;
         private System.Windows.Forms.ImageList imlFS;
+        private System.Windows.Forms.ToolStripButton btnSaveKey;
     }
 }
 

@@ -115,6 +115,7 @@ namespace _3DSExplorer
             makeNewListItem("0x300", "4", "Used ROM size [bytes]", cxt.cci.UsedRomSize.ToString());
             makeNewListItem("0x320", "16", "Unknown", byteArrayToString(cxt.cci.Unknown));
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileSystem.Clear();
         }
 
         private void showNCCH(int i)
@@ -147,6 +148,21 @@ namespace _3DSExplorer
             makeNewListItem("0x1C0", "0x20", "ExeFS superblock hash", byteArrayToString(cxt.cxis[i].ExeFSSuperBlockhash));
             makeNewListItem("0x1E0", "0x20", "RomFS superblock hash", byteArrayToString(cxt.cxis[i].RomFSSuperBlockhash));
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileSystem.Clear();
+            ListViewItem lvItem;
+            if (cxt.cxis[i].RomFSSize > 0)
+            {
+                lvItem = lvFileSystem.Items.Add("RomFS" + i + ".bin");
+                lvItem.ImageIndex = 0;
+                lvItem.Tag = cxt.cxis[i];
+            }
+            if (cxt.cxis[i].ExeFSSize > 0)
+            {
+                lvItem = lvFileSystem.Items.Add("ExeFS" + i + ".bin");
+                lvItem.ImageIndex = 0;
+                lvItem.Tag = cxt.cxis[i];
+            }
+
         }
 
         private void showNCCHPlainRegion(int i)
@@ -157,6 +173,7 @@ namespace _3DSExplorer
                 makeNewListItem("", cxt.cxiprs[i].PlainRegionStrings[j].Length.ToString(), "Text", cxt.cxiprs[i].PlainRegionStrings[j]);
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileSystem.Clear();
         }
 
         private void OpenCCI(string path)
@@ -240,7 +257,7 @@ namespace _3DSExplorer
             makeNewListItem("0x004", "4", "Unknown 2", cxt.fileHeader.Unknown2.ToString());
             makeNewListItem("", "", "Blockmap length", cxt.BlockmapLength.ToString());
             makeNewListItem("", "", "Journal size", cxt.JournalSize.ToString());
-            makeNewListItem("DISA", "", "", "");
+            makeNewListItem("DISA", "", "", "found @ 0x" + String.Format("{0:X4}", cxt.DisaOffset));
             makeNewListItem("0x000", "4", "DISA Magic", charArrayToString(cxt.imageHeader.DISA.Magic));
             makeNewListItem("0x004", "12", "Unknown", byteArrayToString(cxt.imageHeader.DISA.Unknown0));
             makeNewListItem("0x010", "8", "First Difi offset", cxt.imageHeader.DISA.FirstDifiOffset.ToString());
@@ -253,6 +270,7 @@ namespace _3DSExplorer
             makeNewListItem("0x040", "0x20", "Hash", byteArrayToString(cxt.imageHeader.DISA.Hash));
             makeNewListItem("0x060", "0x74", "Unknown", byteArrayToString(cxt.imageHeader.DISA.Unknown2));
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileSystem.Clear();
         }
 
         private void showDifi()
@@ -284,13 +302,14 @@ namespace _3DSExplorer
             makeNewListItem("0x000", "4", "FileSystem Block Offset (block=0x200 bytes)", save.FSTBlockOffset.ToString());
             makeNewListItem("0x000", "0x08", "Unknown", byteArrayToString(save.Unknown2));
             makeNewListItem("0x000", "4", "FileSystem Exact Offset", save.FSTExactOffset.ToString());
+            lvFileSystem.Clear();
             if (SaveTool.isSaveMagic(save.MagicSAVE))
             {
                 lvFileSystem.Clear();
                 ListViewItem lvItem;
                 foreach (SFFileSystemEntry fse in (SFFileSystemEntry[])cxt.savesFiles[cxt.currentDifi])
                 {
-                    lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename) + "(" + fse.FileSize + "b)");
+                    lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename) + "\n" + fse.FileSize + "b");
                     lvItem.ImageIndex = 0;
                     lvItem.Tag = fse;
                 }
@@ -301,8 +320,7 @@ namespace _3DSExplorer
         private void OpenSave(string path, bool encrypted)
         {
             SFContext cxt = new SFContext();
-            //ArrayList headers;
-            //ArrayList lse;
+
             //get the file into buffer to find the key if needed
             byte[] fileBuffer = File.ReadAllBytes(path);
             MemoryStream ms = new MemoryStream(fileBuffer);
@@ -318,8 +336,8 @@ namespace _3DSExplorer
                     MessageBox.Show("Can't find key to decrypt the binary file");
                 else
                 {
-                    File.WriteAllBytes(path + ".key", key);
                     SaveTool.XorByteArray(fileBuffer, key, 0x1000);
+                    cxt.Key = key;
                 }
             }
 
@@ -327,59 +345,59 @@ namespace _3DSExplorer
             ArrayList mapping = new ArrayList();
 
             //get the blockmap headers
-            int lastAllocationCount = 0;
-            cxt.BlockmapLength = 0;
+            cxt.BlockmapLength = (int)(ms.Length >> 12) - 1;
             SFHeaderEntry hEntry = new SFHeaderEntry();
-            //headers = new ArrayList();
-            while (lastAllocationCount <= 1)
+            for (int i=0;i<cxt.BlockmapLength;i++)
             {
                 hEntry = ReadStruct<SFHeaderEntry>(ms);
-                lastAllocationCount = hEntry.AllocationCount;
-                if (lastAllocationCount <= 1)
-                {
-                    //headers.Add(hEntry);
-                    mapping.Add((int)hEntry.PhysicalSector);
-                    cxt.BlockmapLength++;
-                }
+                mapping.Add((int)(hEntry.PhysicalSector));
             }
-            //skip back over the last one (which wasn't a blockmap header)
-            ms.Seek( - Marshal.SizeOf(hEntry), SeekOrigin.Current);
-
             //Check crc16
             byte[] twoBytes = new byte[2], crcBytes = new byte[2];
             ms.Read(crcBytes, 0, 2);
             twoBytes = CRC16.GetCRC(fileBuffer,0,ms.Position);
             if (crcBytes[0] != twoBytes[0] || crcBytes[1] != twoBytes[1])
+            {
                 MessageBox.Show("CRC Error");
+                lstInfo.Clear();
+                treeView.Nodes.Clear();
+            }
             else
             {
                 //get journal updates
                 int lastMagic = cxt.JournalMagic;
                 cxt.JournalSize = 0;
                 SFLongSectorEntry lsEntry = new SFLongSectorEntry();
-                //lse = new ArrayList();
                 while (lastMagic == cxt.JournalMagic)
                 {
                     lsEntry = ReadStruct<SFLongSectorEntry>(ms);
                     lastMagic = lsEntry.Magic;
                     if (lastMagic == cxt.JournalMagic)
                     {
-                        //lse.Add(lsEntry);
                         mapping[lsEntry.Sector.VirtualSector] = (int)(lsEntry.Sector.PhysicalSector);
                         cxt.JournalSize++;
                     }
                 }
+                //File.WriteAllBytes("image_notarranged.bin", fileBuffer);
+                
                 //rearragne by virtual
                 cxt.image = new byte[fileBuffer.Length - 0x1000];
                 for (int i = 0; i < mapping.Count; i++)
                     if ((int)mapping[i] != -1)
-                        Buffer.BlockCopy(fileBuffer, ((int)mapping[i] & 0x7F ) * 0x1000, cxt.image, i * 0x1000, 0x1000);
+                        Buffer.BlockCopy(fileBuffer, ((int)mapping[i] & 0x7F) * 0x1000, cxt.image, i * 0x1000, 0x1000);
 
-                //File.WriteAllBytes("image.bin", cxt.image);
-                
+                //File.WriteAllBytes("image_arranged.bin", cxt.image);
+
                 MemoryStream ims = new MemoryStream(cxt.image);
 
                 cxt.imageHeader = ReadStruct<SFImageHeader>(ims);
+                cxt.DisaOffset = 0;
+                while (!SaveTool.isDisaMagic(cxt.imageHeader.DISA.Magic)) //DISA not found, find it
+                {
+                    ims.Seek(0x1000 - Marshal.SizeOf(cxt.imageHeader), SeekOrigin.Current);
+                    cxt.imageHeader = ReadStruct<SFImageHeader>(ims);
+                    cxt.DisaOffset += 0x1000;
+                }
                 char[] lastDifiMagic = new char[] { 'D', 'I', 'F', 'I' };
                 SFDIFIBlob difiBlob;
                 cxt.difis = new ArrayList();
@@ -397,8 +415,8 @@ namespace _3DSExplorer
                 //Collect save partitions
                 cxt.saves = new ArrayList();
                 cxt.savesFiles = new ArrayList();
-                ims.Seek(0x2000,SeekOrigin.Begin);
-                long lastPos = 0x2000, savePos;
+                ims.Seek(cxt.DisaOffset + 0x2000, SeekOrigin.Begin);
+                long lastPos = ims.Position, savePos;
                 for (int i = 0; i < cxt.difis.Count; i++)
                 {
                     lastPos = ims.Position;
@@ -413,7 +431,7 @@ namespace _3DSExplorer
                             ims.Seek(savePos + save.FSTBlockOffset * 0x200 + save.FSTOffset, SeekOrigin.Begin);
                         else //no block offset
                             ims.Seek(savePos + save.FSTExactOffset, SeekOrigin.Begin);
-                        
+
                         SFFileSystemEntry root = ReadStruct<SFFileSystemEntry>(ims);
                         if ((root.NodeCount > 1) && (root.Magic == 0)) //if has files
                         {
@@ -431,7 +449,7 @@ namespace _3DSExplorer
                     else
                         cxt.savesFiles.Add(new SFFileSystemEntry[0]); //No legal SAVE filesystem
                     //go to next partition
-                    ims.Seek(savePos + (long)((SFDIFIBlob)cxt.difis[i]).FileSystemLength , SeekOrigin.Begin);
+                    ims.Seek(savePos + (long)((SFDIFIBlob)cxt.difis[i]).FileSystemLength, SeekOrigin.Begin);
                     /*
                     if (ims.Position % 0x1000 != 0) //go to the nearest block (0x1000)
                     {
@@ -439,7 +457,7 @@ namespace _3DSExplorer
                     }*/
                 }
 
-                ims.Close();                
+                ims.Close();
 
                 lstInfo.Items.Clear();
             }
@@ -499,6 +517,7 @@ namespace _3DSExplorer
                 //TMDContentChunkRecord[ContentCount]
                 */
                 lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                lvFileSystem.Clear();
             }
         }
 
@@ -578,18 +597,30 @@ namespace _3DSExplorer
                         type = 1;
                     else if ((flag >= 0x00000100) && (flag <= 0x04000100))
                         type = 2;
+                    else //can't decide (go with extension)
+                    {
+                        if (filePath.EndsWith("sav"))
+                            type = 1;
+                        else if (filePath.EndsWith("3ds"))
+                            type = 0;
+                        else
+                            type = 2;
+                    }
                 }
                 fs.Close();
+                
+                bool encrypted = false;
                 switch (type)
                 {
                     case 0: OpenCCI(filePath); break;
-                    case 1: bool encrypted = false;
+                    case 1: 
                         encrypted = (MessageBox.Show("Is this save file encrypted?","Question",MessageBoxButtons.YesNo)==DialogResult.Yes);
                         OpenSave(filePath, encrypted); 
                         break;
                     case 2: OpenTMD(filePath); break;
                     default: MessageBox.Show("This file is unsupported!"); break;
                 }
+                btnSaveKey.Visible = (type == 1) && encrypted;
             }
         }
 
@@ -598,18 +629,12 @@ namespace _3DSExplorer
             if (currentContext is CCIContext)
             {
                 CCIContext cxt = (CCIContext)currentContext;
-                if (btnSaveExeFS.Enabled) //disable by default
-                    btnSaveExeFS.Enabled = false;
-                if (btnSaveRomFS.Enabled) //disable by default
-                    btnSaveRomFS.Enabled = false;
                 if (e.Node.Text.StartsWith("NCSD"))
                     showNCSD();
                 else if (e.Node.Text.StartsWith("NCCH"))
                 {
                     cxt.currentNcch = e.Node.Text[4] - '0';
                     showNCCH(cxt.currentNcch);
-                    btnSaveExeFS.Enabled = true;
-                    btnSaveRomFS.Enabled = true;
                 }
                 else if (e.Node.Text.StartsWith("Pla"))
                 {
@@ -661,49 +686,6 @@ namespace _3DSExplorer
             }
             return retArray;
         }
-
-        private void btnSaveExeFS_Click(object sender, EventArgs e)
-        {
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                string strKey = InputBox.ShowDialog("Please Enter Key:");
-                if (strKey != null)
-                {
-                    byte[] key = parseKeyStringToByteArray(strKey);
-
-                    if (key == null)
-                        MessageBox.Show("Error parsing key string, (must be a multiple of 2 and made of hex letters.");
-                    else
-                    {
-                        CCIContext cxt = (CCIContext)currentContext;
-                        // Read the ExeFS
-                        string inpath = openFileDialog.FileName;
-                        FileStream infs = File.OpenRead(inpath);
-
-                        long offset = cxt.cxis[cxt.currentNcch].ExeFSOffset;
-                        if (cxt.currentNcch == 0) offset += cxt.cci.FirstNCCHOffset;
-                        else if (cxt.currentNcch == 1) offset += cxt.cci.SecondNCCHOffset;
-                        else offset += cxt.cci.ThirdNCCHOffset;
-                        offset *= 0x200; //media units
-
-                        infs.Seek(offset, SeekOrigin.Begin);
-                        byte[] exefsbuffer = new byte[cxt.cxis[cxt.currentNcch].ExeFSSize * 0x200];
-                        infs.Read(exefsbuffer, 0, exefsbuffer.Length);
-                        infs.Close();
-                        if (key.Length > 0)
-                        {
-                            AES128CTR aes = new AES128CTR(key);
-                            aes.Decrypt(exefsbuffer);
-                        }
-                        string outpath = saveFileDialog.FileName;
-                        FileStream outfs = File.OpenWrite(outpath);
-                        outfs.Write(exefsbuffer, 0, exefsbuffer.Length);
-                        outfs.Close();
-                    }
-                }
-            }
-            
-        }
         
         private void btnXOR_Click(object sender, EventArgs e)
         {
@@ -715,69 +697,88 @@ namespace _3DSExplorer
             System.Diagnostics.Process.Start(lblBrew.Text);
         }
 
-        private void btnSaveRomFS_Click(object sender, EventArgs e)
-        {
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                string strKey = InputBox.ShowDialog("Please Enter Key:");
-                if (strKey != null)
-                {
-                    byte[] key = parseKeyStringToByteArray(strKey);
-
-                    if (key == null)
-                        MessageBox.Show("Error parsing key string, (must be a multiple of 2 and made of hex letters.");
-                    else
-                    {
-                        CCIContext cxt = (CCIContext)currentContext;
-                        // Read the RomFS
-                        string inpath = openFileDialog.FileName;
-                        FileStream infs = File.OpenRead(inpath);
-
-                        long offset = cxt.cxis[cxt.currentNcch].RomFSOffset;
-                        if (cxt.currentNcch == 0) offset += cxt.cci.FirstNCCHOffset;
-                        else if (cxt.currentNcch == 1) offset += cxt.cci.SecondNCCHOffset;
-                        else offset += cxt.cci.ThirdNCCHOffset;
-                        offset *= 0x200; //media units
-
-                        infs.Seek(offset, SeekOrigin.Begin);
-                        byte[] romfsbuffer = new byte[cxt.cxis[cxt.currentNcch].RomFSSize * 0x200];
-                        infs.Read(romfsbuffer, 0, romfsbuffer.Length);
-                        infs.Close();
-
-                        if (key.Length > 0)
-                        {
-                            AES128CTR aes = new AES128CTR(key);
-                            aes.Decrypt(romfsbuffer);
-                        }
-
-                        string outpath = saveFileDialog.FileName;
-                        FileStream outfs = File.OpenWrite(outpath);
-                        outfs.Write(romfsbuffer, 0, romfsbuffer.Length);
-                        outfs.Close();
-                    }
-                }
-            }
-        }
-
         private void lvFileSystem_ItemActivate(object sender, EventArgs e)
         {
             ListViewItem item = lvFileSystem.SelectedItems[0];
             if (item.Tag != null)
             {
+                saveFileDialog.Filter = "All Files (*.*)|*.*";
                 if (item.Tag is SFFileSystemEntry)
                 {   SFFileSystemEntry entry = (SFFileSystemEntry)item.Tag;
                     SFContext cxt = (SFContext)currentContext;
-                    saveFileDialog.Filter = "All Files (*.*)|*.*";
                     saveFileDialog.FileName = charArrayToString(entry.Filename);
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         FileStream fs = File.OpenRead(filePath);
-                        //loop through difis to get to the SAVE then go FSTBlockOffset + entry.offset * 0x200
+                        fs.Seek(0x2000 + cxt.DisaOffset, SeekOrigin.Begin);
+                        //loop through difis to get to the SAVE
+                        for (int i = 0; i < cxt.currentDifi; i++)
+                        {
+                            fs.Seek((long)(((SFDIFIBlob)cxt.difis[i]).HashTableLength + ((SFDIFIBlob)cxt.difis[i]).FileSystemLength),SeekOrigin.Current);
+                        }
+                        fs.Seek((long)(((SFDIFIBlob)cxt.difis[cxt.currentDifi]).HashTableLength), SeekOrigin.Current);
+                        //then go FSTBlockOffset + entry.offset * 0x200
+                        fs.Seek((long)(((SFSave)cxt.saves[cxt.currentDifi]).FSTBlockOffset + entry.BlockOffset * 0x200), SeekOrigin.Current);
                         //read entry.filesize
+                        byte[] fileBuffer = new byte[entry.FileSize];
+                        fs.Read(fileBuffer, 0, fileBuffer.Length);
+                        File.WriteAllBytes(saveFileDialog.FileName, fileBuffer);
                         fs.Close();
                     }
                 }
+                else if (item.Tag is CXI)
+                {
+                    CXI cxi = (CXI)item.Tag;
+                    CCIContext cxt = (CCIContext)currentContext;
+                    saveFileDialog.FileName = item.Text;
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        string strKey = InputBox.ShowDialog("Please Enter Key:\nPress OK with empty key to save encrypted");
+                        if (strKey != null)
+                        {
+                            byte[] key = parseKeyStringToByteArray(strKey);
+
+                            if (key == null)
+                                MessageBox.Show("Error parsing key string, (must be a multiple of 2 and made of hex letters.");
+                            else
+                            {            
+                                string inpath = openFileDialog.FileName;
+                                FileStream infs = File.OpenRead(inpath);
+                                bool isExeFS = item.Text.StartsWith("Exe");
+
+                                long offset = isExeFS ? cxi.ExeFSOffset : cxi.RomFSOffset;
+                                if (cxt.currentNcch == 0) offset += cxt.cci.FirstNCCHOffset;
+                                else if (cxt.currentNcch == 1) offset += cxt.cci.SecondNCCHOffset;
+                                else offset += cxt.cci.ThirdNCCHOffset;
+                                offset *= 0x200; //media units
+
+                                infs.Seek(offset, SeekOrigin.Begin);
+                                long bufferSize = isExeFS ? cxi.ExeFSSize * 0x200 : cxi.RomFSSize * 0x200;
+                                byte[] buffer = new byte[bufferSize];
+                                infs.Read(buffer, 0, buffer.Length);
+                                infs.Close();
+                                if (key.Length > 0)
+                                {
+                                    AES128CTR aes = new AES128CTR(key);
+                                    aes.Decrypt(buffer);
+                                }
+                                string outpath = saveFileDialog.FileName;
+                                FileStream outfs = File.OpenWrite(outpath);
+                                outfs.Write(buffer, 0, buffer.Length);
+                                outfs.Close();
+                            }
+                        }
+                    }
+                }
             }
+        }
+
+        private void btnSaveKey_Click(object sender, EventArgs e)
+        {
+            SFContext cxt = (SFContext)currentContext;
+            saveFileDialog.Filter = "Key file (*.key)|*.key|All Files|*.*";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                File.WriteAllBytes(saveFileDialog.FileName, cxt.Key);
         }
 
     }
