@@ -620,6 +620,7 @@ namespace _3DSExplorer
                     case 2: OpenTMD(filePath); break;
                     default: MessageBox.Show("This file is unsupported!"); break;
                 }
+                btnSaveImage.Visible = (type == 1);
                 btnSaveKey.Visible = (type == 1) && encrypted;
             }
         }
@@ -709,7 +710,7 @@ namespace _3DSExplorer
                     saveFileDialog.FileName = charArrayToString(entry.Filename);
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        FileStream fs = File.OpenRead(filePath);
+                        MemoryStream fs = new MemoryStream(cxt.image);
                         fs.Seek(0x2000 + cxt.DisaOffset, SeekOrigin.Begin);
                         //loop through difis to get to the SAVE
                         for (int i = 0; i < cxt.currentDifi; i++)
@@ -779,6 +780,15 @@ namespace _3DSExplorer
             saveFileDialog.Filter = "Key file (*.key)|*.key|All Files|*.*";
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 File.WriteAllBytes(saveFileDialog.FileName, cxt.Key);
+        }
+
+        private void btnSaveImage_Click(object sender, EventArgs e)
+        {
+                saveFileDialog.Filter = "Image Files (*.bin)|*.bin";
+                SFContext cxt = (SFContext)currentContext;
+                saveFileDialog.FileName = filePath.Substring(filePath.LastIndexOf('\\') + 1).Replace('.','_') + ".bin";
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    File.WriteAllBytes(saveFileDialog.FileName, cxt.image);
         }
 
     }
