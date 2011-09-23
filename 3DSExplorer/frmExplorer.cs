@@ -10,7 +10,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-
+using System.Reflection;
 
 namespace _3DSExplorer
 {
@@ -37,7 +37,63 @@ namespace _3DSExplorer
             handle.Free();
             return temp;
         }
+        public T ReadStructBE<T>(Stream fs)
+        {
+            byte[] buffer = new byte[Marshal.SizeOf(typeof(T))];
 
+            fs.Read(buffer, 0, Marshal.SizeOf(typeof(T)));
+            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            T temp = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
+            handle.Free();
+            System.Type t = temp.GetType();
+            FieldInfo[] fieldInfo = t.GetFields();
+            foreach (FieldInfo fi in fieldInfo)
+            {                 
+                if (fi.FieldType == typeof(System.Int16))
+                {
+                    Int16 i16 = (Int16)fi.GetValue(temp);
+                    byte[] b16 = BitConverter.GetBytes(i16);
+                    byte[] b16r = b16.Reverse().ToArray();
+                    fi.SetValueDirect(__makeref(temp), BitConverter.ToInt16(b16r, 0));
+                }
+                else if (fi.FieldType == typeof(System.Int32))
+                {
+                    Int32 i32 = (Int32)fi.GetValue(temp);
+                    byte[] b32 = BitConverter.GetBytes(i32);
+                    byte[] b32r = b32.Reverse().ToArray();
+                    fi.SetValueDirect(__makeref(temp), BitConverter.ToInt32(b32r, 0));
+                }
+                else if (fi.FieldType == typeof(System.Int64))
+                {
+                    Int64 i64 = (Int64)fi.GetValue(temp);
+                    byte[] b64 = BitConverter.GetBytes(i64);
+                    byte[] b64r = b64.Reverse().ToArray();
+                    fi.SetValueDirect(__makeref(temp), BitConverter.ToInt64(b64r, 0));
+                }
+                else if (fi.FieldType == typeof(System.UInt16))
+                {
+                    UInt16 i16 = (UInt16)fi.GetValue(temp);
+                    byte[] b16 = BitConverter.GetBytes(i16);
+                    byte[] b16r = b16.Reverse().ToArray();
+                    fi.SetValueDirect(__makeref(temp), BitConverter.ToUInt16(b16r, 0));
+                }
+                else if (fi.FieldType == typeof(System.UInt32))
+                {
+                    UInt32 i32 = (UInt32)fi.GetValue(temp);
+                    byte[] b32 = BitConverter.GetBytes(i32);
+                    byte[] b32r = b32.Reverse().ToArray();
+                    fi.SetValueDirect(__makeref(temp), BitConverter.ToUInt32(b32r, 0));
+                }
+                else if (fi.FieldType == typeof(System.UInt64))
+                {
+                    UInt64 i64 = (UInt64)fi.GetValue(temp);
+                    byte[] b64 = BitConverter.GetBytes(i64);
+                    byte[] b64r = b64.Reverse().ToArray();
+                    fi.SetValueDirect(__makeref(temp), BitConverter.ToUInt64(b64r, 0));
+                }
+            }
+            return temp;
+        }
         private void makeNewListItem(string text, string sub1,string sub2, string sub3)
         {
             ListViewItem lvi = new ListViewItem(text);
@@ -355,7 +411,7 @@ namespace _3DSExplorer
             //Check crc16
             byte[] twoBytes = new byte[2], crcBytes = new byte[2];
             ms.Read(crcBytes, 0, 2);
-            twoBytes = CRC16.GetCRC(fileBuffer,0,ms.Position);
+            twoBytes = CRC16.GetCRC(fileBuffer,0,ms.Position - 2);
             if (crcBytes[0] != twoBytes[0] || crcBytes[1] != twoBytes[1])
             {
                 MessageBox.Show("CRC Error");
@@ -472,6 +528,34 @@ namespace _3DSExplorer
 
         #region TMDContext
 
+        private void showTMDContentChunks()
+        {
+            TMDContext cxt = (TMDContext)currentContext;
+            lstInfo.Items.Clear();
+            TMDContentChunkRecord cr;
+            for (int i = 0; i < cxt.chunks.Count; i++)
+            {
+                cr = (TMDContentChunkRecord)cxt.chunks[i];
+                makeNewListItem(i.ToString(), "4", "Content ID", cr.ContentID.ToString());
+                makeNewListItem("", "2", "Content Index", cr.ContentIndex.ToString());
+                makeNewListItem("", "2", "Content Type", cr.ContentType.ToString() + " " + TMDTool.typeToString(cr.ContentType));
+                makeNewListItem("", "8", "Content Size", cr.ContentSize.ToString());
+                makeNewListItem("", "32", "Content Hash", byteArrayToString(cr.ContentHash));
+            }
+        }
+
+        private void showTMDContentRecords()
+        {
+            TMDContext cxt = (TMDContext)currentContext;
+            lstInfo.Items.Clear();
+            for (int i = 0; i < 64; i++)
+            {
+                makeNewListItem(i.ToString(), "2", "Content Command Count", cxt.ContentInfoRecords[i].ContentCommandCount.ToString());
+                makeNewListItem("", "2", "Content Index Offset", cxt.ContentInfoRecords[i].ContentIndexOffset.ToString());
+                makeNewListItem("", "32", "Next Content Hash", byteArrayToString(cxt.ContentInfoRecords[i].NextContentHash));
+            }
+        }
+
         private void showTMD()
         {
 
@@ -479,16 +563,12 @@ namespace _3DSExplorer
             if (cxt.SignatureType == TMDSignatureType.RSA_2048_SHA256 || cxt.SignatureType == TMDSignatureType.RSA_4096_SHA256)
             {
                 lstInfo.Items.Clear();
-                TMDHeader head;
-                if (cxt.SignatureType == TMDSignatureType.RSA_2048_SHA256)
-                    head = cxt.tmd2048.Header;
-                else
-                    head = cxt.tmd4096.Header;
+                TMDHeader head = cxt.tmd;
                 makeNewListItem("0x000", "4", "Signature Type", cxt.SignatureType.ToString());
                 if (cxt.SignatureType == TMDSignatureType.RSA_2048_SHA256)
-                    makeNewListItem("0x004", "0x100", "RSA-2048 signature of the TMD", byteArrayToString(cxt.tmd2048.Signature));
+                    makeNewListItem("0x004", "0x100", "RSA-2048 signature of the TMD", byteArrayToString(cxt.tmdSHA));
                 else
-                    makeNewListItem("0x004", "0x200", "RSA-4096 signature of the TMD", byteArrayToString(cxt.tmd4096.Signature));
+                    makeNewListItem("0x004", "0x200", "RSA-4096 signature of the TMD", byteArrayToString(cxt.tmdSHA));
                 
                 makeNewListItem("", "", "Reserved0", byteArrayToString(head.Reserved0));
                 makeNewListItem("", "", "Issuer", charArrayToString(head.Issuer));
@@ -530,11 +610,7 @@ namespace _3DSExplorer
             byte[] intBytes = new byte[4];
             fs.Read(intBytes, 0, 4);
             cxt.SignatureType = (TMDSignatureType)BitConverter.ToInt32(intBytes, 0);
-
-            //Build Tree
-            treeView.Nodes.Clear();
-            topNode = treeView.Nodes.Add("TMD");
-
+            bool supported = false;
             // Read the TMD
             switch (cxt.SignatureType)
             {
@@ -545,32 +621,39 @@ namespace _3DSExplorer
                     MessageBox.Show("This kind is unsupported!");
                     break;
                 case TMDSignatureType.RSA_2048_SHA256:
-                    cxt.tmd2048 = ReadStruct<TMD2048>(fs);
-                    cxt.ContentInfoRecords = new TMDContentInfoRecord[64];
-                    for (int i = 0; i < cxt.ContentInfoRecords.Length; i++)
-                        cxt.ContentInfoRecords[i] = ReadStruct<TMDContentInfoRecord>(fs);
-                    cxt.chunks = new ArrayList();
-                    for (int i = 0; i < cxt.tmd2048.Header.ContentCount; i++)
-                        cxt.chunks.Add(ReadStruct<TMDContentChunkRecord>(fs));
+                    supported = true;
+                    cxt.tmdSHA = new byte[256];
                     break;
                 case TMDSignatureType.RSA_4096_SHA256:
-                    cxt.tmd4096 = ReadStruct<TMD4096>(fs);
-                    cxt.ContentInfoRecords = new TMDContentInfoRecord[64];
-                    for (int i = 0; i < cxt.ContentInfoRecords.Length; i++)
-                        cxt.ContentInfoRecords[i] = ReadStruct<TMDContentInfoRecord>(fs);
-                    cxt.chunks = new ArrayList();
-                    for (int i = 0; i < cxt.tmd4096.Header.ContentCount; i++)
-                        cxt.chunks.Add(ReadStruct<TMDContentChunkRecord>(fs));
+                    supported = true;
+                    cxt.tmdSHA = new byte[512];
                     break;
             }
+            if (supported)
+            {
+                fs.Read(cxt.tmdSHA, 0, cxt.tmdSHA.Length); //read signature
+                cxt.tmd = ReadStructBE<TMDHeader>(fs); //read header
+                cxt.ContentInfoRecords = new TMDContentInfoRecord[64];
+                for (int i = 0; i < cxt.ContentInfoRecords.Length; i++)
+                    cxt.ContentInfoRecords[i] = ReadStructBE<TMDContentInfoRecord>(fs);
+                cxt.chunks = new ArrayList();
+                for (int i = 0; i < cxt.tmd.ContentCount; i++)
+                    cxt.chunks.Add(ReadStructBE<TMDContentChunkRecord>(fs));
+                
+                //Build Tree
+                treeView.Nodes.Clear();
+                topNode = treeView.Nodes.Add("TMD");
+                childNodes = new TreeNode[2];
+                childNodes[0] = topNode.Nodes.Add("Content Info Records");
+                childNodes[1] = topNode.Nodes.Add("Content Chunk Records");
 
-            treeView.ExpandAll();
+                treeView.ExpandAll();
 
+                currentContext = cxt;
+
+                treeView.SelectedNode = topNode;
+            }
             fs.Close();
-
-            currentContext = cxt;
-
-            treeView.SelectedNode = topNode;
         }
 
         #endregion
@@ -582,6 +665,7 @@ namespace _3DSExplorer
                 filePath = openFileDialog.FileName;
                 //Determin what kind of file it is
                 int type = -1;
+                bool encrypted = false;
                 FileStream fs = File.OpenRead(filePath);
                 byte[] magic = new byte[4];
                 fs.Seek(0x100,SeekOrigin.Current);
@@ -591,12 +675,22 @@ namespace _3DSExplorer
                 else
                 {
                     fs.Seek(0, SeekOrigin.Begin);
-                    fs.Read(magic, 0, 4);
-                    uint flag = BitConverter.ToUInt32(magic, 0);
-                    if (flag < 0xff) //suppose to be small for save binary files
-                        type = 1;
-                    else if ((flag >= 0x00000100) && (flag <= 0x04000100))
-                        type = 2;
+                    byte[] crcCheck = new byte[8+10*(fs.Length/0x1000-1)];
+                    fs.Read(crcCheck,0,crcCheck.Length);
+                    fs.Read(magic, 0, 2);
+                    byte[] calcCheck = CRC16.GetCRC(crcCheck);
+                    if (magic[0]==calcCheck[0] && magic[1]==calcCheck[1]) //crc is ok then save
+                    {
+                        type = 1; //SAVE
+                        //check if encrypted
+                        fs.Seek(0x1000,SeekOrigin.Begin); //Start of information
+                        while ((fs.Length - fs.Position > 0x200) & !SaveTool.isSaveMagic(magic))
+                        {
+                            fs.Read(magic, 0, 4);
+                            fs.Seek(0x200 - 4, SeekOrigin.Current);
+                        }
+                        encrypted = (fs.Length - fs.Position <= 0x200);
+                    }
                     else //can't decide (go with extension)
                     {
                         if (filePath.EndsWith("sav"))
@@ -609,14 +703,10 @@ namespace _3DSExplorer
                 }
                 fs.Close();
                 
-                bool encrypted = false;
                 switch (type)
                 {
                     case 0: OpenCCI(filePath); break;
-                    case 1: 
-                        encrypted = (MessageBox.Show("Is this save file encrypted?","Question",MessageBoxButtons.YesNo)==DialogResult.Yes);
-                        OpenSave(filePath, encrypted); 
-                        break;
+                    case 1: OpenSave(filePath, encrypted); break;
                     case 2: OpenTMD(filePath); break;
                     default: MessageBox.Show("This file is unsupported!"); break;
                 }
@@ -665,6 +755,14 @@ namespace _3DSExplorer
                 if (e.Node.Text.StartsWith("TMD"))
                 {
                     showTMD();
+                }
+                else if (e.Node.Text.StartsWith("Content I"))
+                {
+                    showTMDContentRecords();
+                }
+                else if (e.Node.Text.StartsWith("Content C"))
+                {
+                    showTMDContentChunks();
                 }
             }
         }
@@ -789,6 +887,20 @@ namespace _3DSExplorer
                 saveFileDialog.FileName = filePath.Substring(filePath.LastIndexOf('\\') + 1).Replace('.','_') + ".bin";
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     File.WriteAllBytes(saveFileDialog.FileName, cxt.image);
+        }
+
+        private void frmExplorer_Load(object sender, EventArgs e)
+        {
+            Text = "3DS Explorer v." + Application.ProductVersion + " by elisherer";
+        }
+
+        private void lstInfo_DoubleClick(object sender, EventArgs e)
+        {
+            if (lstInfo.SelectedIndices.Count > 0)
+            {
+                Clipboard.SetText(lstInfo.SelectedItems[0].SubItems[3].Text);
+                MessageBox.Show("Value copied to clipboard!");
+            }
         }
 
     }

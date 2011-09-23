@@ -40,9 +40,10 @@ namespace _3DSExplorer
 
     class TMDContext : Context
     {
+
         public TMDSignatureType SignatureType;
-        public TMD2048 tmd2048;
-        public TMD4096 tmd4096;
+        public TMDHeader tmd;
+        public byte[] tmdSHA;
         public TMDContentInfoRecord[] ContentInfoRecords;
         public ArrayList chunks; // of TMDContentChunkRecord
     }
