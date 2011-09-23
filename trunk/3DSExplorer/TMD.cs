@@ -12,22 +12,6 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct TMD2048
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-        public byte[] Signature;
-        public TMDHeader Header;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct TMD4096
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 512)]
-        public byte[] Signature;
-        public TMDHeader Header;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class TMDHeader
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 60)]
@@ -61,8 +45,6 @@ namespace _3DSExplorer
         //TMDContentChunkRecord[ContentCount]
     }
 
-
-
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class TMDContentInfoRecord
     {
@@ -78,7 +60,7 @@ namespace _3DSExplorer
         public int ContentID;
         public short ContentIndex;
         public short ContentType;
-        public Int64 ContentSize; 
+        public Int64 ContentSize;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public byte[] ContentHash; //SHA-256
     }
@@ -109,5 +91,24 @@ namespace _3DSExplorer
         public char[] Name;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x104)]
         public byte[] Key;
+    }
+
+    public class TMDTool
+    {
+        public static string typeToString(short type)
+        {
+            string ret = "";
+            if ((type & 1) != 0)
+                ret += "[encrypted]";
+            if ((type & 2) != 0)
+                ret += "[disc]";
+            if ((type & 4) != 0)
+                ret += "[cfm]";
+            if ((type & 0x4000) != 0)
+                ret += "[optional]";
+            if ((type & 0x8000) != 0)
+                ret += "[shared]";
+            return ret;
+        }
     }
 }

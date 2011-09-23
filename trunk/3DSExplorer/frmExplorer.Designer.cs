@@ -33,6 +33,7 @@
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.btnOpen = new System.Windows.Forms.ToolStripButton();
             this.btnSep0 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnSaveImage = new System.Windows.Forms.ToolStripButton();
             this.btnSaveKey = new System.Windows.Forms.ToolStripButton();
             this.btnXOR = new System.Windows.Forms.ToolStripButton();
             this.lblCopyright = new System.Windows.Forms.ToolStripLabel();
@@ -50,7 +51,6 @@
             this.lvFileSystem = new System.Windows.Forms.ListView();
             this.imlFS = new System.Windows.Forms.ImageList(this.components);
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.btnSaveImage = new System.Windows.Forms.ToolStripButton();
             this.toolStrip.SuspendLayout();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -91,6 +91,17 @@
             // 
             this.btnSep0.Name = "btnSep0";
             this.btnSep0.Size = new System.Drawing.Size(6, 39);
+            // 
+            // btnSaveImage
+            // 
+            this.btnSaveImage.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnSaveImage.Image = global::_3DSExplorer.Properties.Resources.ico_disk_32;
+            this.btnSaveImage.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSaveImage.Name = "btnSaveImage";
+            this.btnSaveImage.Size = new System.Drawing.Size(36, 36);
+            this.btnSaveImage.Text = "Save Image file";
+            this.btnSaveImage.Visible = false;
+            this.btnSaveImage.Click += new System.EventHandler(this.btnSaveImage_Click);
             // 
             // btnSaveKey
             // 
@@ -152,6 +163,7 @@
             this.lstInfo.TabIndex = 1;
             this.lstInfo.UseCompatibleStateImageBehavior = false;
             this.lstInfo.View = System.Windows.Forms.View.Details;
+            this.lstInfo.DoubleClick += new System.EventHandler(this.lstInfo_DoubleClick);
             // 
             // columnHeader1
             // 
@@ -244,17 +256,6 @@
             this.imlFS.TransparentColor = System.Drawing.Color.Transparent;
             this.imlFS.Images.SetKeyName(0, "page_white_text.png");
             // 
-            // btnSaveImage
-            // 
-            this.btnSaveImage.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnSaveImage.Image = global::_3DSExplorer.Properties.Resources.ico_disk_32;
-            this.btnSaveImage.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnSaveImage.Name = "btnSaveImage";
-            this.btnSaveImage.Size = new System.Drawing.Size(36, 36);
-            this.btnSaveImage.Text = "Save Image file";
-            this.btnSaveImage.Visible = false;
-            this.btnSaveImage.Click += new System.EventHandler(this.btnSaveImage_Click);
-            // 
             // frmExplorer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -264,7 +265,8 @@
             this.Controls.Add(this.toolStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmExplorer";
-            this.Text = "3DS Explorer (v0.51) by elisherer";
+            this.Text = "3DS Explorer";
+            this.Load += new System.EventHandler(this.frmExplorer_Load);
             this.toolStrip.ResumeLayout(false);
             this.toolStrip.PerformLayout();
             this.splitContainer.Panel1.ResumeLayout(false);

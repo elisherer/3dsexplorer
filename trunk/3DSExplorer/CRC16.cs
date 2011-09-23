@@ -18,7 +18,7 @@ namespace _3DSExplorer
             ushort CRCFull = InitalValue;
             char CRCLSB;
 
-            for (long i = offset; i < offset + length - 2; i++)
+            for (long i = offset; i < offset + length; i++)
             {
                 CRCFull = (ushort)(CRCFull ^ message[i]);
                 for (int j = 0; j < 8; j++)
