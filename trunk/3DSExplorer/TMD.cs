@@ -27,7 +27,8 @@ namespace _3DSExplorer
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
         public byte[] TitleID;
         public int TitleType;
-        public short GroupID;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        public char[] GroupID;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 62)]
         public byte[] Reserved2;
         public int AccessRights;
@@ -37,12 +38,6 @@ namespace _3DSExplorer
         public short Padding0;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public byte[] ContentInfoRecordsHash;
-
-        //These doesn't work!!
-
-        //[MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        //public TMDContentInfoRecord[] ContentInfoRecords;
-        //TMDContentChunkRecord[ContentCount]
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -66,31 +61,21 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class TMDCertificate2048
+    public class TMDCertificate
     {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-        public byte[] Signature;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 60)]
+        public byte[] Reserved0;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public byte[] Issuer;
+        public char[] Issuer;
         public int Tag;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public char[] Name; 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x104)]
         public byte[] Key;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class TMDCertificate4096
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 512)]
-        public byte[] Signature;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public byte[] Issuer;
-        public int Tag;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public char[] Name;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x104)]
-        public byte[] Key;
+        public short Unknown1;
+        public short Unknown2;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 52)]
+        public byte[] Padding;
     }
 
     public class TMDTool
