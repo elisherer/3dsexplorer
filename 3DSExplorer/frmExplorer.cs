@@ -558,47 +558,58 @@ namespace _3DSExplorer
 
         private void showTMD()
         {
-
             TMDContext cxt = (TMDContext)currentContext;
-            if (cxt.SignatureType == TMDSignatureType.RSA_2048_SHA256 || cxt.SignatureType == TMDSignatureType.RSA_4096_SHA256)
-            {
-                lstInfo.Items.Clear();
-                TMDHeader head = cxt.tmd;
-                makeNewListItem("0x000", "4", "Signature Type", cxt.SignatureType.ToString());
-                if (cxt.SignatureType == TMDSignatureType.RSA_2048_SHA256)
-                    makeNewListItem("0x004", "0x100", "RSA-2048 signature of the TMD", byteArrayToString(cxt.tmdSHA));
-                else
-                    makeNewListItem("0x004", "0x200", "RSA-4096 signature of the TMD", byteArrayToString(cxt.tmdSHA));
-                
-                makeNewListItem("", "", "Reserved0", byteArrayToString(head.Reserved0));
-                makeNewListItem("", "", "Issuer", charArrayToString(head.Issuer));
-                makeNewListItem("", "", "Version", head.Version.ToString());
-                makeNewListItem("", "", "Car Crl Version", head.CarCrlVersion.ToString());
-                makeNewListItem("", "", "Signer Version", head.SignerVersion.ToString());
-                makeNewListItem("", "", "Reserved1", head.Reserved1.ToString());
-                makeNewListItem("", "", "System Version", byteArrayToString(head.SystemVersion));
-                makeNewListItem("", "", "Title ID", byteArrayToString(head.TitleID));
-                makeNewListItem("", "", "Title Type", head.TitleType.ToString());
-                makeNewListItem("", "", "Group ID", head.GroupID.ToString());
-                makeNewListItem("", "", "Reserved2", byteArrayToString(head.Reserved2));
-                makeNewListItem("", "", "Access Rights", head.AccessRights.ToString());
-                makeNewListItem("", "", "Title Version", head.TitleVersion.ToString());
-                makeNewListItem("", "", "Content Count", head.ContentCount.ToString());
-                makeNewListItem("", "", "Boot Content", head.BootContent.ToString());
-                makeNewListItem("", "", "Padding", head.Padding0.ToString());
-                makeNewListItem("", "", "Content Info Records Hash", byteArrayToString(head.ContentInfoRecordsHash));
-                /*
-                for (int i = 0; i < 64; i++)
-                {
-                    makeNewListItem(i.ToString(), "", "Content Info Records Hash", byteArrayToString(head.ContentInfoRecordsHash));
-                }
-                //[MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-                //public TMDContentInfoRecord[] ContentInfoRecords;
-                //TMDContentChunkRecord[ContentCount]
-                */
-                lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-                lvFileSystem.Clear();
-            }
+            lstInfo.Items.Clear();
+            TMDHeader head = cxt.head;
+            makeNewListItem("0x000", "4", "Signature Type", cxt.SignatureType.ToString());
+            if (cxt.SignatureType == TMDSignatureType.RSA_2048_SHA256 || cxt.SignatureType == TMDSignatureType.RSA_2048_SHA1)
+                makeNewListItem("0x004", "0x100", "RSA-2048 signature of the TMD", byteArrayToString(cxt.tmdSHA));
+            else
+                makeNewListItem("0x004", "0x200", "RSA-4096 signature of the TMD", byteArrayToString(cxt.tmdSHA));
+            makeNewListItem("", "60", "Reserved0", byteArrayToString(head.Reserved0));
+            makeNewListItem("", "64", "Issuer", charArrayToString(head.Issuer));
+            makeNewListItem("", "4", "Version", head.Version.ToString());
+            makeNewListItem("", "", "Car Crl Version", head.CarCrlVersion.ToString());
+            makeNewListItem("", "", "Signer Version", head.SignerVersion.ToString());
+            makeNewListItem("", "", "Reserved1", head.Reserved1.ToString());
+            makeNewListItem("", "", "System Version", byteArrayToString(head.SystemVersion));
+            makeNewListItem("", "", "Title ID", byteArrayToString(head.TitleID));
+            makeNewListItem("", "", "Title Type", head.TitleType.ToString());
+            makeNewListItem("", "", "Group ID", charArrayToString(head.GroupID));
+            makeNewListItem("", "", "Reserved2", byteArrayToString(head.Reserved2));
+            makeNewListItem("", "", "Access Rights", head.AccessRights.ToString());
+            makeNewListItem("", "", "Title Version", head.TitleVersion.ToString());
+            makeNewListItem("", "", "Content Count", head.ContentCount.ToString());
+            makeNewListItem("", "", "Boot Content", head.BootContent.ToString());
+            makeNewListItem("", "", "Padding", head.Padding0.ToString());
+            makeNewListItem("", "", "Content Info Records Hash", byteArrayToString(head.ContentInfoRecordsHash));
+
+            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileSystem.Clear();
+        }
+
+        private void showTMDCertificate(int i)
+        {
+            TMDContext cxt = (TMDContext)currentContext;
+            lstInfo.Items.Clear();
+            TMDCertContext ccxt = (TMDCertContext)cxt.certs[i];
+            TMDCertificate cert = ccxt.cert;
+            makeNewListItem("0x000", "4", "Signature Type", ccxt.SignatureType.ToString());
+            if (ccxt.SignatureType == TMDSignatureType.RSA_2048_SHA256 || ccxt.SignatureType == TMDSignatureType.RSA_2048_SHA1)
+                makeNewListItem("0x004", "0x100", "RSA-2048 signature of the TMD", byteArrayToString(ccxt.tmdSHA));
+            else
+                makeNewListItem("0x004", "0x200", "RSA-4096 signature of the TMD", byteArrayToString(ccxt.tmdSHA));
+            makeNewListItem("", "60", "Reserved0", byteArrayToString(cert.Reserved0));
+            makeNewListItem("", "64", "Issuer", charArrayToString(cert.Issuer));
+            makeNewListItem("", "4", "Tag", cert.Tag.ToString());
+            makeNewListItem("", "64", "Name", charArrayToString(cert.Name));
+            makeNewListItem("", "0x104", "Key", byteArrayToString(cert.Key));
+            makeNewListItem("", "2", "Unknown0", cert.Unknown1.ToString());
+            makeNewListItem("", "2", "Unknown1", cert.Unknown2.ToString());
+            makeNewListItem("", "52", "Padding", byteArrayToString(cert.Padding));
+
+            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileSystem.Clear();
         }
 
         private void OpenTMD(string path)
@@ -606,47 +617,58 @@ namespace _3DSExplorer
             TMDContext cxt = new TMDContext();
 
             FileStream fs = File.OpenRead(path);
-
+            bool supported = true;
+            
             byte[] intBytes = new byte[4];
             fs.Read(intBytes, 0, 4);
             cxt.SignatureType = (TMDSignatureType)BitConverter.ToInt32(intBytes, 0);
-            bool supported = false;
-            // Read the TMD
-            switch (cxt.SignatureType)
+            // Read the TMD RSA Type 
+            if (cxt.SignatureType == TMDSignatureType.RSA_2048_SHA256)
+                cxt.tmdSHA = new byte[256];
+            else if (cxt.SignatureType == TMDSignatureType.RSA_4096_SHA256)
+                cxt.tmdSHA = new byte[512];
+            else
             {
-                case TMDSignatureType.RSA_2048_SHA1:
-                    MessageBox.Show("This kind is unsupported!");
-                    break;
-                case TMDSignatureType.RSA_4096_SHA1:
-                    MessageBox.Show("This kind is unsupported!");
-                    break;
-                case TMDSignatureType.RSA_2048_SHA256:
-                    supported = true;
-                    cxt.tmdSHA = new byte[256];
-                    break;
-                case TMDSignatureType.RSA_4096_SHA256:
-                    supported = true;
-                    cxt.tmdSHA = new byte[512];
-                    break;
+                MessageBox.Show("This kind of TMD is unsupported.");
+                supported = false;
             }
             if (supported)
             {
-                fs.Read(cxt.tmdSHA, 0, cxt.tmdSHA.Length); //read signature
-                cxt.tmd = ReadStructBE<TMDHeader>(fs); //read header
+                fs.Read(cxt.tmdSHA, 0, cxt.tmdSHA.Length);
+                //Continue reading header
+                cxt.head = ReadStructBE<TMDHeader>(fs); //read header
                 cxt.ContentInfoRecords = new TMDContentInfoRecord[64];
                 for (int i = 0; i < cxt.ContentInfoRecords.Length; i++)
                     cxt.ContentInfoRecords[i] = ReadStructBE<TMDContentInfoRecord>(fs);
                 cxt.chunks = new ArrayList();
-                for (int i = 0; i < cxt.tmd.ContentCount; i++)
+                for (int i = 0; i < cxt.head.ContentCount; i++)
                     cxt.chunks.Add(ReadStructBE<TMDContentChunkRecord>(fs));
-                
+                //start reading certificates
+                cxt.certs = new ArrayList();
+                while (fs.Position != fs.Length)
+                {
+                    TMDCertContext tcert = new TMDCertContext();
+                    fs.Read(intBytes, 0, 4);
+                    tcert.SignatureType = (TMDSignatureType)BitConverter.ToInt32(intBytes, 0);
+                    // RSA Type
+                    if (tcert.SignatureType == TMDSignatureType.RSA_2048_SHA256 || tcert.SignatureType == TMDSignatureType.RSA_2048_SHA1)
+                        tcert.tmdSHA = new byte[256];
+                    else if (tcert.SignatureType == TMDSignatureType.RSA_4096_SHA256 || tcert.SignatureType == TMDSignatureType.RSA_4096_SHA1)
+                        tcert.tmdSHA = new byte[512];
+                    fs.Read(tcert.tmdSHA, 0, tcert.tmdSHA.Length);
+                    tcert.cert = ReadStructBE<TMDCertificate>(fs);
+                    cxt.certs.Add(tcert);
+                }
                 //Build Tree
                 treeView.Nodes.Clear();
                 topNode = treeView.Nodes.Add("TMD");
-                childNodes = new TreeNode[2];
-                childNodes[0] = topNode.Nodes.Add("Content Info Records");
-                childNodes[1] = topNode.Nodes.Add("Content Chunk Records");
-
+                topNode.Nodes.Add("Content Info Records");
+                topNode.Nodes.Add("Content Chunk Records");
+                for (int i = 0; i < cxt.certs.Count; i++)
+                {
+                    TMDCertContext tmd = (TMDCertContext)cxt.certs[i];
+                    topNode.Nodes.Add("TMD Certificate " + i);
+                }
                 treeView.ExpandAll();
 
                 currentContext = cxt;
@@ -663,44 +685,59 @@ namespace _3DSExplorer
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 filePath = openFileDialog.FileName;
+                FileStream fs = File.OpenRead(filePath);
+                bool encrypted = false;
+                byte[] magic = new byte[4];
+
                 //Determin what kind of file it is
                 int type = -1;
-                bool encrypted = false;
-                FileStream fs = File.OpenRead(filePath);
-                byte[] magic = new byte[4];
-                fs.Seek(0x100,SeekOrigin.Current);
-                fs.Read(magic, 0, 4);
-                if (magic[0] == 'N' && magic[1] == 'C' & magic[2] == 'S' & magic[3] == 'D')
-                    type = 0; //CCI
-                else
-                {
+
+                if (filePath.EndsWith("3ds") || filePath.EndsWith("cci"))
+                    type = 0;
+                else if (filePath.EndsWith("sav") || filePath.EndsWith("bin"))
+                    type = 1;
+                else if (filePath.EndsWith("tmd") || filePath.EndsWith("tmd"))
+                    type = 2;
+                else //Autodetect by content
+                {               
+                    //TMD Check
                     fs.Seek(0, SeekOrigin.Begin);
-                    byte[] crcCheck = new byte[8+10*(fs.Length/0x1000-1)];
-                    fs.Read(crcCheck,0,crcCheck.Length);
-                    fs.Read(magic, 0, 2);
-                    byte[] calcCheck = CRC16.GetCRC(crcCheck);
-                    if (magic[0]==calcCheck[0] && magic[1]==calcCheck[1]) //crc is ok then save
+                    fs.Read(magic, 0, 4);
+                    if (magic[0] < 5 & magic[1] == 0 & magic[2] == 1 & magic[3] == 0)
+                        type = 1;
+                    else if (fs.Length >= 0x104) // > 256+4
                     {
-                        type = 1; //SAVE
-                        //check if encrypted
-                        fs.Seek(0x1000,SeekOrigin.Begin); //Start of information
-                        while ((fs.Length - fs.Position > 0x200) & !SaveTool.isSaveMagic(magic))
-                        {
-                            fs.Read(magic, 0, 4);
-                            fs.Seek(0x200 - 4, SeekOrigin.Current);
-                        }
-                        encrypted = (fs.Length - fs.Position <= 0x200);
-                    }
-                    else //can't decide (go with extension)
-                    {
-                        if (filePath.EndsWith("sav"))
-                            type = 1;
-                        else if (filePath.EndsWith("3ds"))
+                        //CCI CHECK
+                        fs.Seek(0x100, SeekOrigin.Current);
+                        fs.Read(magic, 0, 4);
+                        if (magic[0] == 'N' && magic[1] == 'C' & magic[2] == 'S' & magic[3] == 'D')
                             type = 0;
-                        else
-                            type = 2;
+                        else if (fs.Length >= 0x10000) // > 64kb
+                        {
+                            //SAVE Check
+                            fs.Seek(0, SeekOrigin.Begin);
+                            byte[] crcCheck = new byte[8 + 10 * (fs.Length / 0x1000 - 1)];
+                            fs.Read(crcCheck, 0, crcCheck.Length);
+                            fs.Read(magic, 0, 2);
+                            byte[] calcCheck = CRC16.GetCRC(crcCheck);
+                            if (magic[0] == calcCheck[0] && magic[1] == calcCheck[1]) //crc is ok then save
+                                type = 1; //SAVE
+                        }
                     }
                 }
+                if (type == 1)
+                {
+                    //check if encrypted
+                    fs.Seek(0x1000, SeekOrigin.Begin); //Start of information
+                    while ((fs.Length - fs.Position > 0x200) & !SaveTool.isSaveMagic(magic))
+                    {
+                        fs.Read(magic, 0, 4);
+                        fs.Seek(0x200 - 4, SeekOrigin.Current);
+                    }
+                    encrypted = (fs.Length - fs.Position <= 0x200);
+
+                }
+
                 fs.Close();
                 
                 switch (type)
@@ -751,8 +788,13 @@ namespace _3DSExplorer
             }
             else if (currentContext is TMDContext)
             {
-                TMDContext tmd = (TMDContext)currentContext;
-                if (e.Node.Text.StartsWith("TMD"))
+                TMDContext cxt = (TMDContext)currentContext;
+                if (e.Node.Text.StartsWith("TMD C"))
+                {
+                    int i = e.Node.Text[16] - '0';
+                    showTMDCertificate(i);
+                }
+                else if (e.Node.Text.StartsWith("TMD"))
                 {
                     showTMD();
                 }

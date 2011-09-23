@@ -38,13 +38,22 @@ namespace _3DSExplorer
         public ArrayList savesFiles; // of SFFileSystemEntry
     }
 
+    class TMDCertContext
+    {
+        
+        public TMDCertificate cert;
+        public TMDSignatureType SignatureType;
+        public byte[] tmdSHA;
+    }
+
     class TMDContext : Context
     {
-
+        public TMDHeader head;
         public TMDSignatureType SignatureType;
-        public TMDHeader tmd;
-        public byte[] tmdSHA;
         public TMDContentInfoRecord[] ContentInfoRecords;
         public ArrayList chunks; // of TMDContentChunkRecord
+        public byte[] tmdSHA;
+
+        public ArrayList certs; //of TMDCertContext
     }
 }
