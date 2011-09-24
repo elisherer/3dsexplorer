@@ -25,8 +25,6 @@ namespace _3DSExplorer
 
         public byte[] Key;
 
-        public int DisaOffset;
-
         public int BlockmapLength;
         public int JournalSize;
         public SFHeader fileHeader;

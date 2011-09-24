@@ -109,9 +109,9 @@ namespace _3DSExplorer
         {
             int i;
             string arraystring = "";
-            for (i = 0; i < array.Length && i < 30; i++)
+            for (i = 0; i < array.Length && i < 33; i++)
                 arraystring += String.Format("{0:X2}", array[i]) + (i < array.Length - 1 ? " " : "");
-            if (i == 30) return arraystring + "..."; //ellipsis
+            if (i == 33) return arraystring + "..."; //ellipsis
             return arraystring;
         }
 
@@ -127,7 +127,7 @@ namespace _3DSExplorer
             return arraystring + "";
         }
 
-        private string toHexString(int digits, UInt64 number)
+        private string toHexString(int digits, ulong number)
         {
             return "0x" + String.Format("{0:X" + digits + "}", number);
         }
@@ -313,7 +313,7 @@ namespace _3DSExplorer
             makeNewListItem("0x004", "4", "Unknown 2", cxt.fileHeader.Unknown2.ToString());
             makeNewListItem("", "", "Blockmap length", cxt.BlockmapLength.ToString());
             makeNewListItem("", "", "Journal size", cxt.JournalSize.ToString());
-            makeNewListItem("DISA", "", "", "found @ 0x" + String.Format("{0:X4}", cxt.DisaOffset));
+            makeNewListItem("DISA", "", "", "");
             makeNewListItem("0x000", "4", "DISA Magic", charArrayToString(cxt.imageHeader.DISA.Magic));
             makeNewListItem("0x004", "12", "Unknown", byteArrayToString(cxt.imageHeader.DISA.Unknown0));
             makeNewListItem("0x010", "8", "First Difi offset", cxt.imageHeader.DISA.FirstDifiOffset.ToString());
@@ -358,13 +358,26 @@ namespace _3DSExplorer
             makeNewListItem("0x000", "4", "FileSystem Block Offset (block=0x200 bytes)", save.FSTBlockOffset.ToString());
             makeNewListItem("0x000", "0x08", "Unknown", byteArrayToString(save.Unknown2));
             makeNewListItem("0x000", "4", "FileSystem Exact Offset", save.FSTExactOffset.ToString());
+            
             lvFileSystem.Clear();
             if (SaveTool.isSaveMagic(save.MagicSAVE))
             {
+                makeNewListItem("[FILES]", "", "", "");
+
                 lvFileSystem.Clear();
                 ListViewItem lvItem;
+                int i = 0;
                 foreach (SFFileSystemEntry fse in (SFFileSystemEntry[])cxt.savesFiles[cxt.currentDifi])
                 {
+                    makeNewListItem(i++.ToString(), fse.FileSize.ToString(), charArrayToString(fse.Filename), "");
+                    makeNewListItem("", "4", "NodeCount", fse.NodeCount.ToString());
+                    makeNewListItem("", "4", "FileIndex", fse.Index.ToString());
+                    makeNewListItem("", "4", "Magic? (Unknown1)", fse.Magic.ToString());
+                    makeNewListItem("", "4", "FileBlockOffset", fse.BlockOffset.ToString() + "(=" + toHexString(4, (ulong)fse.BlockOffset) + ")");
+                    makeNewListItem("", "4", "Unknown2", fse.Unknown2.ToString());
+                    makeNewListItem("", "4", "Unknown3", fse.Unknown3.ToString() + "(=" +toHexString(4,(ulong)fse.Unknown3) +")");
+                    makeNewListItem("", "4", "Unknown4", fse.Unknown4.ToString());
+                    
                     lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename) + "\n" + fse.FileSize + "b");
                     lvItem.ImageIndex = 0;
                     lvItem.Tag = fse;
@@ -421,14 +434,14 @@ namespace _3DSExplorer
             else
             {
                 //get journal updates
-                int lastMagic = cxt.JournalMagic;
+                byte[] lastChk = new byte[8];
                 cxt.JournalSize = 0;
                 SFLongSectorEntry lsEntry = new SFLongSectorEntry();
-                while (lastMagic == cxt.JournalMagic)
+                while (!SaveTool.isFF(lastChk) && ms.Position < 0x1000) //assure stopping
                 {
                     lsEntry = ReadStruct<SFLongSectorEntry>(ms);
-                    lastMagic = lsEntry.Magic;
-                    if (lastMagic == cxt.JournalMagic)
+                    lastChk = lsEntry.Dupe.CheckSums;
+                    if (!SaveTool.isFF(lastChk))
                     {
                         mapping[lsEntry.Sector.VirtualSector] = (int)(lsEntry.Sector.PhysicalSector);
                         cxt.JournalSize++;
@@ -447,13 +460,7 @@ namespace _3DSExplorer
                 MemoryStream ims = new MemoryStream(cxt.image);
 
                 cxt.imageHeader = ReadStruct<SFImageHeader>(ims);
-                cxt.DisaOffset = 0;
-                while (!SaveTool.isDisaMagic(cxt.imageHeader.DISA.Magic)) //DISA not found, find it
-                {
-                    ims.Seek(0x1000 - Marshal.SizeOf(cxt.imageHeader), SeekOrigin.Current);
-                    cxt.imageHeader = ReadStruct<SFImageHeader>(ims);
-                    cxt.DisaOffset += 0x1000;
-                }
+
                 char[] lastDifiMagic = new char[] { 'D', 'I', 'F', 'I' };
                 SFDIFIBlob difiBlob;
                 cxt.difis = new ArrayList();
@@ -471,7 +478,7 @@ namespace _3DSExplorer
                 //Collect save partitions
                 cxt.saves = new ArrayList();
                 cxt.savesFiles = new ArrayList();
-                ims.Seek(cxt.DisaOffset + 0x2000, SeekOrigin.Begin);
+                ims.Seek(0x2000, SeekOrigin.Begin);
                 long lastPos = ims.Position, savePos;
                 for (int i = 0; i < cxt.difis.Count; i++)
                 {
@@ -506,11 +513,11 @@ namespace _3DSExplorer
                         cxt.savesFiles.Add(new SFFileSystemEntry[0]); //No legal SAVE filesystem
                     //go to next partition
                     ims.Seek(savePos + (long)((SFDIFIBlob)cxt.difis[i]).FileSystemLength, SeekOrigin.Begin);
-                    /*
+                    
                     if (ims.Position % 0x1000 != 0) //go to the nearest block (0x1000)
                     {
                         ims.Seek(0x1000 - (ims.Position % 0x1000), SeekOrigin.Current);
-                    }*/
+                    }
                 }
 
                 ims.Close();
@@ -823,6 +830,7 @@ namespace _3DSExplorer
             }
             catch (Exception ex)
             {
+                MessageBox.Show("Can't parse key string!\n" + ex.Message);
                 return null;
             }
             return retArray;
@@ -851,13 +859,10 @@ namespace _3DSExplorer
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         MemoryStream fs = new MemoryStream(cxt.image);
-                        fs.Seek(0x2000 + cxt.DisaOffset, SeekOrigin.Begin);
-                        //loop through difis to get to the SAVE
+                        fs.Seek(0x2000, SeekOrigin.Begin);
+                        //loop through difis to get to the current file system
                         for (int i = 0; i < cxt.currentDifi; i++)
-                        {
-                            fs.Seek((long)(((SFDIFIBlob)cxt.difis[i]).HashTableLength + ((SFDIFIBlob)cxt.difis[i]).FileSystemLength),SeekOrigin.Current);
-                        }
-                        fs.Seek((long)(((SFDIFIBlob)cxt.difis[cxt.currentDifi]).HashTableLength), SeekOrigin.Current);
+                            fs.Seek((long)((SFDIFIBlob)cxt.difis[i]).FileSystemLength,SeekOrigin.Current);
                         //then go FSTBlockOffset + entry.offset * 0x200
                         fs.Seek((long)(((SFSave)cxt.saves[cxt.currentDifi]).FSTBlockOffset + entry.BlockOffset * 0x200), SeekOrigin.Current);
                         //read entry.filesize
