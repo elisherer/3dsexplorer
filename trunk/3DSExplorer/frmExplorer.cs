@@ -353,7 +353,7 @@ namespace _3DSExplorer
             makeNewListItem("[SAVE]", "", "", "");
             makeNewListItem("0x000", "4", "SAVE Magic", charArrayToString(save.MagicSAVE));
             makeNewListItem("0x000", "0x54", "Unknown", byteArrayToString(save.Unknown0));
-            makeNewListItem("0x000", "4", "FileSystem Offset (in block)", save.FSTOffset.ToString());
+            makeNewListItem("0x000", "4", "FileSystem Offset (form SAVE)", save.FSTOffset.ToString());
             makeNewListItem("0x000", "0x10", "Unknown", byteArrayToString(save.Unknown1));
             makeNewListItem("0x000", "4", "FileSystem Block Offset (block=0x200 bytes)", save.FSTBlockOffset.ToString());
             makeNewListItem("0x000", "0x08", "Unknown", byteArrayToString(save.Unknown2));
@@ -859,12 +859,25 @@ namespace _3DSExplorer
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         MemoryStream fs = new MemoryStream(cxt.image);
-                        fs.Seek(0x2000, SeekOrigin.Begin);
-                        //loop through difis to get to the current file system
-                        for (int i = 0; i < cxt.currentDifi; i++)
-                            fs.Seek((long)((SFDIFIBlob)cxt.difis[i]).FileSystemLength,SeekOrigin.Current);
-                        //then go FSTBlockOffset + entry.offset * 0x200
-                        fs.Seek((long)(((SFSave)cxt.saves[cxt.currentDifi]).FSTBlockOffset + entry.BlockOffset * 0x200), SeekOrigin.Current);
+
+                        long offset = 0x2000; //Start of partitions
+                        
+                        //loop through difis to get to the SAVE	position
+                        for (int i = 0; i < cxt.currentDifi; i++)	
+                        {
+                            offset += (long)((SFDIFIBlob)cxt.difis[i]).HashTableLength + (long)((SFDIFIBlob)cxt.difis[i]).FileSystemLength;
+                        }		
+                        offset += (long)(((SFDIFIBlob)cxt.difis[cxt.currentDifi]).HashTableLength);
+                        
+                        //calcualte the file's entry point
+                        int fstBlockOffset = ((SFSave)cxt.saves[cxt.currentDifi]).FSTBlockOffset;
+                        int fstExactOffset = ((SFSave)cxt.saves[cxt.currentDifi]).FSTExactOffset;
+                        offset += (fstBlockOffset == 0 ? fstExactOffset : fstBlockOffset);
+
+                        offset += entry.BlockOffset * 0x200;
+
+                        fs.Seek(offset, SeekOrigin.Begin);
+
                         //read entry.filesize
                         byte[] fileBuffer = new byte[entry.FileSize];
                         fs.Read(fileBuffer, 0, fileBuffer.Length);
