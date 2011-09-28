@@ -338,44 +338,53 @@ namespace _3DSExplorer
             SFSave save = cxt.save;
 
             makeNewListItem("0x000", "4", "Magic DIFI", charArrayToString(difi.MagicDIFI));
-            makeNewListItem("0x004", "0x35", "Unknown", byteArrayToString(difi.Unknown0));
-            makeNewListItem("0x039", "4", "Index", difi.Index.ToString());
-            makeNewListItem("0x03D", "7", "Unknown", byteArrayToString(difi.Unknown1));
-            makeNewListItem("0x044", "4", "Magic IVFC", charArrayToString(difi.MagicIVFC));
-            makeNewListItem("0x048", "0x54", "Unknown", byteArrayToString(difi.Unknown2));
-            makeNewListItem("0x050", "8", "HashTableLength", difi.HashTableLength.ToString());
-            makeNewListItem("0x058", "8", "FileSystemLength", difi.FileSystemLength.ToString());
+            makeNewListItem("0x004", "4", "Unknown 0", difi.Unknown0.ToString());
 
-            makeNewListItem("0x060", "0x10", "Unknown", byteArrayToString(difi.Unknown3));
-            makeNewListItem("0x070", "4", "Magic DPFS", charArrayToString(difi.MagicDPFS));
-            makeNewListItem("0x074", "0x6C", "Unknown", byteArrayToString(difi.Unknown4));
+            makeNewListItem("0x008", "8", "IVFC Offset", difi.IVFCOffset.ToString());
+            makeNewListItem("0x010", "8", "IVFC Size", difi.IVFCSize.ToString());
+            makeNewListItem("0x018", "8", "DPFS Offset", difi.DPFSOffset.ToString());
+            makeNewListItem("0x020", "8", "DPFS Size", difi.DPFSSize.ToString());
+            makeNewListItem("0x028", "8", "Hash Offset", difi.HashOffset.ToString());
+            makeNewListItem("0x030", "8", "Hash Size", difi.HashSize.ToString());
+            makeNewListItem("0x038", "8", "Unknown 1", difi.Unknown1.ToString());
+            makeNewListItem("0x040", "4", "Padding?", difi.Padding0.ToString());
+            
+            makeNewListItem("0x044", "4", "Magic IVFC", charArrayToString(difi.MagicIVFC));
+            makeNewListItem("0x048", "0x54", "Unknown 2", byteArrayToString(difi.Unknown2));
+            makeNewListItem("0x09C", "8", "HashTableLength", difi.HashTableLength.ToString());
+            makeNewListItem("0x0A4", "8", "FileSystemLength", difi.FileSystemLength.ToString());
+
+            makeNewListItem("0x0AC", "0x10", "Unknown 3", byteArrayToString(difi.Unknown3));
+            makeNewListItem("0x0BC", "4", "Magic DPFS", charArrayToString(difi.MagicDPFS));
+            makeNewListItem("0x074", "0x4C", "DPFS Data", byteArrayToString(difi.DPFSData));
+            makeNewListItem("0x10C", "0x20", "Hash", byteArrayToString(difi.Hash));
             if (cxt.currentDifi == 0)
             {
                 makeNewListItem("[SAVE]", "", "", "");
                 makeNewListItem("0x000", "4", "SAVE Magic", charArrayToString(save.MagicSAVE));
-                makeNewListItem("0x004", "4", "Unknown", save.Unknown0.ToString());
-                makeNewListItem("0x008", "4", "Unknown", save.Unknown1.ToString());
-                makeNewListItem("0x00C", "4", "Unknown", save.Unknown2.ToString());
-                makeNewListItem("0x010", "4", "Size of data partition [medias]", save.Unknown3 + " (=" + save.Unknown3 * 0x200 + ")");
+                makeNewListItem("0x004", "4", "Unknown 0", save.Unknown0.ToString());
+                makeNewListItem("0x008", "4", "Unknown 1", save.Unknown1.ToString());
+                makeNewListItem("0x00C", "4", "Unknown 2", save.Unknown2.ToString());
+                makeNewListItem("0x010", "4", "Size of data partition [medias]", save.PartitionSize + " (=" + save.PartitionSize * 0x200 + ")");
 
-                makeNewListItem("0x014", "4", "U0", save.U0.ToString());
-                makeNewListItem("0x018", "4", "U1", save.U1.ToString());
-                makeNewListItem("0x01C", "4", "U2", save.U2.ToString());
-                makeNewListItem("0x020", "4", "U3", save.U3.ToString());
-                makeNewListItem("0x024", "4", "U4", save.U4.ToString());
-                makeNewListItem("0x028", "4", "U5", save.U5.ToString());
+                makeNewListItem("0x014", "4", "Unknown 3", save.Unknown3.ToString());
+                makeNewListItem("0x018", "4", "Unknown 4", save.Unknown4.ToString());
+                makeNewListItem("0x01C", "4", "Unknown 5", save.Unknown5.ToString());
+                makeNewListItem("0x020", "4", "Unknown 6", save.Unknown6.ToString());
+                makeNewListItem("0x024", "4", "Unknown 7", save.Unknown7.ToString());
+                makeNewListItem("0x028", "4", "Unknown 8", save.Unknown8.ToString());
 
-                makeNewListItem("0x02C", "0x2C", "Unknown", byteArrayToString(save.Unknown4));
+                makeNewListItem("0x02C", "0x2C", "Unknown 9", byteArrayToString(save.Unknown9));
                 makeNewListItem("0x058", "4", "Local File Base Offset (form SAVE)", save.LocalFileBaseOffset.ToString());
 
-                makeNewListItem("0x05C", "4", "Unknown", save.Unknown5.ToString());
-                makeNewListItem("0x060", "4", "Size of data partition [medias] (used?)", save.Unknown6 + " (=" + save.Unknown6 * 0x200 + ")");
-                makeNewListItem("0x064", "4", "Unknown", save.Unknown7.ToString());
-                makeNewListItem("0x068", "4", "Unknown Offset (form SAVE)", save.Unknown8.ToString());
+                makeNewListItem("0x05C", "4", "Unknown 10", save.Unknown10.ToString());
+                makeNewListItem("0x060", "4", "Size of data partition [medias] (used?)", save.Unknown11 + " (=" + save.Unknown11 * 0x200 + ")");
+                makeNewListItem("0x064", "4", "Unknown 12", save.Unknown12.ToString());
+                makeNewListItem("0x068", "4", "Unknown 13 Offset (form SAVE)", save.Unknown13.ToString());
 
                 makeNewListItem("0x06C", "4", "FileSystem Table Block Offset (block=0x200 bytes)", save.FSTBlockOffset.ToString());
-                makeNewListItem("0x070", "4", "Unknown", save.Unknown9.ToString());
-                makeNewListItem("0x074", "4", "Unknown", save.Unknown10.ToString());
+                makeNewListItem("0x070", "4", "Unknown 14", save.Unknown14.ToString());
+                makeNewListItem("0x074", "4", "Unknown 15", save.Unknown15.ToString());
                 makeNewListItem("0x078", "4", "FileSystem Table Exact Offset", save.FSTExactOffset.ToString());
 
                 lvFileSystem.Clear();
@@ -391,11 +400,11 @@ namespace _3DSExplorer
                         makeNewListItem(i++.ToString(), fse.FileSize.ToString(), charArrayToString(fse.Filename), "");
                         makeNewListItem("", "4", "NodeCount", fse.NodeCount.ToString());
                         makeNewListItem("", "4", "FileIndex", fse.Index.ToString());
-                        makeNewListItem("", "4", "Magic? (Unknown1)", fse.Magic.ToString() + "(=" + toHexString(4, (ulong)fse.Magic) + ")");
+                        makeNewListItem("", "4", "Magic? (Unknown 1)", fse.Magic.ToString() + "(=" + toHexString(4, (ulong)fse.Magic) + ")");
                         makeNewListItem("", "4", "FileBlockOffset", (fse.BlockOffset < 0 ? "Negative" : fse.BlockOffset.ToString()));
-                        makeNewListItem("", "4", "Unknown2", fse.Unknown2.ToString());
-                        makeNewListItem("", "4", "Unknown3", fse.Unknown3.ToString() + "(=" + toHexString(4, (ulong)fse.Unknown3) + ")");
-                        makeNewListItem("", "4", "Unknown4", fse.Unknown4.ToString());
+                        makeNewListItem("", "4", "Unknown 2", fse.Unknown2.ToString());
+                        makeNewListItem("", "4", "Unknown 3", fse.Unknown3.ToString() + "(=" + toHexString(4, (ulong)fse.Unknown3) + ")");
+                        makeNewListItem("", "4", "Unknown 4", fse.Unknown4.ToString());
 
                         lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename) + "\n" + fse.FileSize + "b");
                         lvItem.ImageIndex = 0;
