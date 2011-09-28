@@ -127,8 +127,8 @@
             // lblCopyright
             // 
             this.lblCopyright.Name = "lblCopyright";
-            this.lblCopyright.Size = new System.Drawing.Size(309, 36);
-            this.lblCopyright.Text = "All structures and algorithms based on information from";
+            this.lblCopyright.Size = new System.Drawing.Size(237, 36);
+            this.lblCopyright.Text = "Most of the structures based on info from";
             // 
             // lblBrew
             // 

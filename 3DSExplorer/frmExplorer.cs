@@ -242,7 +242,8 @@ namespace _3DSExplorer
 
             //Build Tree
             treeView.Nodes.Clear();
-            topNode = treeView.Nodes.Add("NCSD (" + path.Substring(path.LastIndexOf('\\') + 1) + ")");
+            topNode = treeView.Nodes.Add("NCSD");
+            LoadText(path);
             childNodes = new TreeNode[3]; // 3 Nodes (null nodes are missing NCCHs)
 
             // Read the NCCHs
@@ -316,13 +317,13 @@ namespace _3DSExplorer
             makeNewListItem("DISA", "", "", "");
             makeNewListItem("0x000", "4", "DISA Magic", charArrayToString(cxt.imageHeader.DISA.Magic));
             makeNewListItem("0x004", "12", "Unknown", byteArrayToString(cxt.imageHeader.DISA.Unknown0));
-            makeNewListItem("0x010", "8", "First Difi offset", cxt.imageHeader.DISA.FirstDifiOffset.ToString());
-            makeNewListItem("0x018", "8", "Second Difi offset", cxt.imageHeader.DISA.SecondDifiOffset.ToString());
-            makeNewListItem("0x020", "8", "First Difi size", cxt.imageHeader.DISA.FirstDifiSize.ToString());
+            makeNewListItem("0x010", "8", "First Difi Table offset", cxt.imageHeader.DISA.FirstDifiTableOffset.ToString());
+            makeNewListItem("0x018", "8", "Second Difi Table offset", cxt.imageHeader.DISA.SecondDifiTableOffset.ToString());
+            makeNewListItem("0x020", "8", "Table Size", cxt.imageHeader.DISA.TableSize.ToString());
             makeNewListItem("0x028", "8", "Padding?", cxt.imageHeader.DISA.Padding.ToString());
-            makeNewListItem("0x030", "8", "Second Difi size", cxt.imageHeader.DISA.SecondDifiSize.ToString());
+            makeNewListItem("0x030", "8", "Hashed size", cxt.imageHeader.DISA.HashSize.ToString());
             makeNewListItem("0x038", "0x30", "Unknown", byteArrayToString(cxt.imageHeader.DISA.Unknown1));
-            makeNewListItem("0x03C", "4", "Hash is for",cxt.imageHeader.DISA.FirstHashed == 1 ? "First Difi" : "Second Difi" );
+            makeNewListItem("0x03C", "4", "Active Partition", ((cxt.imageHeader.DISA.ActiveTable & 1) == 1 ? "Second" : "First") + (cxt.imageHeader.DISA.ActiveTable > 1 ? ", Filebase @ " + (cxt.imageHeader.DISA.ActiveTable & 0xFFFFFFFE) : ""));
             makeNewListItem("0x040", "0x20", "Hash", byteArrayToString(cxt.imageHeader.DISA.Hash));
             makeNewListItem("0x060", "0x74", "Unknown", byteArrayToString(cxt.imageHeader.DISA.Unknown2));
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
@@ -333,8 +334,8 @@ namespace _3DSExplorer
         {
             SFContext cxt = (SFContext)currentContext;
             lstInfo.Items.Clear();
-            SFDIFIBlob difi = (SFDIFIBlob)cxt.difis[cxt.currentDifi];
-            SFSave save = (SFSave)cxt.saves[cxt.currentDifi];
+            SFDIFIBlob difi = cxt.difis[cxt.currentDifi];
+            SFSave save = cxt.save;
 
             makeNewListItem("0x000", "4", "Magic DIFI", charArrayToString(difi.MagicDIFI));
             makeNewListItem("0x004", "0x35", "Unknown", byteArrayToString(difi.Unknown0));
@@ -348,39 +349,58 @@ namespace _3DSExplorer
             makeNewListItem("0x060", "0x10", "Unknown", byteArrayToString(difi.Unknown3));
             makeNewListItem("0x070", "4", "Magic DPFS", charArrayToString(difi.MagicDPFS));
             makeNewListItem("0x074", "0x6C", "Unknown", byteArrayToString(difi.Unknown4));
-            makeNewListItem("0x0E0", "4", "Garbage", byteArrayToString(difi.Garbage));
-            
-            makeNewListItem("[SAVE]", "", "", "");
-            makeNewListItem("0x000", "4", "SAVE Magic", charArrayToString(save.MagicSAVE));
-            makeNewListItem("0x000", "0x54", "Unknown", byteArrayToString(save.Unknown0));
-            makeNewListItem("0x000", "4", "FileSystem Offset (form SAVE)", save.FSTOffset.ToString());
-            makeNewListItem("0x000", "0x10", "Unknown", byteArrayToString(save.Unknown1));
-            makeNewListItem("0x000", "4", "FileSystem Block Offset (block=0x200 bytes)", save.FSTBlockOffset.ToString());
-            makeNewListItem("0x000", "0x08", "Unknown", byteArrayToString(save.Unknown2));
-            makeNewListItem("0x000", "4", "FileSystem Exact Offset", save.FSTExactOffset.ToString());
-            
-            lvFileSystem.Clear();
-            if (SaveTool.isSaveMagic(save.MagicSAVE))
+            if (cxt.currentDifi == 0)
             {
-                makeNewListItem("[FILES]", "", "", "");
+                makeNewListItem("[SAVE]", "", "", "");
+                makeNewListItem("0x000", "4", "SAVE Magic", charArrayToString(save.MagicSAVE));
+                makeNewListItem("0x004", "4", "Unknown", save.Unknown0.ToString());
+                makeNewListItem("0x008", "4", "Unknown", save.Unknown1.ToString());
+                makeNewListItem("0x00C", "4", "Unknown", save.Unknown2.ToString());
+                makeNewListItem("0x010", "4", "Size of data partition [medias]", save.Unknown3 + " (=" + save.Unknown3 * 0x200 + ")");
+
+                makeNewListItem("0x014", "4", "U0", save.U0.ToString());
+                makeNewListItem("0x018", "4", "U1", save.U1.ToString());
+                makeNewListItem("0x01C", "4", "U2", save.U2.ToString());
+                makeNewListItem("0x020", "4", "U3", save.U3.ToString());
+                makeNewListItem("0x024", "4", "U4", save.U4.ToString());
+                makeNewListItem("0x028", "4", "U5", save.U5.ToString());
+
+                makeNewListItem("0x02C", "0x2C", "Unknown", byteArrayToString(save.Unknown4));
+                makeNewListItem("0x058", "4", "Local File Base Offset (form SAVE)", save.LocalFileBaseOffset.ToString());
+
+                makeNewListItem("0x05C", "4", "Unknown", save.Unknown5.ToString());
+                makeNewListItem("0x060", "4", "Size of data partition [medias] (used?)", save.Unknown6 + " (=" + save.Unknown6 * 0x200 + ")");
+                makeNewListItem("0x064", "4", "Unknown", save.Unknown7.ToString());
+                makeNewListItem("0x068", "4", "Unknown Offset (form SAVE)", save.Unknown8.ToString());
+
+                makeNewListItem("0x06C", "4", "FileSystem Table Block Offset (block=0x200 bytes)", save.FSTBlockOffset.ToString());
+                makeNewListItem("0x070", "4", "Unknown", save.Unknown9.ToString());
+                makeNewListItem("0x074", "4", "Unknown", save.Unknown10.ToString());
+                makeNewListItem("0x078", "4", "FileSystem Table Exact Offset", save.FSTExactOffset.ToString());
 
                 lvFileSystem.Clear();
-                ListViewItem lvItem;
-                int i = 0;
-                foreach (SFFileSystemEntry fse in (SFFileSystemEntry[])cxt.savesFiles[cxt.currentDifi])
+                if (SaveTool.isSaveMagic(save.MagicSAVE))
                 {
-                    makeNewListItem(i++.ToString(), fse.FileSize.ToString(), charArrayToString(fse.Filename), "");
-                    makeNewListItem("", "4", "NodeCount", fse.NodeCount.ToString());
-                    makeNewListItem("", "4", "FileIndex", fse.Index.ToString());
-                    makeNewListItem("", "4", "Magic? (Unknown1)", fse.Magic.ToString());
-                    makeNewListItem("", "4", "FileBlockOffset", fse.BlockOffset.ToString() + "(=" + toHexString(4, (ulong)fse.BlockOffset) + ")");
-                    makeNewListItem("", "4", "Unknown2", fse.Unknown2.ToString());
-                    makeNewListItem("", "4", "Unknown3", fse.Unknown3.ToString() + "(=" +toHexString(4,(ulong)fse.Unknown3) +")");
-                    makeNewListItem("", "4", "Unknown4", fse.Unknown4.ToString());
-                    
-                    lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename) + "\n" + fse.FileSize + "b");
-                    lvItem.ImageIndex = 0;
-                    lvItem.Tag = fse;
+                    makeNewListItem("[FILES]", "", "", "");
+
+                    lvFileSystem.Clear();
+                    ListViewItem lvItem;
+                    int i = 0;
+                    foreach (SFFileSystemEntry fse in cxt.saveFiles)
+                    {
+                        makeNewListItem(i++.ToString(), fse.FileSize.ToString(), charArrayToString(fse.Filename), "");
+                        makeNewListItem("", "4", "NodeCount", fse.NodeCount.ToString());
+                        makeNewListItem("", "4", "FileIndex", fse.Index.ToString());
+                        makeNewListItem("", "4", "Magic? (Unknown1)", fse.Magic.ToString() + "(=" + toHexString(4, (ulong)fse.Magic) + ")");
+                        makeNewListItem("", "4", "FileBlockOffset", (fse.BlockOffset < 0 ? "Negative" : fse.BlockOffset.ToString()));
+                        makeNewListItem("", "4", "Unknown2", fse.Unknown2.ToString());
+                        makeNewListItem("", "4", "Unknown3", fse.Unknown3.ToString() + "(=" + toHexString(4, (ulong)fse.Unknown3) + ")");
+                        makeNewListItem("", "4", "Unknown4", fse.Unknown4.ToString());
+
+                        lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename) + "\n" + fse.FileSize + "b");
+                        lvItem.ImageIndex = 0;
+                        lvItem.Tag = fse;
+                    }
                 }
             }
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
@@ -394,10 +414,6 @@ namespace _3DSExplorer
             byte[] fileBuffer = File.ReadAllBytes(path);
             MemoryStream ms = new MemoryStream(fileBuffer);
 
-            //Build Tree
-            treeView.Nodes.Clear();
-            topNode = treeView.Nodes.Add("Save Flash");
-
             if (encrypted)
             {
                 byte[] key = SaveTool.FindKey(fileBuffer);
@@ -405,7 +421,7 @@ namespace _3DSExplorer
                     MessageBox.Show("Can't find key to decrypt the binary file");
                 else
                 {
-                    SaveTool.XorByteArray(fileBuffer, key, 0x1000);
+                    SaveTool.XorExperimental(fileBuffer, key, 0x1000);
                     cxt.Key = key;
                 }
             }
@@ -429,7 +445,7 @@ namespace _3DSExplorer
             {
                 MessageBox.Show("CRC Error");
                 lstInfo.Clear();
-                treeView.Nodes.Clear();
+                //treeView.Nodes.Clear();
             }
             else
             {
@@ -447,77 +463,109 @@ namespace _3DSExplorer
                         cxt.JournalSize++;
                     }
                 }
-                //File.WriteAllBytes("image_notarranged.bin", fileBuffer);
-                
+               
                 //rearragne by virtual
                 cxt.image = new byte[fileBuffer.Length - 0x1000];
                 for (int i = 0; i < mapping.Count; i++)
                     if ((int)mapping[i] != -1)
                         Buffer.BlockCopy(fileBuffer, ((int)mapping[i] & 0x7F) * 0x1000, cxt.image, i * 0x1000, 0x1000);
 
-                //File.WriteAllBytes("image_arranged.bin", cxt.image);
-
                 MemoryStream ims = new MemoryStream(cxt.image);
 
                 cxt.imageHeader = ReadStruct<SFImageHeader>(ims);
 
-                char[] lastDifiMagic = new char[] { 'D', 'I', 'F', 'I' };
-                SFDIFIBlob difiBlob;
-                cxt.difis = new ArrayList();
-                while (SaveTool.isDifiMagic(lastDifiMagic))
+                //Build Tree
+                treeView.Nodes.Clear();
+                topNode = treeView.Nodes.Add("Save Flash " + (encrypted ? "(Encrypted)" : ""));
+                LoadText(path);
+
+                //Which table to read
+                if ((cxt.imageHeader.DISA.ActiveTable & 1) == 1) //second table
+                    ims.Seek(cxt.imageHeader.DISA.SecondDifiTableOffset, SeekOrigin.Begin);
+                else
+                    ims.Seek(cxt.imageHeader.DISA.FirstDifiTableOffset, SeekOrigin.Begin);
+
+                cxt.difis = new SFDIFIBlob[(int)Math.Ceiling((double)cxt.imageHeader.DISA.TableSize / 0x130)];
+                for (int i=0; i<cxt.difis.Length; i++)
                 {
-                    difiBlob = ReadStruct<SFDIFIBlob>(ims);
-                    lastDifiMagic = difiBlob.MagicDIFI;
-                    if (SaveTool.isDifiMagic(lastDifiMagic))
-                    {
-                        topNode.Nodes.Add("Partition " + cxt.difis.Count);
-                        cxt.difis.Add(difiBlob);
-                    }
+                    cxt.difis[i] = ReadStruct<SFDIFIBlob>(ims);
+                    ims.Seek(4, SeekOrigin.Current); // skip garbage
                 }
 
-                //Collect save partitions
-                cxt.saves = new ArrayList();
-                cxt.savesFiles = new ArrayList();
+                //Get SAVE Partition
                 ims.Seek(0x2000, SeekOrigin.Begin);
-                long lastPos = ims.Position, savePos;
-                for (int i = 0; i < cxt.difis.Count; i++)
+                long savePos;
+                
+                //jump to backup if needed (SAVE partition is written twice)
+                //if ((cxt.imageHeader.DISA.ActiveTable & 1) == 1)
                 {
-                    lastPos = ims.Position;
-                    ims.Seek((long)((SFDIFIBlob)cxt.difis[i]).HashTableLength, SeekOrigin.Current);
-                    savePos = ims.Position;
-                    SFSave save = ReadStruct<SFSave>(ims);
-                    cxt.saves.Add(save);
-                    if (SaveTool.isSaveMagic(((SFSave)cxt.saves[i]).MagicSAVE)) //read 
+                    ims.Seek(cxt.difis[0].FileSystemLength + cxt.difis[0].HashTableLength, SeekOrigin.Current);
+                    //go to the nearest block (0x1000)
+                    if (ims.Position % 0x1000 != 0)
+                        ims.Seek(0x1000 - (ims.Position % 0x1000), SeekOrigin.Current);
+                }
+            
+                topNode.Nodes.Add("SAVE Partition");
+                ims.Seek((long)((SFDIFIBlob)cxt.difis[0]).HashTableLength, SeekOrigin.Current);
+                savePos = ims.Position;
+                cxt.save = ReadStruct<SFSave>(ims);
+                //add SAVE information (if exists) (suppose to...)
+                if (SaveTool.isSaveMagic(cxt.save.MagicSAVE)) //read 
+                {
+                    //go to FST
+                    if ((cxt.save.FSTBlockOffset != 0) || (cxt.save.LocalFileBaseOffset != 0))
                     {
-                        //go to FST
-                        if ((save.FSTBlockOffset != 0) || (save.FSTOffset != 0))
-                            ims.Seek(savePos + save.FSTBlockOffset * 0x200 + save.FSTOffset, SeekOrigin.Begin);
-                        else //no block offset
-                            ims.Seek(savePos + save.FSTExactOffset, SeekOrigin.Begin);
-
-                        SFFileSystemEntry root = ReadStruct<SFFileSystemEntry>(ims);
-                        if ((root.NodeCount > 1) && (root.Magic == 0)) //if has files
-                        {
-                            SFFileSystemEntry[] files = new SFFileSystemEntry[root.NodeCount - 1];
-                            for (int j = 0; j < files.Length; j++)
-                                files[j] = ReadStruct<SFFileSystemEntry>(ims);
-                            cxt.savesFiles.Add(files);
-                        }
-                        else //empty
-                        {
-                            cxt.savesFiles.Add(new SFFileSystemEntry[0]);
-                        }
-
+                        ims.Seek(savePos + cxt.save.FSTBlockOffset * 0x200 + cxt.save.LocalFileBaseOffset, SeekOrigin.Begin);
+                        cxt.fileBase = savePos + cxt.save.LocalFileBaseOffset;
                     }
-                    else
-                        cxt.savesFiles.Add(new SFFileSystemEntry[0]); //No legal SAVE filesystem
+                    else //file base is remote
+                    {
+                        ims.Seek(savePos + cxt.save.FSTExactOffset, SeekOrigin.Begin);
+                        //TODO: add the part offset
+                        //cxt.fileBase = cxt.imageHeader.DISA.ActiveTable & 0xFFFFFFFE;
+                    }
+
+                    SFFileSystemEntry root = ReadStruct<SFFileSystemEntry>(ims);
+                    if ((root.NodeCount > 1) && (root.Magic == 0)) //if has files
+                    {
+                        cxt.saveFiles = new SFFileSystemEntry[root.NodeCount - 1];
+                        for (int j = 0; j < cxt.saveFiles.Length; j++)
+                            cxt.saveFiles[j] = ReadStruct<SFFileSystemEntry>(ims);
+                    }
+                    else //empty
+                        cxt.saveFiles = new SFFileSystemEntry[0];
+
+                }
+                else
+                    cxt.saveFiles = new SFFileSystemEntry[0]; //Not a legal SAVE filesystem
+                ims.Seek(savePos + (long)((SFDIFIBlob)cxt.difis[0]).FileSystemLength, SeekOrigin.Begin);
+                //go to the nearest block (0x1000)
+                if (ims.Position % 0x1000 != 0) 
+                    ims.Seek(0x1000 - (ims.Position % 0x1000), SeekOrigin.Current);
+                
+                /*/if we didn't use backup then we need to skip it...
+                if ((cxt.imageHeader.DISA.ActiveTable & 1) == 0)
+                {
+                    ims.Seek((long)(((SFDIFIBlob)cxt.difis[0]).FileSystemLength + ((SFDIFIBlob)cxt.difis[0]).HashTableLength), SeekOrigin.Current);
+                    //go to the nearest block (0x1000)
+                    if (ims.Position % 0x1000 != 0)
+                        ims.Seek(0x1000 - (ims.Position % 0x1000), SeekOrigin.Current);
+                }*/
+
+                for (int i = 1; i < cxt.difis.Length; i++) //half of the partitions because the other half is backup
+                {
+                    topNode.Nodes.Add("Partition " + i);
+                                        
+                    if (i == 1) //temporary solution
+                        cxt.fileBase = ims.Position + cxt.imageHeader.DISA.ActiveTable & 0xFFFFFFFE;
+                    /*
+                    ims.Seek((long)((SFDIFIBlob)cxt.difis[i]).HashTableLength, SeekOrigin.Current);
                     //go to next partition
-                    ims.Seek(savePos + (long)((SFDIFIBlob)cxt.difis[i]).FileSystemLength, SeekOrigin.Begin);
+                    ims.Seek((long)((SFDIFIBlob)cxt.difis[i]).FileSystemLength, SeekOrigin.Current);
                     
                     if (ims.Position % 0x1000 != 0) //go to the nearest block (0x1000)
-                    {
                         ims.Seek(0x1000 - (ims.Position % 0x1000), SeekOrigin.Current);
-                    }
+                    */
                 }
 
                 ims.Close();
@@ -669,6 +717,7 @@ namespace _3DSExplorer
                 //Build Tree
                 treeView.Nodes.Clear();
                 topNode = treeView.Nodes.Add("TMD");
+                LoadText(path);
                 topNode.Nodes.Add("Content Info Records");
                 topNode.Nodes.Add("Content Chunk Records");
                 for (int i = 0; i < cxt.certs.Count; i++)
@@ -784,6 +833,11 @@ namespace _3DSExplorer
                 {
                     showSave();
                 }
+                else if (e.Node.Text.StartsWith("SAVE"))
+                {
+                    cxt.currentDifi = 0;
+                    showDifi();
+                }
                 else if (e.Node.Text.StartsWith("Part"))
                 {
                     cxt.currentDifi = e.Node.Text[10] - '0';
@@ -859,25 +913,7 @@ namespace _3DSExplorer
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         MemoryStream fs = new MemoryStream(cxt.image);
-
-                        long offset = 0x2000; //Start of partitions
-                        
-                        //loop through difis to get to the SAVE	position
-                        for (int i = 0; i < cxt.currentDifi; i++)	
-                        {
-                            offset += (long)((SFDIFIBlob)cxt.difis[i]).HashTableLength + (long)((SFDIFIBlob)cxt.difis[i]).FileSystemLength;
-                        }		
-                        offset += (long)(((SFDIFIBlob)cxt.difis[cxt.currentDifi]).HashTableLength);
-                        
-                        //calcualte the file's entry point
-                        int fstBlockOffset = ((SFSave)cxt.saves[cxt.currentDifi]).FSTBlockOffset;
-                        int fstExactOffset = ((SFSave)cxt.saves[cxt.currentDifi]).FSTExactOffset;
-                        offset += (fstBlockOffset == 0 ? fstExactOffset : fstBlockOffset);
-
-                        offset += entry.BlockOffset * 0x200;
-
-                        fs.Seek(offset, SeekOrigin.Begin);
-
+                        fs.Seek(cxt.fileBase + entry.BlockOffset * 0x200, SeekOrigin.Begin);
                         //read entry.filesize
                         byte[] fileBuffer = new byte[entry.FileSize];
                         fs.Read(fileBuffer, 0, fileBuffer.Length);
@@ -947,6 +983,11 @@ namespace _3DSExplorer
                 saveFileDialog.FileName = filePath.Substring(filePath.LastIndexOf('\\') + 1).Replace('.','_') + ".bin";
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     File.WriteAllBytes(saveFileDialog.FileName, cxt.image);
+        }
+
+        private void LoadText(string path)
+        {
+            Text = "3DS Explorer v." + Application.ProductVersion + " by elisherer (" + path.Substring(path.LastIndexOf('\\') + 1) + ")";
         }
 
         private void frmExplorer_Load(object sender, EventArgs e)
