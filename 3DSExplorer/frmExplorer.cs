@@ -323,7 +323,7 @@ namespace _3DSExplorer
             makeNewListItem("0x028", "8", "Padding?", cxt.imageHeader.DISA.Padding.ToString());
             makeNewListItem("0x030", "8", "Hashed size", cxt.imageHeader.DISA.HashSize.ToString());
             makeNewListItem("0x038", "0x30", "Unknown", byteArrayToString(cxt.imageHeader.DISA.Unknown1));
-            makeNewListItem("0x03C", "4", "Active Partition", ((cxt.imageHeader.DISA.ActiveTable & 1) == 1 ? "Second" : "First") + (cxt.imageHeader.DISA.ActiveTable > 1 ? ", Filebase @ " + (cxt.imageHeader.DISA.ActiveTable & 0xFFFFFFFE) : ""));
+            makeNewListItem("0x03C", "4", "Active Partition", ((cxt.imageHeader.DISA.ActiveTable & 1) == 1 ? "First" : "Second") + (cxt.imageHeader.DISA.ActiveTable > 1 ? ", Filebase @ " + (cxt.imageHeader.DISA.ActiveTable & 0xFFFFFFFE) : ""));
             makeNewListItem("0x040", "0x20", "Hash", byteArrayToString(cxt.imageHeader.DISA.Hash));
             makeNewListItem("0x060", "0x74", "Unknown", byteArrayToString(cxt.imageHeader.DISA.Unknown2));
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
