@@ -31,9 +31,10 @@ namespace _3DSExplorer
         public byte[] image;
         public SFImageHeader imageHeader;
         public int currentDifi;
-        public ArrayList difis; // of SFDIFIBlob
-        public ArrayList saves; // of SFSave
-        public ArrayList savesFiles; // of SFFileSystemEntry
+        public SFDIFIBlob[] difis;
+        public SFSave save;
+        public SFFileSystemEntry[] saveFiles;
+        public long fileBase;
     }
 
     class TMDCertContext
