@@ -39,3 +39,4 @@ G:\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.Properties.Resources.resou
 G:\3DS\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.csproj.GenerateResource.Cache
 G:\3DS\3DSExplorer\3DSExplorer\bin\Debug\3DSExplorer.exe
 G:\3DS\3DSExplorer\3DSExplorer\bin\Debug\3DSExplorer.pdb
+D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmHashTool.resources
