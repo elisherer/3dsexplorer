@@ -60,6 +60,13 @@ namespace _3DSExplorer.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap application_form_magnify {
+            get {
+                object obj = ResourceManager.GetObject("application_form_magnify", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap ico_disk_32 {
             get {
                 object obj = ResourceManager.GetObject("ico_disk_32", resourceCulture);

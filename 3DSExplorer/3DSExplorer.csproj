@@ -68,6 +68,12 @@
       <DependentUpon>frmExplorer.cs</DependentUpon>
     </Compile>
     <Compile Include="GameTitleResolver.cs" />
+    <Compile Include="frmHashTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmHashTool.Designer.cs">
+      <DependentUpon>frmHashTool.cs</DependentUpon>
+    </Compile>
     <Compile Include="InputBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -84,6 +90,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmExplorer.resx">
       <DependentUpon>frmExplorer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmHashTool.resx">
+      <DependentUpon>frmHashTool.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InputBox.resx">
       <DependentUpon>InputBox.cs</DependentUpon>
@@ -113,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />
+    <None Include="Resources\application_form_magnify.png" />
     <None Include="Resources\key.png" />
     <None Include="Resources\ico_xor.png" />
     <None Include="Resources\ico_disk_32.png" />
