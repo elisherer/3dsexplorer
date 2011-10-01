@@ -33,19 +33,36 @@ namespace _3DSExplorer
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     FileStream fs = File.OpenRead(openFileDialog.FileName);
+                    fs.Seek(Int32.Parse(txtOffset.Text),SeekOrigin.Begin);
                     byte[] block = new byte[blockSize];
                     byte[] hash;
-                    SHA256 sha = SHA256.Create();
+                    HashAlgorithm ha = null;
+                    switch (comboBox1.SelectedIndex)
+                    {
+                        case 0:
+                            ha = SHA256.Create();
+                            break;
+                        case 1:
+                            ha = SHA1.Create();
+                            break;
+                        case 2:
+                            break;
+                    }
                     int readBytes = 0;
                     txtList.Text = "";
+                    int blocks = Int32.Parse(txtBlocks.Text);
                     do
                     {
                         txtList.Text += "Line " + fs.Position.ToString("X7") + ": ";
                         readBytes = fs.Read(block, 0, blockSize);
-                        hash = sha.ComputeHash(block);
+                        if (ha != null)
+                            hash = ha.ComputeHash(block);
+                        else
+                            hash = CRC16.GetCRC(block);
                         txtList.Text += byteArrayToString(hash) + Environment.NewLine;
+                        blocks--;
 
-                    } while (readBytes == blockSize);
+                    } while (readBytes == blockSize && blocks != 0);
                     
                     fs.Close();
                 }
@@ -54,6 +71,11 @@ namespace _3DSExplorer
             {
                 MessageBox.Show(ex.Message);
             }
+
+        }
+
+        private void txtOffset_TextChanged(object sender, EventArgs e)
+        {
 
         }
     }
