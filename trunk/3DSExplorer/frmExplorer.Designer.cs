@@ -31,7 +31,12 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
             this.toolStrip = new System.Windows.Forms.ToolStrip();
+            this.btnOpen = new System.Windows.Forms.ToolStripButton();
             this.btnSep0 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnSaveImage = new System.Windows.Forms.ToolStripButton();
+            this.btnSaveKey = new System.Windows.Forms.ToolStripButton();
+            this.btnXOR = new System.Windows.Forms.ToolStripButton();
+            this.btnHashTool = new System.Windows.Forms.ToolStripButton();
             this.lblCopyright = new System.Windows.Forms.ToolStripLabel();
             this.lblBrew = new System.Windows.Forms.ToolStripLabel();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -47,11 +52,6 @@
             this.lvFileSystem = new System.Windows.Forms.ListView();
             this.imlFS = new System.Windows.Forms.ImageList(this.components);
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.btnOpen = new System.Windows.Forms.ToolStripButton();
-            this.btnSaveImage = new System.Windows.Forms.ToolStripButton();
-            this.btnSaveKey = new System.Windows.Forms.ToolStripButton();
-            this.btnXOR = new System.Windows.Forms.ToolStripButton();
-            this.btnHashTool = new System.Windows.Forms.ToolStripButton();
             this.toolStrip.SuspendLayout();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -79,10 +79,62 @@
             this.toolStrip.TabIndex = 0;
             this.toolStrip.Text = "toolStrip1";
             // 
+            // btnOpen
+            // 
+            this.btnOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnOpen.Image = global::_3DSExplorer.Properties.Resources.ico_folder_32;
+            this.btnOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnOpen.Name = "btnOpen";
+            this.btnOpen.Size = new System.Drawing.Size(36, 36);
+            this.btnOpen.Text = "Open File...";
+            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+            // 
             // btnSep0
             // 
             this.btnSep0.Name = "btnSep0";
             this.btnSep0.Size = new System.Drawing.Size(6, 39);
+            // 
+            // btnSaveImage
+            // 
+            this.btnSaveImage.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnSaveImage.Image = global::_3DSExplorer.Properties.Resources.ico_disk_32;
+            this.btnSaveImage.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSaveImage.Name = "btnSaveImage";
+            this.btnSaveImage.Size = new System.Drawing.Size(36, 36);
+            this.btnSaveImage.Text = "Save Image file";
+            this.btnSaveImage.Visible = false;
+            this.btnSaveImage.Click += new System.EventHandler(this.btnSaveImage_Click);
+            // 
+            // btnSaveKey
+            // 
+            this.btnSaveKey.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnSaveKey.Image = global::_3DSExplorer.Properties.Resources.key;
+            this.btnSaveKey.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSaveKey.Name = "btnSaveKey";
+            this.btnSaveKey.Size = new System.Drawing.Size(36, 36);
+            this.btnSaveKey.Text = "Save key file";
+            this.btnSaveKey.Visible = false;
+            this.btnSaveKey.Click += new System.EventHandler(this.btnSaveKey_Click);
+            // 
+            // btnXOR
+            // 
+            this.btnXOR.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnXOR.Image = global::_3DSExplorer.Properties.Resources.ico_xor;
+            this.btnXOR.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnXOR.Name = "btnXOR";
+            this.btnXOR.Size = new System.Drawing.Size(36, 36);
+            this.btnXOR.Text = "XOR 2 Files";
+            this.btnXOR.Click += new System.EventHandler(this.btnXOR_Click);
+            // 
+            // btnHashTool
+            // 
+            this.btnHashTool.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnHashTool.Image = global::_3DSExplorer.Properties.Resources.application_form_magnify;
+            this.btnHashTool.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnHashTool.Name = "btnHashTool";
+            this.btnHashTool.Size = new System.Drawing.Size(36, 36);
+            this.btnHashTool.Text = "Hash Tool";
+            this.btnHashTool.Click += new System.EventHandler(this.btnHashTool_Click);
             // 
             // lblCopyright
             // 
@@ -215,58 +267,6 @@
             this.imlFS.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imlFS.ImageStream")));
             this.imlFS.TransparentColor = System.Drawing.Color.Transparent;
             this.imlFS.Images.SetKeyName(0, "page_white_text.png");
-            // 
-            // btnOpen
-            // 
-            this.btnOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnOpen.Image = global::_3DSExplorer.Properties.Resources.ico_folder_32;
-            this.btnOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Size = new System.Drawing.Size(36, 36);
-            this.btnOpen.Text = "Open File...";
-            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
-            // 
-            // btnSaveImage
-            // 
-            this.btnSaveImage.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnSaveImage.Image = global::_3DSExplorer.Properties.Resources.ico_disk_32;
-            this.btnSaveImage.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnSaveImage.Name = "btnSaveImage";
-            this.btnSaveImage.Size = new System.Drawing.Size(36, 36);
-            this.btnSaveImage.Text = "Save Image file";
-            this.btnSaveImage.Visible = false;
-            this.btnSaveImage.Click += new System.EventHandler(this.btnSaveImage_Click);
-            // 
-            // btnSaveKey
-            // 
-            this.btnSaveKey.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnSaveKey.Image = global::_3DSExplorer.Properties.Resources.key;
-            this.btnSaveKey.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnSaveKey.Name = "btnSaveKey";
-            this.btnSaveKey.Size = new System.Drawing.Size(36, 36);
-            this.btnSaveKey.Text = "Save key file";
-            this.btnSaveKey.Visible = false;
-            this.btnSaveKey.Click += new System.EventHandler(this.btnSaveKey_Click);
-            // 
-            // btnXOR
-            // 
-            this.btnXOR.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnXOR.Image = global::_3DSExplorer.Properties.Resources.ico_xor;
-            this.btnXOR.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnXOR.Name = "btnXOR";
-            this.btnXOR.Size = new System.Drawing.Size(36, 36);
-            this.btnXOR.Text = "XOR 2 Files";
-            this.btnXOR.Click += new System.EventHandler(this.btnXOR_Click);
-            // 
-            // btnHashTool
-            // 
-            this.btnHashTool.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnHashTool.Image = global::_3DSExplorer.Properties.Resources.application_form_magnify;
-            this.btnHashTool.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnHashTool.Name = "btnHashTool";
-            this.btnHashTool.Size = new System.Drawing.Size(36, 36);
-            this.btnHashTool.Text = "Hash Tool";
-            this.btnHashTool.Click += new System.EventHandler(this.btnHashTool_Click);
             // 
             // frmExplorer
             // 

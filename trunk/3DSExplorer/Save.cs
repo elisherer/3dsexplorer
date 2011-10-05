@@ -42,7 +42,7 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct SFFileSystemEntry
+    public struct FileSystemEntry
     {
         public int NodeCount;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x10)]
@@ -57,15 +57,15 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct SFDISABlob
+    public struct DISA
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0xc)]
-        public byte[] Unknown0;
-        public long FirstDifiTableOffset;
-        public long SecondDifiTableOffset;
+        public int Unknown0;
         public long TableSize;
+        public long PrimaryTableOffset;
+        public long SecondaryTableOffset;
+        public long TableLength;
         public long Padding;
         public long HashSize;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x30)]
@@ -78,20 +78,10 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct SFImageHeader
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x10)]
-        public byte[] Hash;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0xF0)]
-        public byte[] Padding;
-        public SFDISABlob DISA;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct SFDIFIBlob
+    public struct DIFI
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
-        public char[] MagicDIFI;
+        public char[] Magic;
         public int Unknown0;
         public long IVFCOffset;
         public long IVFCSize;
@@ -99,32 +89,45 @@ namespace _3DSExplorer
         public long DPFSSize;
         public long HashOffset;
         public long HashSize;
-        public long Unknown1;
-        public int Padding0;
-        //IVFC
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
-        public char[] MagicIVFC;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x54)]
-        public byte[] Unknown2;
-        public long HashTableLength;
-        public long FileSystemLength;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x10)]
-        public byte[] Unknown3;
-        //DPFS
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
-        public char[] MagicDPFS;           
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4C)]
-        public byte[] DPFSData;
-        //Hash
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x20)]
-        public byte[] Hash;
+        public int Flags;
+        public long FileBase;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct SFSave
+    public struct IVFC
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
-        public char[] MagicSAVE;
+        public char[] Magic;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x20)]
+        public byte[] Unknown2_0;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x1C)]
+        public byte[] Unknown2_1;
+        public long HashTableOffset;
+        public long HashTableLength;
+        public long Unknown2_2;
+        public long FileSystemOffset;
+        public long FileSystemLength;
+        public long HashedBlockLength; //shift
+        public long Unknown3; //0x78
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct DPFS
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
+        public char[] Magic;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x20)]
+        public byte[] DPFSData_0;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x1C)]
+        public byte[] DPFSData_1;
+        public long OffsetToNextPartition;
+        public long DPFSUnknown;
+    }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct SAVE
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
+        public char[] Magic;
 
         public uint Unknown0;
         public uint Unknown1;

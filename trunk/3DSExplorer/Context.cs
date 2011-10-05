@@ -18,10 +18,23 @@ namespace _3DSExplorer
         public int currentNcch;
     }
 
+    class Partition
+    {
+        public const int HASH_LENGTH = 0x20;
+
+        public DIFI Difi;
+        public IVFC Ivfc;
+        public DPFS Dpfs;
+        public byte[] Hash; //0x20 - SHA256
+
+        public byte[][] HashTable;
+    }
+
     class SFContext : Context
     {
-        public int JournalMagic = 0x080D6CE0;
-        public uint SaveFSEMagic = 0xD57B1100;
+        public const int IMAGE_HASH_LENGTH = 0x10;
+
+        //Wear-Level stuff
 
         public byte[] Key;
 
@@ -29,11 +42,17 @@ namespace _3DSExplorer
         public int JournalSize;
         public SFHeader fileHeader;
         public byte[] image;
-        public SFImageHeader imageHeader;
-        public int currentDifi;
-        public SFDIFIBlob[] difis;
-        public SFSave save;
-        public SFFileSystemEntry[] saveFiles;
+        
+        //Image stuff
+
+        public byte[] ImageHash; //0x10 - ??
+        public DISA Disa;
+        
+        public int currentPartition;
+        public Partition[] Partitions;
+
+        public SAVE Save;
+        public FileSystemEntry[] Files;
         public long fileBase;
     }
 
