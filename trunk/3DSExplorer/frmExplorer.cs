@@ -18,6 +18,7 @@ namespace _3DSExplorer
     public partial class frmExplorer : Form
     {
         TreeNode topNode;
+        frmHashTool hashTool;
         TreeNode[] childNodes;
         Context currentContext;
         string filePath;
@@ -1094,14 +1095,31 @@ namespace _3DSExplorer
 
         #region MENU Tools
 
+        private void openForm<T>() where T : Form, new()
+        {
+            T form = null;
+
+            foreach (Form f in Application.OpenForms)
+                if (f.GetType().IsAssignableFrom(typeof(T)))
+                {
+                    form = (T)f;
+                    break;
+                }
+
+            if (form == null)
+                form = new T();
+            form.Show();
+            form.BringToFront();
+        }
+
         private void menuToolsXORTool_Click(object sender, EventArgs e)
         {
-            (new frmXORTool()).ShowDialog();
+            openForm<frmXORTool>();
         }
 
         private void menuToolsHashTool_Click(object sender, EventArgs e)
         {
-            (new frmHashTool()).ShowDialog();
+            openForm<frmHashTool>();
         }
 
         #endregion
