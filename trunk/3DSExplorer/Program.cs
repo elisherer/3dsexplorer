@@ -14,8 +14,13 @@ namespace _3DSExplorer
         static void Main()
         {
             Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmExplorer());
+            Application.SetCompatibleTextRenderingDefault(true);
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+                Application.Run(new frmExplorer(args[1]));
+            else
+                Application.Run(new frmExplorer());
+            
         }
     }
 }

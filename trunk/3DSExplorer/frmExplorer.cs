@@ -25,6 +25,13 @@ namespace _3DSExplorer
         public frmExplorer()
         {
             InitializeComponent();
+            LoadText(null);
+        }
+
+        public frmExplorer(string path)
+        {
+            InitializeComponent();
+            openFile(path);
         }
 
         #region Stream Readers
@@ -113,6 +120,11 @@ namespace _3DSExplorer
             lvi.SubItems.Add(sub2);
             lvi.SubItems.Add(sub3);
             lstInfo.Items.Add(lvi);
+        }
+
+        private void makeEmptyListItem()
+        {
+            lstInfo.Items.Add(new ListViewItem(""));
         }
 
         #region ToString functions
@@ -328,6 +340,7 @@ namespace _3DSExplorer
             makeNewListItem("0x004", "4", "Unknown 2", cxt.fileHeader.Unknown2.ToString());
             makeNewListItem("", "", "Blockmap length", cxt.BlockmapLength.ToString());
             makeNewListItem("", "", "Journal size", cxt.JournalSize.ToString());
+            makeEmptyListItem();
             makeNewListItem("[Image]", "", "", "");
             makeNewListItem("", "0x10", "Image Hash", byteArrayToString(cxt.ImageHash));
             makeNewListItem("0x000", "4", "DISA Magic", charArrayToString(cxt.Disa.Magic));
@@ -392,6 +405,7 @@ namespace _3DSExplorer
             
             if (cxt.currentPartition == 0)
             {
+                makeEmptyListItem();
                 makeNewListItem("[SAVE]", "", "", "");
                 makeNewListItem("0x000", "4", "SAVE Magic", charArrayToString(save.Magic));
                 makeNewListItem("0x004", "4", "Unknown 0", save.Unknown0.ToString());
@@ -421,6 +435,7 @@ namespace _3DSExplorer
 
                 if (save.Magic != null & SaveTool.isSaveMagic(save.Magic))
                 {
+                    makeEmptyListItem();
                     makeNewListItem("[FILES]", "", "", "");
 
                     ListViewItem lvItem;
@@ -433,7 +448,7 @@ namespace _3DSExplorer
                         makeNewListItem("", "4", "Magic? (Unknown 1)", fse.Magic.ToString() + "(=" + toHexString(4, (ulong)fse.Magic) + ")");
                         makeNewListItem("", "4", "FileBlockOffset", (fse.BlockOffset < 0 ? "Negative" : fse.BlockOffset.ToString()));
                         makeNewListItem("", "4", "Unknown 2", fse.Unknown2.ToString());
-                        makeNewListItem("", "4", "Unknown 3", fse.Unknown3.ToString() + "(=" + toHexString(4, (ulong)fse.Unknown3) + ")");
+                        makeNewListItem("", "4", "Unknown 3", fse.Unknown3.ToString() + " (=" + toHexString(4, (ulong)fse.Unknown3) + ")");
                         makeNewListItem("", "4", "Unknown 4", fse.Unknown4.ToString());
 
                         lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename) + "\n" + fse.FileSize + "b");
@@ -790,76 +805,73 @@ namespace _3DSExplorer
 
         #endregion
 
-        private void btnOpen_Click(object sender, EventArgs e)
+        private void openFile(string path)
         {
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            filePath = path;
+            FileStream fs = File.OpenRead(filePath);
+            bool encrypted = false;
+            byte[] magic = new byte[4];
+
+            //Determin what kind of file it is
+            int type = -1;
+
+            if (filePath.EndsWith("3ds") || filePath.EndsWith("cci"))
+                type = 0;
+            else if (filePath.EndsWith("sav") || filePath.EndsWith("bin"))
+                type = 1;
+            else if (filePath.EndsWith("tmd") || filePath.EndsWith("tmd"))
+                type = 2;
+            else //Autodetect by content
             {
-                filePath = openFileDialog.FileName;
-                FileStream fs = File.OpenRead(filePath);
-                bool encrypted = false;
-                byte[] magic = new byte[4];
-
-                //Determin what kind of file it is
-                int type = -1;
-
-                if (filePath.EndsWith("3ds") || filePath.EndsWith("cci"))
-                    type = 0;
-                else if (filePath.EndsWith("sav") || filePath.EndsWith("bin"))
+                //TMD Check
+                fs.Seek(0, SeekOrigin.Begin);
+                fs.Read(magic, 0, 4);
+                if (magic[0] < 5 & magic[1] == 0 & magic[2] == 1 & magic[3] == 0)
                     type = 1;
-                else if (filePath.EndsWith("tmd") || filePath.EndsWith("tmd"))
-                    type = 2;
-                else //Autodetect by content
-                {               
-                    //TMD Check
-                    fs.Seek(0, SeekOrigin.Begin);
+                else if (fs.Length >= 0x104) // > 256+4
+                {
+                    //CCI CHECK
+                    fs.Seek(0x100, SeekOrigin.Current);
                     fs.Read(magic, 0, 4);
-                    if (magic[0] < 5 & magic[1] == 0 & magic[2] == 1 & magic[3] == 0)
-                        type = 1;
-                    else if (fs.Length >= 0x104) // > 256+4
+                    if (magic[0] == 'N' && magic[1] == 'C' & magic[2] == 'S' & magic[3] == 'D')
+                        type = 0;
+                    else if (fs.Length >= 0x10000) // > 64kb
                     {
-                        //CCI CHECK
-                        fs.Seek(0x100, SeekOrigin.Current);
-                        fs.Read(magic, 0, 4);
-                        if (magic[0] == 'N' && magic[1] == 'C' & magic[2] == 'S' & magic[3] == 'D')
-                            type = 0;
-                        else if (fs.Length >= 0x10000) // > 64kb
-                        {
-                            //SAVE Check
-                            fs.Seek(0, SeekOrigin.Begin);
-                            byte[] crcCheck = new byte[8 + 10 * (fs.Length / 0x1000 - 1)];
-                            fs.Read(crcCheck, 0, crcCheck.Length);
-                            fs.Read(magic, 0, 2);
-                            byte[] calcCheck = CRC16.GetCRC(crcCheck);
-                            if (magic[0] == calcCheck[0] && magic[1] == calcCheck[1]) //crc is ok then save
-                                type = 1; //SAVE
-                        }
+                        //SAVE Check
+                        fs.Seek(0, SeekOrigin.Begin);
+                        byte[] crcCheck = new byte[8 + 10 * (fs.Length / 0x1000 - 1)];
+                        fs.Read(crcCheck, 0, crcCheck.Length);
+                        fs.Read(magic, 0, 2);
+                        byte[] calcCheck = CRC16.GetCRC(crcCheck);
+                        if (magic[0] == calcCheck[0] && magic[1] == calcCheck[1]) //crc is ok then save
+                            type = 1; //SAVE
                     }
                 }
-                if (type == 1)
-                {
-                    //check if encrypted
-                    fs.Seek(0x1000, SeekOrigin.Begin); //Start of information
-                    while ((fs.Length - fs.Position > 0x200) & !SaveTool.isSaveMagic(magic))
-                    {
-                        fs.Read(magic, 0, 4);
-                        fs.Seek(0x200 - 4, SeekOrigin.Current);
-                    }
-                    encrypted = (fs.Length - fs.Position <= 0x200);
-
-                }
-
-                fs.Close();
-                
-                switch (type)
-                {
-                    case 0: OpenCCI(filePath); break;
-                    case 1: OpenSave(filePath, encrypted); break;
-                    case 2: OpenTMD(filePath); break;
-                    default: MessageBox.Show("This file is unsupported!"); break;
-                }
-                btnSaveImage.Visible = (type == 1);
-                btnSaveKey.Visible = (type == 1) && encrypted;
             }
+            if (type == 1)
+            {
+                //check if encrypted
+                fs.Seek(0x1000, SeekOrigin.Begin); //Start of information
+                while ((fs.Length - fs.Position > 0x200) & !SaveTool.isSaveMagic(magic))
+                {
+                    fs.Read(magic, 0, 4);
+                    fs.Seek(0x200 - 4, SeekOrigin.Current);
+                }
+                encrypted = (fs.Length - fs.Position <= 0x200);
+
+            }
+
+            fs.Close();
+
+            switch (type)
+            {
+                case 0: OpenCCI(filePath); break;
+                case 1: OpenSave(filePath, encrypted); break;
+                case 2: OpenTMD(filePath); break;
+                default: MessageBox.Show("This file is unsupported!"); break;
+            }
+            menuFileSaveImageFile.Enabled = (type == 1);
+            menuFileSaveKeyFile.Enabled = (type == 1) && encrypted;
         }
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
@@ -943,16 +955,6 @@ namespace _3DSExplorer
             }
             return retArray;
         }
-        
-        private void btnXOR_Click(object sender, EventArgs e)
-        {
-            (new frmKeyTool()).ShowDialog();
-        }
-
-        private void lblBrew_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start(lblBrew.Text);
-        }
 
         private void lvFileSystem_ItemActivate(object sender, EventArgs e)
         {
@@ -1022,31 +1024,9 @@ namespace _3DSExplorer
             }
         }
 
-        private void btnSaveKey_Click(object sender, EventArgs e)
-        {
-            SFContext cxt = (SFContext)currentContext;
-            saveFileDialog.Filter = "Key file (*.key)|*.key|All Files|*.*";
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                File.WriteAllBytes(saveFileDialog.FileName, cxt.Key);
-        }
-
-        private void btnSaveImage_Click(object sender, EventArgs e)
-        {
-                saveFileDialog.Filter = "Image Files (*.bin)|*.bin";
-                SFContext cxt = (SFContext)currentContext;
-                saveFileDialog.FileName = filePath.Substring(filePath.LastIndexOf('\\') + 1).Replace('.','_') + ".bin";
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                    File.WriteAllBytes(saveFileDialog.FileName, cxt.image);
-        }
-
         private void LoadText(string path)
         {
-            Text = "3DS Explorer v." + Application.ProductVersion + " by elisherer (" + path.Substring(path.LastIndexOf('\\') + 1) + ")";
-        }
-
-        private void frmExplorer_Load(object sender, EventArgs e)
-        {
-            Text = "3DS Explorer v." + Application.ProductVersion + " by elisherer";
+            Text = "3DS Explorer v." + Application.ProductVersion + " by elisherer" +  (path != null ? " (" + path.Substring(path.LastIndexOf('\\') + 1) + ")" : "");
         }
 
         private void lstInfo_DoubleClick(object sender, EventArgs e)
@@ -1058,9 +1038,94 @@ namespace _3DSExplorer
             }
         }
 
-        private void btnHashTool_Click(object sender, EventArgs e)
+        #region Drag & Drop
+
+        private void frmExplorer_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop, false) == true)
+                e.Effect = DragDropEffects.All;
+        }
+
+        private void frmExplorer_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            openFile(files[0]);
+        }
+
+        #endregion
+
+        #region MENU File
+
+        private void menuFileOpen_Click(object sender, EventArgs e)
+        {
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+                openFile(openFileDialog.FileName);
+        }
+
+        private void menuFileSave_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void menuFileSaveImageFile_Click(object sender, EventArgs e)
+        {
+            SFContext cxt = (SFContext)currentContext;
+            saveFileDialog.Filter = "Image Files (*.bin)|*.bin";
+            saveFileDialog.FileName = filePath.Substring(filePath.LastIndexOf('\\') + 1).Replace('.', '_') + ".bin";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                File.WriteAllBytes(saveFileDialog.FileName, cxt.image);
+        }
+
+        private void menuFileSaveKeyFile_Click(object sender, EventArgs e)
+        {
+            SFContext cxt = (SFContext)currentContext;
+            saveFileDialog.Filter = "Key file (*.key)|*.key|All Files|*.*";
+            saveFileDialog.FileName = filePath.Substring(filePath.LastIndexOf('\\') + 1).Replace('.', '_') + ".key";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                File.WriteAllBytes(saveFileDialog.FileName, cxt.Key);
+        }
+
+        private void menuFileExit_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        #endregion
+
+        #region MENU Tools
+
+        private void menuToolsXORTool_Click(object sender, EventArgs e)
+        {
+            (new frmXORTool()).ShowDialog();
+        }
+
+        private void menuToolsHashTool_Click(object sender, EventArgs e)
         {
             (new frmHashTool()).ShowDialog();
         }
+
+        #endregion
+
+        #region MENU Help
+
+        private void menuHelpVisit3DBrew_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start("http://www.3dbrew.org/");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("This system doesn't support clicking a link...\n\n" + ex.Message);
+            }
+        }
+
+        private void menuHelpAbout_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        #endregion
+
     }
 }

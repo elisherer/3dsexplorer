@@ -55,11 +55,11 @@
     <Compile Include="Context.cs" />
     <Compile Include="CRC16.cs" />
     <Compile Include="CXI.cs" />
-    <Compile Include="frmKeyTool.cs">
+    <Compile Include="frmXORTool.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmKeyTool.Designer.cs">
-      <DependentUpon>frmKeyTool.cs</DependentUpon>
+    <Compile Include="frmXORTool.Designer.cs">
+      <DependentUpon>frmXORTool.cs</DependentUpon>
     </Compile>
     <Compile Include="frmExplorer.cs">
       <SubType>Form</SubType>
@@ -85,8 +85,8 @@
     <Compile Include="MakerResolver.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="frmKeyTool.resx">
-      <DependentUpon>frmKeyTool.cs</DependentUpon>
+    <EmbeddedResource Include="frmXORTool.resx">
+      <DependentUpon>frmXORTool.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmExplorer.resx">
       <DependentUpon>frmExplorer.cs</DependentUpon>
@@ -122,11 +122,17 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />
-    <None Include="Resources\application_form_magnify.png" />
-    <None Include="Resources\key.png" />
-    <None Include="Resources\ico_xor.png" />
-    <None Include="Resources\ico_disk_32.png" />
-    <None Include="Resources\ico_folder_32.png" />
+    <None Include="Resources\help.png" />
+    <None Include="Resources\toolbox.png" />
+    <None Include="Resources\page.png" />
+    <None Include="Resources\disk.png" />
+    <None Include="Resources\drive_disk.png" />
+    <None Include="Resources\key1.png" />
+    <None Include="Resources\select_by_intersection.png" />
+    <None Include="Resources\magnifier.png" />
+    <None Include="Resources\information.png" />
+    <None Include="Resources\door_in.png" />
+    <None Include="Resources\folder.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
