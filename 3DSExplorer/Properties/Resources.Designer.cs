@@ -60,37 +60,79 @@ namespace _3DSExplorer.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap application_form_magnify {
+        internal static System.Drawing.Bitmap disk {
             get {
-                object obj = ResourceManager.GetObject("application_form_magnify", resourceCulture);
+                object obj = ResourceManager.GetObject("disk", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap ico_disk_32 {
+        internal static System.Drawing.Bitmap door_in {
             get {
-                object obj = ResourceManager.GetObject("ico_disk_32", resourceCulture);
+                object obj = ResourceManager.GetObject("door_in", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap ico_folder_32 {
+        internal static System.Drawing.Bitmap drive_disk {
             get {
-                object obj = ResourceManager.GetObject("ico_folder_32", resourceCulture);
+                object obj = ResourceManager.GetObject("drive_disk", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap ico_xor {
+        internal static System.Drawing.Bitmap folder {
             get {
-                object obj = ResourceManager.GetObject("ico_xor", resourceCulture);
+                object obj = ResourceManager.GetObject("folder", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap key {
+        internal static System.Drawing.Bitmap help {
             get {
-                object obj = ResourceManager.GetObject("key", resourceCulture);
+                object obj = ResourceManager.GetObject("help", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap information {
+            get {
+                object obj = ResourceManager.GetObject("information", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap key1 {
+            get {
+                object obj = ResourceManager.GetObject("key1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap magnifier {
+            get {
+                object obj = ResourceManager.GetObject("magnifier", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap page {
+            get {
+                object obj = ResourceManager.GetObject("page", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap select_by_intersection {
+            get {
+                object obj = ResourceManager.GetObject("select_by_intersection", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap toolbox {
+            get {
+                object obj = ResourceManager.GetObject("toolbox", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -30,15 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
-            this.toolStrip = new System.Windows.Forms.ToolStrip();
-            this.btnOpen = new System.Windows.Forms.ToolStripButton();
-            this.btnSep0 = new System.Windows.Forms.ToolStripSeparator();
-            this.btnSaveImage = new System.Windows.Forms.ToolStripButton();
-            this.btnSaveKey = new System.Windows.Forms.ToolStripButton();
-            this.btnXOR = new System.Windows.Forms.ToolStripButton();
-            this.btnHashTool = new System.Windows.Forms.ToolStripButton();
-            this.lblCopyright = new System.Windows.Forms.ToolStripLabel();
-            this.lblBrew = new System.Windows.Forms.ToolStripLabel();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.lstInfo = new System.Windows.Forms.ListView();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
@@ -52,105 +43,30 @@
             this.lvFileSystem = new System.Windows.Forms.ListView();
             this.imlFS = new System.Windows.Forms.ImageList(this.components);
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.toolStrip.SuspendLayout();
+            this.menuStrip = new System.Windows.Forms.MenuStrip();
+            this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuFileOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuFileSave = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuFileSep0 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuFileSaveImageFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuFileSaveKeyFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuFileSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuFileExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuTools = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuToolsXORTool = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuToolsHashTool = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelpVisit3DBrew = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelpSep0 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.menuStrip.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // toolStrip
-            // 
-            this.toolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnOpen,
-            this.btnSep0,
-            this.btnSaveImage,
-            this.btnSaveKey,
-            this.btnXOR,
-            this.btnHashTool,
-            this.lblCopyright,
-            this.lblBrew});
-            this.toolStrip.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip.Name = "toolStrip";
-            this.toolStrip.Size = new System.Drawing.Size(1076, 39);
-            this.toolStrip.TabIndex = 0;
-            this.toolStrip.Text = "toolStrip1";
-            // 
-            // btnOpen
-            // 
-            this.btnOpen.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnOpen.Image = global::_3DSExplorer.Properties.Resources.ico_folder_32;
-            this.btnOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Size = new System.Drawing.Size(36, 36);
-            this.btnOpen.Text = "Open File...";
-            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
-            // 
-            // btnSep0
-            // 
-            this.btnSep0.Name = "btnSep0";
-            this.btnSep0.Size = new System.Drawing.Size(6, 39);
-            // 
-            // btnSaveImage
-            // 
-            this.btnSaveImage.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnSaveImage.Image = global::_3DSExplorer.Properties.Resources.ico_disk_32;
-            this.btnSaveImage.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnSaveImage.Name = "btnSaveImage";
-            this.btnSaveImage.Size = new System.Drawing.Size(36, 36);
-            this.btnSaveImage.Text = "Save Image file";
-            this.btnSaveImage.Visible = false;
-            this.btnSaveImage.Click += new System.EventHandler(this.btnSaveImage_Click);
-            // 
-            // btnSaveKey
-            // 
-            this.btnSaveKey.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnSaveKey.Image = global::_3DSExplorer.Properties.Resources.key;
-            this.btnSaveKey.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnSaveKey.Name = "btnSaveKey";
-            this.btnSaveKey.Size = new System.Drawing.Size(36, 36);
-            this.btnSaveKey.Text = "Save key file";
-            this.btnSaveKey.Visible = false;
-            this.btnSaveKey.Click += new System.EventHandler(this.btnSaveKey_Click);
-            // 
-            // btnXOR
-            // 
-            this.btnXOR.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnXOR.Image = global::_3DSExplorer.Properties.Resources.ico_xor;
-            this.btnXOR.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnXOR.Name = "btnXOR";
-            this.btnXOR.Size = new System.Drawing.Size(36, 36);
-            this.btnXOR.Text = "XOR 2 Files";
-            this.btnXOR.Click += new System.EventHandler(this.btnXOR_Click);
-            // 
-            // btnHashTool
-            // 
-            this.btnHashTool.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnHashTool.Image = global::_3DSExplorer.Properties.Resources.application_form_magnify;
-            this.btnHashTool.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnHashTool.Name = "btnHashTool";
-            this.btnHashTool.Size = new System.Drawing.Size(36, 36);
-            this.btnHashTool.Text = "Hash Tool";
-            this.btnHashTool.Click += new System.EventHandler(this.btnHashTool_Click);
-            // 
-            // lblCopyright
-            // 
-            this.lblCopyright.Name = "lblCopyright";
-            this.lblCopyright.Size = new System.Drawing.Size(237, 36);
-            this.lblCopyright.Text = "Most of the structures based on info from";
-            // 
-            // lblBrew
-            // 
-            this.lblBrew.ActiveLinkColor = System.Drawing.Color.DarkBlue;
-            this.lblBrew.IsLink = true;
-            this.lblBrew.Name = "lblBrew";
-            this.lblBrew.Size = new System.Drawing.Size(144, 36);
-            this.lblBrew.Text = "http://www.3DBrew.org";
-            this.lblBrew.VisitedLinkColor = System.Drawing.Color.Blue;
-            this.lblBrew.Click += new System.EventHandler(this.lblBrew_Click);
             // 
             // openFileDialog
             // 
@@ -171,7 +87,7 @@
             this.lstInfo.HideSelection = false;
             this.lstInfo.Location = new System.Drawing.Point(0, 0);
             this.lstInfo.Name = "lstInfo";
-            this.lstInfo.Size = new System.Drawing.Size(874, 302);
+            this.lstInfo.Size = new System.Drawing.Size(874, 312);
             this.lstInfo.TabIndex = 1;
             this.lstInfo.UseCompatibleStateImageBehavior = false;
             this.lstInfo.View = System.Windows.Forms.View.Details;
@@ -198,7 +114,7 @@
             // splitContainer
             // 
             this.splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer.Location = new System.Drawing.Point(0, 39);
+            this.splitContainer.Location = new System.Drawing.Point(0, 24);
             this.splitContainer.Name = "splitContainer";
             // 
             // splitContainer.Panel1
@@ -208,7 +124,7 @@
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.splitContainer1);
-            this.splitContainer.Size = new System.Drawing.Size(1076, 410);
+            this.splitContainer.Size = new System.Drawing.Size(1076, 425);
             this.splitContainer.SplitterDistance = 198;
             this.splitContainer.TabIndex = 2;
             // 
@@ -221,7 +137,7 @@
             this.treeView.Location = new System.Drawing.Point(0, 0);
             this.treeView.Name = "treeView";
             this.treeView.SelectedImageIndex = 0;
-            this.treeView.Size = new System.Drawing.Size(198, 410);
+            this.treeView.Size = new System.Drawing.Size(198, 425);
             this.treeView.TabIndex = 0;
             this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
             // 
@@ -245,8 +161,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.lvFileSystem);
-            this.splitContainer1.Size = new System.Drawing.Size(874, 410);
-            this.splitContainer1.SplitterDistance = 302;
+            this.splitContainer1.Size = new System.Drawing.Size(874, 425);
+            this.splitContainer1.SplitterDistance = 312;
             this.splitContainer1.TabIndex = 2;
             // 
             // lvFileSystem
@@ -257,7 +173,7 @@
             this.lvFileSystem.Location = new System.Drawing.Point(0, 0);
             this.lvFileSystem.MultiSelect = false;
             this.lvFileSystem.Name = "lvFileSystem";
-            this.lvFileSystem.Size = new System.Drawing.Size(874, 104);
+            this.lvFileSystem.Size = new System.Drawing.Size(874, 109);
             this.lvFileSystem.TabIndex = 0;
             this.lvFileSystem.UseCompatibleStateImageBehavior = false;
             this.lvFileSystem.ItemActivate += new System.EventHandler(this.lvFileSystem_ItemActivate);
@@ -268,25 +184,163 @@
             this.imlFS.TransparentColor = System.Drawing.Color.Transparent;
             this.imlFS.Images.SetKeyName(0, "page_white_text.png");
             // 
+            // menuStrip
+            // 
+            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuFile,
+            this.menuTools,
+            this.menuHelp});
+            this.menuStrip.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Size = new System.Drawing.Size(1076, 24);
+            this.menuStrip.TabIndex = 3;
+            this.menuStrip.Text = "menuStrip1";
+            // 
+            // menuFile
+            // 
+            this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuFileOpen,
+            this.menuFileSave,
+            this.menuFileSep0,
+            this.menuFileSaveImageFile,
+            this.menuFileSaveKeyFile,
+            this.menuFileSep1,
+            this.menuFileExit});
+            this.menuFile.Image = global::_3DSExplorer.Properties.Resources.page;
+            this.menuFile.Name = "menuFile";
+            this.menuFile.Size = new System.Drawing.Size(52, 20);
+            this.menuFile.Text = "&File";
+            // 
+            // menuFileOpen
+            // 
+            this.menuFileOpen.Image = global::_3DSExplorer.Properties.Resources.folder;
+            this.menuFileOpen.Name = "menuFileOpen";
+            this.menuFileOpen.Size = new System.Drawing.Size(169, 22);
+            this.menuFileOpen.Text = "&Open...";
+            this.menuFileOpen.Click += new System.EventHandler(this.menuFileOpen_Click);
+            // 
+            // menuFileSave
+            // 
+            this.menuFileSave.Image = global::_3DSExplorer.Properties.Resources.disk;
+            this.menuFileSave.Name = "menuFileSave";
+            this.menuFileSave.Size = new System.Drawing.Size(169, 22);
+            this.menuFileSave.Text = "&Save...";
+            this.menuFileSave.Click += new System.EventHandler(this.menuFileSave_Click);
+            // 
+            // menuFileSep0
+            // 
+            this.menuFileSep0.Name = "menuFileSep0";
+            this.menuFileSep0.Size = new System.Drawing.Size(166, 6);
+            // 
+            // menuFileSaveImageFile
+            // 
+            this.menuFileSaveImageFile.Enabled = false;
+            this.menuFileSaveImageFile.Image = global::_3DSExplorer.Properties.Resources.drive_disk;
+            this.menuFileSaveImageFile.Name = "menuFileSaveImageFile";
+            this.menuFileSaveImageFile.Size = new System.Drawing.Size(169, 22);
+            this.menuFileSaveImageFile.Text = "Save I&mage file...";
+            this.menuFileSaveImageFile.Click += new System.EventHandler(this.menuFileSaveImageFile_Click);
+            // 
+            // menuFileSaveKeyFile
+            // 
+            this.menuFileSaveKeyFile.Enabled = false;
+            this.menuFileSaveKeyFile.Image = global::_3DSExplorer.Properties.Resources.key1;
+            this.menuFileSaveKeyFile.Name = "menuFileSaveKeyFile";
+            this.menuFileSaveKeyFile.Size = new System.Drawing.Size(169, 22);
+            this.menuFileSaveKeyFile.Text = "Save &key file...";
+            this.menuFileSaveKeyFile.Click += new System.EventHandler(this.menuFileSaveKeyFile_Click);
+            // 
+            // menuFileSep1
+            // 
+            this.menuFileSep1.Name = "menuFileSep1";
+            this.menuFileSep1.Size = new System.Drawing.Size(166, 6);
+            // 
+            // menuFileExit
+            // 
+            this.menuFileExit.Image = global::_3DSExplorer.Properties.Resources.door_in;
+            this.menuFileExit.Name = "menuFileExit";
+            this.menuFileExit.Size = new System.Drawing.Size(169, 22);
+            this.menuFileExit.Text = "&Exit";
+            this.menuFileExit.Click += new System.EventHandler(this.menuFileExit_Click);
+            // 
+            // menuTools
+            // 
+            this.menuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuToolsXORTool,
+            this.menuToolsHashTool});
+            this.menuTools.Image = global::_3DSExplorer.Properties.Resources.toolbox;
+            this.menuTools.Name = "menuTools";
+            this.menuTools.Size = new System.Drawing.Size(64, 20);
+            this.menuTools.Text = "&Tools";
+            // 
+            // menuToolsXORTool
+            // 
+            this.menuToolsXORTool.Image = global::_3DSExplorer.Properties.Resources.select_by_intersection;
+            this.menuToolsXORTool.Name = "menuToolsXORTool";
+            this.menuToolsXORTool.Size = new System.Drawing.Size(128, 22);
+            this.menuToolsXORTool.Text = "&XOR Tool";
+            this.menuToolsXORTool.Click += new System.EventHandler(this.menuToolsXORTool_Click);
+            // 
+            // menuToolsHashTool
+            // 
+            this.menuToolsHashTool.Image = global::_3DSExplorer.Properties.Resources.magnifier;
+            this.menuToolsHashTool.Name = "menuToolsHashTool";
+            this.menuToolsHashTool.Size = new System.Drawing.Size(128, 22);
+            this.menuToolsHashTool.Text = "&Hash Tool";
+            this.menuToolsHashTool.Click += new System.EventHandler(this.menuToolsHashTool_Click);
+            // 
+            // menuHelp
+            // 
+            this.menuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuHelpVisit3DBrew,
+            this.menuHelpSep0,
+            this.menuHelpAbout});
+            this.menuHelp.Image = global::_3DSExplorer.Properties.Resources.help;
+            this.menuHelp.Name = "menuHelp";
+            this.menuHelp.Size = new System.Drawing.Size(59, 20);
+            this.menuHelp.Text = "&Help";
+            // 
+            // menuHelpVisit3DBrew
+            // 
+            this.menuHelpVisit3DBrew.Name = "menuHelpVisit3DBrew";
+            this.menuHelpVisit3DBrew.Size = new System.Drawing.Size(165, 22);
+            this.menuHelpVisit3DBrew.Text = "&Visit 3DBrew.org";
+            this.menuHelpVisit3DBrew.Click += new System.EventHandler(this.menuHelpVisit3DBrew_Click);
+            // 
+            // menuHelpSep0
+            // 
+            this.menuHelpSep0.Name = "menuHelpSep0";
+            this.menuHelpSep0.Size = new System.Drawing.Size(162, 6);
+            // 
+            // menuHelpAbout
+            // 
+            this.menuHelpAbout.Image = global::_3DSExplorer.Properties.Resources.information;
+            this.menuHelpAbout.Name = "menuHelpAbout";
+            this.menuHelpAbout.Size = new System.Drawing.Size(165, 22);
+            this.menuHelpAbout.Text = "&About";
+            this.menuHelpAbout.Click += new System.EventHandler(this.menuHelpAbout_Click);
+            // 
             // frmExplorer
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1076, 449);
             this.Controls.Add(this.splitContainer);
-            this.Controls.Add(this.toolStrip);
+            this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmExplorer";
             this.Text = "3DS Explorer";
-            this.Load += new System.EventHandler(this.frmExplorer_Load);
-            this.toolStrip.ResumeLayout(false);
-            this.toolStrip.PerformLayout();
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.frmExplorer_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.frmExplorer_DragEnter);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel2.ResumeLayout(false);
             this.splitContainer.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.ResumeLayout(false);
+            this.menuStrip.ResumeLayout(false);
+            this.menuStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -294,8 +348,6 @@
 
         #endregion
 
-        private System.Windows.Forms.ToolStrip toolStrip;
-        private System.Windows.Forms.ToolStripButton btnOpen;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.ListView lstInfo;
         private System.Windows.Forms.ColumnHeader columnHeader1;
@@ -305,17 +357,26 @@
         private System.Windows.Forms.SplitContainer splitContainer;
         private System.Windows.Forms.TreeView treeView;
         private System.Windows.Forms.ImageList imageList;
-        private System.Windows.Forms.ToolStripSeparator btnSep0;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
-        private System.Windows.Forms.ToolStripLabel lblCopyright;
-        private System.Windows.Forms.ToolStripButton btnXOR;
-        private System.Windows.Forms.ToolStripLabel lblBrew;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ListView lvFileSystem;
         private System.Windows.Forms.ImageList imlFS;
-        private System.Windows.Forms.ToolStripButton btnSaveKey;
-        private System.Windows.Forms.ToolStripButton btnSaveImage;
-        private System.Windows.Forms.ToolStripButton btnHashTool;
+        private System.Windows.Forms.MenuStrip menuStrip;
+        private System.Windows.Forms.ToolStripMenuItem menuFile;
+        private System.Windows.Forms.ToolStripMenuItem menuFileOpen;
+        private System.Windows.Forms.ToolStripMenuItem menuTools;
+        private System.Windows.Forms.ToolStripMenuItem menuHelp;
+        private System.Windows.Forms.ToolStripMenuItem menuToolsXORTool;
+        private System.Windows.Forms.ToolStripMenuItem menuToolsHashTool;
+        private System.Windows.Forms.ToolStripMenuItem menuHelpAbout;
+        private System.Windows.Forms.ToolStripSeparator menuFileSep0;
+        private System.Windows.Forms.ToolStripMenuItem menuFileExit;
+        private System.Windows.Forms.ToolStripMenuItem menuFileSave;
+        private System.Windows.Forms.ToolStripMenuItem menuFileSaveImageFile;
+        private System.Windows.Forms.ToolStripMenuItem menuFileSaveKeyFile;
+        private System.Windows.Forms.ToolStripSeparator menuFileSep1;
+        private System.Windows.Forms.ToolStripMenuItem menuHelpVisit3DBrew;
+        private System.Windows.Forms.ToolStripSeparator menuHelpSep0;
     }
 }
 

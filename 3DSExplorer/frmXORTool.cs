@@ -9,8 +9,10 @@ using System.Windows.Forms;
 
 namespace _3DSExplorer
 {
-    public partial class frmKeyTool : Form
+    public partial class frmXORTool : Form
     {
+        bool first = false, second = false;
+
         // returns the bigger array xored with the smaller cyclicly
         // dst suppose to be the size of the bigger array
         private void XorBlock(byte[] dst, byte[] first, byte[] second)
@@ -25,7 +27,7 @@ namespace _3DSExplorer
                 dst[i] = (byte)(big[i] ^ small[i % small.Length]);
         }
 
-        public frmKeyTool()
+        public frmXORTool()
         {
             InitializeComponent();
         }
@@ -33,13 +35,21 @@ namespace _3DSExplorer
         private void btnFirst_Click(object sender, EventArgs e)
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
                 txtFirst.Text = openFileDialog.FileName;
+                first = true;
+                btnSave.Enabled = first && second;
+            }
         }
 
         private void btnSecond_Click(object sender, EventArgs e)
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
                 txtSecond.Text = openFileDialog.FileName;
+                second = true;
+                btnSave.Enabled = first && second;
+            }
         }
 
         private void btnSave_Click(object sender, EventArgs e)
