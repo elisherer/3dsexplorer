@@ -1041,7 +1041,7 @@ namespace _3DSExplorer
 
         private void LoadText(string path)
         {
-            Text = "3DS Explorer v." + Application.ProductVersion + " by elisherer" +  (path != null ? " (" + path.Substring(path.LastIndexOf('\\') + 1) + ")" : "");
+            Text = "3DS Explorer v." + Application.ProductVersion + " " +  (path != null ? " (" + path.Substring(path.LastIndexOf('\\') + 1) + ")" : "");
         }
 
         private void lstInfo_DoubleClick(object sender, EventArgs e)
@@ -1175,26 +1175,30 @@ namespace _3DSExplorer
 
         private void cxtFileReplaceWith_Click(object sender, EventArgs e)
         {
-            SFContext cxt = (SFContext)currentContext;
-            openFileDialog.Filter = "All Files|*.*";
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (currentContext is SFContext)
             {
-                FileSystemEntry originalFile = (FileSystemEntry)lvFileSystem.SelectedItems[0].Tag;
-                FileStream newFile = File.OpenRead(openFileDialog.FileName);
-                long newFileSize = newFile.Length;
-                newFile.Close();
-                if (originalFile.FileSize != newFileSize)
+                SFContext cxt = (SFContext)currentContext;
+                openFileDialog.Filter = "All Files|*.*";
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    MessageBox.Show("File's size doesn't match the target file. \nIt must be the same size as the one to replace.");
-                    return;
+                    FileSystemEntry originalFile = (FileSystemEntry)lvFileSystem.SelectedItems[0].Tag;
+                    FileStream newFile = File.OpenRead(openFileDialog.FileName);
+                    long newFileSize = newFile.Length;
+                    newFile.Close();
+                    if (originalFile.FileSize != newFileSize)
+                    {
+                        MessageBox.Show("File's size doesn't match the target file. \nIt must be the same size as the one to replace.");
+                        return;
+                    }
+                    long offSetInImage = cxt.fileBase + originalFile.BlockOffset * 0x200;
+                    Buffer.BlockCopy(File.ReadAllBytes(openFileDialog.FileName), 0, cxt.image, (int)offSetInImage, (int)newFileSize);
+                    MessageBox.Show("File replaced.");
+
+                    //TODO: Fix hashes
                 }
-                long offSetInImage = cxt.fileBase + originalFile.BlockOffset * 0x200;
-                Buffer.BlockCopy(File.ReadAllBytes(openFileDialog.FileName), 0, cxt.image, (int)offSetInImage, (int)newFileSize);
-                MessageBox.Show("File replaced.");
-
-                //TODO: Fix hashes
             }
+            else
+                MessageBox.Show("This action can't be done!");
         }
-
     }
 }
