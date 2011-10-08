@@ -38,7 +38,9 @@ namespace _3DSExplorer
 
         public byte[] Key;
 
-        public int BlockmapLength;
+        public byte[] MemoryMap;
+        public SFHeaderEntry[] Blockmap;
+        public SFLongSectorEntry[] Journal;
         public int JournalSize;
         public SFHeader fileHeader;
         public byte[] image;
