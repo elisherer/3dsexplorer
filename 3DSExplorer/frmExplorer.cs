@@ -598,7 +598,7 @@ namespace _3DSExplorer
                         }
                         else //file base is remote
                         {
-                            cxt.fileBase = cxt.Partitions[1].Difi.FileBase;
+                            cxt.fileBase = 0x2000 + 2 * cxt.Partitions[0].Dpfs.OffsetToNextPartition + cxt.Partitions[1].Difi.FileBase;
                             ims.Seek(partStart + cxt.Partitions[0].Ivfc.FileSystemOffset + cxt.Save.FSTExactOffset, SeekOrigin.Begin);
                         }
 
