@@ -7,57 +7,58 @@ This page will show the progress made for saving altered save files.
 
 = Progress =
 
-* MemoryMap, Journal & Blockmap are in the context.
-* CRC16 of the blockmap is possible through CRC16.cs
+  * Memory Map, Journal & Blockmap are in the context.
+  * CRC16 of the blockmap is possible through CRC16.cs.
 
-Image Hash: (0x10 @ 0x0000)
+----
 
-+ Changes from one save to another.
+*Image Hash:* (0x10 @ 0x0000)
 
-- Algorithm is unknown.
+  + Changes from one save to another.
+  
+  - Algorithm is unknown.
 
-*DISA Hash: (0x20 @ 0x006C into the DISA block)*
+*DISA Hash:* (0x20 @ 0x006C into the DISA block)
 
-+ Changes from one save to another.
+  + Changes from one save to another.
 
-+ Understood only for "only SAVE-Partition" files (files w/o DATA 
-Partition)
+  + Understood only for "only SAVE-Partition" files (files w/o DATA Partition)
 
-+ Algorithm - SHA256
+  + Algorithm - SHA256
 
-- Hash of files with DATA partitions isn't understood. (didn't find with brute force)
+  - Hash of files with DATA partitions isn't understood. (didn't find with brute force)
 
-*Partition Hash: (0x20 @ 0x010C into Parition entry)*
+*Partition Hash:* (0x20 @ 0x010C into Parition entry)
 
-+ Changes from one save to another.
+  + Changes from one save to another.
 
-? Algorithm - Probably SHA256 becuase it's 32 Bytes.
+  ? Algorithm - Probably SHA256 becuase it's 32 Bytes.
 
-- Isn't understood. (didn't find with brute force)
+  - Isn't understood. (didn't find with brute force)
 
-*Partition Hash Table Header: (0x40 @ 0x0000 into the partition)*
+*Partition Hash Table Header:* (0x40 @ 0x0000 into the partition)
 
-+ Changes from one save to another.
+  + Changes from one save to another.
 
-- Algorithm is unknown.
+  - Algorithm is unknown.
 
-? Probably doesn't matter.
+  ? Probably doesn't matter.
 
 ----
 = Algorithm Proposal =
 
 == Required stuff: ==
-* Image binary (byte array)
-* Key Binary (byte array - 512 bytes)
-* Blockmap + Journal + MemoryMap
-* Disa & Partition table
+
+  * Image binary (byte array)
+  * Key Binary (byte array - 512 bytes)
+  * Blockmap + Journal + Memory Map
+  * Disa & Partition table
 
 After changing a file in the partition.
-
-# Go over the partitions and rehash the hashtable entries (that aren't 0)
-# (Unknwon) Then make the 'Partition Hash Table Header'
-# (Unknown) Go over the Partition table and and make the proper hash (for SAVE & DATA).
-# (Partly) Hash the proper partition table into the DISA struct.
-# Rearrange the 0x1000 blocks according to the MemoryMap.
-# Chechsum every 0x1000 block according to 3DBrew.
-# XOR the whole thing with the key-file.
+  # Go over the partitions and rehash the hashtable entries (that aren't 0)
+  # (Unknwon) Then make the 'Partition Hash Table Header'
+  # (Unknown) Go over the Partition table and and make the proper hash (for SAVE & DATA).
+  # (Partly) Hash the proper partition table into the DISA struct.
+  # Rearrange the 0x1000 blocks according to the Memory Map.
+  # Chechsum every 0x1000 block according to 3DBrew.
+  # XOR the whole thing with the key-file.
