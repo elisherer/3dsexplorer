@@ -43,6 +43,7 @@
             this.lvFileSystem = new System.Windows.Forms.ListView();
             this.clName = new System.Windows.Forms.ColumnHeader();
             this.clSize = new System.Windows.Forms.ColumnHeader();
+            this.clOffset = new System.Windows.Forms.ColumnHeader();
             this.cxtFile = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cxtFileSaveAs = new System.Windows.Forms.ToolStripMenuItem();
             this.cxtFileReplaceWith = new System.Windows.Forms.ToolStripMenuItem();
@@ -64,7 +65,6 @@
             this.menuHelpVisit3DBrew = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.clOffset = new System.Windows.Forms.ColumnHeader();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
@@ -204,6 +204,10 @@
             this.clSize.Text = "Size";
             this.clSize.Width = 72;
             // 
+            // clOffset
+            // 
+            this.clOffset.Text = "Offset";
+            // 
             // cxtFile
             // 
             this.cxtFile.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -272,6 +276,7 @@
             // 
             // menuFileSave
             // 
+            this.menuFileSave.Enabled = false;
             this.menuFileSave.Image = global::_3DSExplorer.Properties.Resources.disk;
             this.menuFileSave.Name = "menuFileSave";
             this.menuFileSave.Size = new System.Drawing.Size(169, 22);
@@ -365,15 +370,12 @@
             // 
             // menuHelpAbout
             // 
+            this.menuHelpAbout.Enabled = false;
             this.menuHelpAbout.Image = global::_3DSExplorer.Properties.Resources.information;
             this.menuHelpAbout.Name = "menuHelpAbout";
             this.menuHelpAbout.Size = new System.Drawing.Size(165, 22);
-            this.menuHelpAbout.Text = "&About";
+            this.menuHelpAbout.Text = "by elisherer";
             this.menuHelpAbout.Click += new System.EventHandler(this.menuHelpAbout_Click);
-            // 
-            // clOffset
-            // 
-            this.clOffset.Text = "Offset";
             // 
             // frmExplorer
             // 
