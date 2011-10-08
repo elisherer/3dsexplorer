@@ -17,8 +17,8 @@ namespace _3DSExplorer
 
     public partial class frmExplorer : Form
     {
+
         TreeNode topNode;
-        frmHashTool hashTool;
         TreeNode[] childNodes;
         Context currentContext;
         string filePath;
@@ -33,6 +33,7 @@ namespace _3DSExplorer
         {
             InitializeComponent();
             openFile(path);
+
         }
 
         #region Stream Readers
@@ -198,7 +199,7 @@ namespace _3DSExplorer
             makeNewListItem("0x300", "4", "Used ROM size [bytes]", cxt.cci.UsedRomSize.ToString());
             makeNewListItem("0x320", "16", "Unknown", byteArrayToString(cxt.cci.Unknown));
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileSystem.Clear();
+            lvFileSystem.Items.Clear();
         }
 
         private void showNCCH(int i)
@@ -231,21 +232,24 @@ namespace _3DSExplorer
             makeNewListItem("0x1C0", "0x20", "ExeFS superblock hash", byteArrayToString(cxt.cxis[i].ExeFSSuperBlockhash));
             makeNewListItem("0x1E0", "0x20", "RomFS superblock hash", byteArrayToString(cxt.cxis[i].RomFSSuperBlockhash));
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileSystem.Clear();
+            lvFileSystem.Items.Clear();
             ListViewItem lvItem;
-            if (cxt.cxis[i].RomFSSize > 0)
-            {
-                lvItem = lvFileSystem.Items.Add("RomFS" + i + ".bin");
-                lvItem.ImageIndex = 0;
-                lvItem.Tag = cxt.cxis[i];
-            }
             if (cxt.cxis[i].ExeFSSize > 0)
             {
                 lvItem = lvFileSystem.Items.Add("ExeFS" + i + ".bin");
+                lvItem.SubItems.Add((cxt.cxis[i].ExeFSSize * 0x200).ToString());
+                lvItem.SubItems.Add(toHexString(6, (ulong)(cxt.cxis[i].ExeFSOffset * 0x200)));
                 lvItem.ImageIndex = 0;
                 lvItem.Tag = cxt.cxis[i];
             }
-
+            if (cxt.cxis[i].RomFSSize > 0)
+            {
+                lvItem = lvFileSystem.Items.Add("RomFS" + i + ".bin");
+                lvItem.SubItems.Add((cxt.cxis[i].RomFSSize * 0x200).ToString());
+                lvItem.SubItems.Add(toHexString(6, (ulong)(cxt.cxis[i].RomFSOffset * 0x200)));
+                lvItem.ImageIndex = 0;
+                lvItem.Tag = cxt.cxis[i];
+            }
         }
 
         private void showNCCHPlainRegion(int i)
@@ -256,7 +260,7 @@ namespace _3DSExplorer
                 makeNewListItem("", cxt.cxiprs[i].PlainRegionStrings[j].Length.ToString(), "Text", cxt.cxiprs[i].PlainRegionStrings[j]);
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileSystem.Clear();
+            lvFileSystem.Items.Clear();
         }
 
         private void OpenCCI(string path)
@@ -339,7 +343,7 @@ namespace _3DSExplorer
             lstInfo.Items.Clear();
             makeNewListItem("0x000", "4", "Unknown 1", cxt.fileHeader.Unknown1.ToString());
             makeNewListItem("0x004", "4", "Unknown 2", cxt.fileHeader.Unknown2.ToString());
-            makeNewListItem("", "", "Blockmap length", cxt.BlockmapLength.ToString());
+            makeNewListItem("", "", "Blockmap length", cxt.Blockmap.Length.ToString());
             makeNewListItem("", "", "Journal size", cxt.JournalSize.ToString());
             makeEmptyListItem();
             makeNewListItem("[Image]", "", "", "");
@@ -357,10 +361,9 @@ namespace _3DSExplorer
             makeNewListItem("0x040", "0x20", "Hash", byteArrayToString(cxt.Disa.Hash));
             makeNewListItem("0x060", "0x74", "Unknown", byteArrayToString(cxt.Disa.Unknown2));
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileSystem.Items.Clear();
         }
 
-        private void showDifi()
+        private void showPartition()
         {
             SFContext cxt = (SFContext)currentContext;
             lstInfo.Items.Clear();
@@ -402,8 +405,6 @@ namespace _3DSExplorer
             
             makeNewListItem("0x10C", "0x20", "Hash", byteArrayToString(cxt.Partitions[cxt.currentPartition].Hash));
             
-            lvFileSystem.Items.Clear();
-            
             if (cxt.currentPartition == 0)
             {
                 makeEmptyListItem();
@@ -439,7 +440,6 @@ namespace _3DSExplorer
                     makeEmptyListItem();
                     makeNewListItem("[FILES]", "", "", "");
 
-                    ListViewItem lvItem;
                     int i = 0;
                     foreach (FileSystemEntry fse in cxt.Files)
                     {
@@ -451,10 +451,6 @@ namespace _3DSExplorer
                         makeNewListItem("", "4", "Unknown 2", fse.Unknown2.ToString());
                         makeNewListItem("", "4", "Unknown 3", fse.Unknown3.ToString() + " (=" + toHexString(4, (ulong)fse.Unknown3) + ")");
                         makeNewListItem("", "4", "Unknown 4", fse.Unknown4.ToString());
-
-                        lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename) + "\n" + fse.FileSize + "b");
-                        lvItem.ImageIndex = 0;
-                        lvItem.Tag = fse;
                     }
                 }
             }
@@ -476,23 +472,23 @@ namespace _3DSExplorer
                     MessageBox.Show("Can't find key to decrypt the binary file");
                 else
                 {
-                    //SaveTool.XorByteArray(fileBuffer, key, 0x1000);
-                    SaveTool.XorExperimental(fileBuffer, key, 0x1000);
+                    SaveTool.XorByteArray(fileBuffer, key, 0x1000);
+                    //SaveTool.XorExperimental(fileBuffer, key, 0x1000);
                     cxt.Key = key;
                 }
             }
 
             cxt.fileHeader = ReadStruct<SFHeader>(ms);
-            ArrayList mapping = new ArrayList();
 
             //get the blockmap headers
+            int bmSize = (int)(ms.Length >> 12) - 1;
+            cxt.Blockmap = new SFHeaderEntry[bmSize];
+            cxt.MemoryMap = new byte[bmSize];
 
-            cxt.BlockmapLength = (int)(ms.Length >> 12) - 1;
-            SFHeaderEntry hEntry = new SFHeaderEntry();
-            for (int i=0;i<cxt.BlockmapLength;i++)
+            for (int i=0;i<cxt.Blockmap.Length;i++)
             {
-                hEntry = ReadStruct<SFHeaderEntry>(ms);
-                mapping.Add((int)(hEntry.PhysicalSector));
+                cxt.Blockmap[i] = ReadStruct<SFHeaderEntry>(ms);
+                cxt.MemoryMap[i] = cxt.Blockmap[i].PhysicalSector;
             }
             //Check crc16
             byte[] twoBytes = new byte[2], crcBytes = new byte[2];
@@ -501,33 +497,33 @@ namespace _3DSExplorer
             if (crcBytes[0] != twoBytes[0] || crcBytes[1] != twoBytes[1])
             {
                 MessageBox.Show("CRC Error or Corrupt Save file");
-                lvFileSystem.Items.Clear();
                 lstInfo.Items.Clear();
                 treeView.Nodes.Clear();
             }
             else
             {
                 //get journal updates
-                byte[] lastChk = new byte[8];
+                int jSize = (int)(0x1000 - ms.Position) / Marshal.SizeOf(typeof(SFLongSectorEntry));
+                cxt.Journal = new SFLongSectorEntry[jSize];
                 cxt.JournalSize = 0;
-                SFLongSectorEntry lsEntry = new SFLongSectorEntry();
-                while (!SaveTool.isFF(lastChk) && ms.Position < 0x1000) //assure stopping
+                int jc = 0;
+                while (ms.Position < 0x1000) //assure stopping
                 {
-                    lsEntry = ReadStruct<SFLongSectorEntry>(ms);
-                    lastChk = lsEntry.Dupe.CheckSums;
-                    if (!SaveTool.isFF(lastChk))
+                    cxt.Journal[jc] = ReadStruct<SFLongSectorEntry>(ms);
+                    if (!SaveTool.isFF(cxt.Journal[jc].Sector.CheckSums)) //check if we got a valid checksum
                     {
-                        mapping[lsEntry.Sector.VirtualSector] = (int)(lsEntry.Sector.PhysicalSector);
-                        cxt.JournalSize++;
+                        cxt.MemoryMap[cxt.Journal[jc].Sector.VirtualSector] = cxt.Journal[jc].Sector.PhysicalSector;
+                        jc++;
                     }
+                    else //if not then it's probably the end of the journal
+                        break;
                 }
+                cxt.JournalSize = jc;
                
                 //rearragne by virtual
                 cxt.image = new byte[fileBuffer.Length - 0x1000];
-                for (int i = 0; i < mapping.Count; i++)
-                    if ((int)mapping[i] != -1)
-                        if ((((int)mapping[i] & 0x7F) * 0x1000 + 0x1000 <= fileBuffer.Length) && (i * 0x1000 + 0x1000 < cxt.image.Length)) //fix for partial images
-                            Buffer.BlockCopy(fileBuffer, ((int)mapping[i] & 0x7F) * 0x1000, cxt.image, i * 0x1000, 0x1000);
+                for (int i = 0; i < cxt.MemoryMap.Length; i++)
+                    Buffer.BlockCopy(fileBuffer, (cxt.MemoryMap[i] & 0x7F) * 0x1000, cxt.image, i * 0x1000, 0x1000);
 
                 MemoryStream ims = new MemoryStream(cxt.image);
 
@@ -603,11 +599,23 @@ namespace _3DSExplorer
                         }
 
                         FileSystemEntry root = ReadStruct<FileSystemEntry>(ims);
+                        lvFileSystem.Items.Clear();
                         if ((root.NodeCount > 1) && (root.Magic == 0)) //if has files
                         {
                             cxt.Files = new FileSystemEntry[root.NodeCount - 1];
-                            for (int j = 0; j < cxt.Files.Length; j++)
-                                cxt.Files[j] = ReadStruct<FileSystemEntry>(ims);
+                            ListViewItem lvItem;
+                            FileSystemEntry fse;
+                            for (int i = 0; i < cxt.Files.Length; i++)
+                            {
+                                fse = ReadStruct<FileSystemEntry>(ims);
+                                lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename));
+                                lvItem.SubItems.Add(fse.FileSize.ToString());
+                                lvItem.SubItems.Add(toHexString(6,(ulong)(cxt.fileBase + 0x200 * fse.BlockOffset)));
+                                lvItem.ImageIndex = 0;
+                                lvItem.Tag = fse;
+                                
+                                cxt.Files[i] = fse;
+                            }
                         }
                         else //empty
                             cxt.Files = new FileSystemEntry[0];
@@ -647,6 +655,12 @@ namespace _3DSExplorer
             currentContext = cxt;
             treeView.ExpandAll();
             treeView.SelectedNode = topNode;
+        }
+
+        private void saveSAVFile(string filepath)
+        {
+            //TODO: rearrange the image to the original blockmap and journal
+            //TODO: create new checksums for the blockmap and journal
         }
 
         #endregion
@@ -903,12 +917,12 @@ namespace _3DSExplorer
                 else if (e.Node.Text.StartsWith("SAVE"))
                 {
                     cxt.currentPartition = 0;
-                    showDifi();
+                    showPartition();
                 }
                 else if (e.Node.Text.StartsWith("DATA"))
                 {
                     cxt.currentPartition = e.Node.Text[15] - '0';
-                    showDifi();
+                    showPartition();
                 }
                 else if (e.Node.Text.StartsWith("File"))
                 {
@@ -994,7 +1008,7 @@ namespace _3DSExplorer
                                 MessageBox.Show("Error parsing key string, (must be a multiple of 2 and made of hex letters.");
                             else
                             {            
-                                string inpath = openFileDialog.FileName;
+                                string inpath = saveFileDialog.FileName;
                                 FileStream infs = File.OpenRead(inpath);
                                 bool isExeFS = item.Text.StartsWith("Exe");
 
@@ -1059,13 +1073,16 @@ namespace _3DSExplorer
 
         private void menuFileOpen_Click(object sender, EventArgs e)
         {
+            openFileDialog.Filter = "All Supported (3ds,cci,bin,sav,tmd)|*.3ds;*.cci;*.bin;*.sav;*.tmd|3DS Dump Files (*.3ds,*.cci)|*.3ds;*.cci|Save Binary Files (*.bin,*.sav)|*.bin;*.sav|Title Metadata (*.tmd)|*.tmd|All Files|*.*";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
                 openFile(openFileDialog.FileName);
         }
 
         private void menuFileSave_Click(object sender, EventArgs e)
         {
-
+            openFileDialog.Filter = "Save Binary Files (*.bin,*.sav)|*.bin;*.sav|All Files|*.*";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+                saveSAVFile(openFileDialog.FileName);
         }
 
         private void menuFileSaveImageFile_Click(object sender, EventArgs e)
@@ -1144,6 +1161,40 @@ namespace _3DSExplorer
         }
 
         #endregion
+
+        private void cxtFile_MouseEnter(object sender, EventArgs e)
+        {
+            if (lvFileSystem.SelectedItems.Count == 0)
+                cxtFile.Close();
+        }
+
+        private void cxtFileSaveAs_Click(object sender, EventArgs e)
+        {
+            lvFileSystem_ItemActivate(null, null);
+        }
+
+        private void cxtFileReplaceWith_Click(object sender, EventArgs e)
+        {
+            SFContext cxt = (SFContext)currentContext;
+            openFileDialog.Filter = "All Files|*.*";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                FileSystemEntry originalFile = (FileSystemEntry)lvFileSystem.SelectedItems[0].Tag;
+                FileStream newFile = File.OpenRead(openFileDialog.FileName);
+                long newFileSize = newFile.Length;
+                newFile.Close();
+                if (originalFile.FileSize != newFileSize)
+                {
+                    MessageBox.Show("File's size doesn't match the target file. \nIt must be the same size as the one to replace.");
+                    return;
+                }
+                long offSetInImage = cxt.fileBase + originalFile.BlockOffset * 0x200;
+                Buffer.BlockCopy(File.ReadAllBytes(openFileDialog.FileName), 0, cxt.image, (int)offSetInImage, (int)newFileSize);
+                MessageBox.Show("File replaced.");
+
+                //TODO: Fix hashes
+            }
+        }
 
     }
 }

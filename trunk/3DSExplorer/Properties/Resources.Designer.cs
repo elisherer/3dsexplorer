@@ -116,9 +116,16 @@ namespace _3DSExplorer.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap page {
+        internal static System.Drawing.Bitmap page_white {
             get {
-                object obj = ResourceManager.GetObject("page", resourceCulture);
+                object obj = ResourceManager.GetObject("page_white", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap page_white_copy {
+            get {
+                object obj = ResourceManager.GetObject("page_white_copy", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

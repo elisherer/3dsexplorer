@@ -80,8 +80,6 @@
     <Compile Include="InputBox.Designer.cs">
       <DependentUpon>InputBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="LZ77.cs" />
-    <Compile Include="LZSS.cs" />
     <Compile Include="MakerResolver.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -117,14 +115,15 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Save.cs" />
-    <Compile Include="StreamExtensions.cs" />
     <Compile Include="TMD.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />
+    <Content Include="README.txt" />
+    <None Include="Resources\page_white_copy.png" />
+    <None Include="Resources\page_white.png" />
     <None Include="Resources\help.png" />
     <None Include="Resources\toolbox.png" />
-    <None Include="Resources\page.png" />
     <None Include="Resources\disk.png" />
     <None Include="Resources\drive_disk.png" />
     <None Include="Resources\key1.png" />

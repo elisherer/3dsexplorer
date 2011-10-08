@@ -38,7 +38,7 @@ namespace _3DSExplorer
     {
         public SFSectorEntry Sector;
         public SFSectorEntry Dupe;
-        public int Magic; //constant  0x080d6ce0
+        public int Magic; //constant through the journal
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
