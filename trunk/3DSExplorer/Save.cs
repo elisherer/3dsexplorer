@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -201,6 +202,14 @@ namespace _3DSExplorer
             return true;
         }
 
+        public static bool is00(byte[] buf)
+        {
+            for (int i = 0; i < buf.Length; i++)
+                if (buf[i] != 0x00)
+                    return false;
+            return true;
+        }
+
         public static void XorByteArray(byte[] array, byte[] mask, int start)
         {
             for (int i = start; i < array.Length; i++)
@@ -277,6 +286,80 @@ namespace _3DSExplorer
             Buffer.BlockCopy(input, hash_list[rec_idx].BlockIndex * 0x200, outbuf, 0, 0x200);
 
             return outbuf;
+        }
+
+
+
+        public static byte[] createSAV(SFContext cxt)
+        {
+            //Recompute the partitions' hash tables
+            HashAlgorithm ha = SHA256.Create();
+            int offset, hashSize;
+            for (int i = 0; i < cxt.Partitions.Length; i++)
+            {
+                // itrerate thorugh the hashes table
+                hashSize = (1 << (int)cxt.Partitions[i].Ivfc.HashedBlockLength);
+                for (int j = 0; j < cxt.Partitions[i].HashTable.Length; j++)
+                    if (!is00(cxt.Partitions[i].HashTable[j])) //hash isn't zero
+                    {
+                        offset = (int)(cxt.Partitions[i].offsetInImage + cxt.Partitions[i].Ivfc.FileSystemOffset);
+                        offset += j * hashSize;
+                        cxt.Partitions[i].HashTable[j] = ha.ComputeHash(cxt.image, offset, hashSize);
+                        //write it into the image
+                        offset = (int)(cxt.Partitions[i].offsetInImage + cxt.Partitions[i].Ivfc.HashTableOffset);
+                        offset += j * Partition.HASH_LENGTH;
+                        Buffer.BlockCopy(cxt.Partitions[i].HashTable[j], 0, cxt.image, offset, Partition.HASH_LENGTH);
+                    }
+            }
+
+            /*TODO:
+            
+            [ ] (Unknwon) Make the 'Partition Hash Table Header'
+            [ ] (Unknown) Correct The Partition table hashes (DIFIs).
+            [ ] (Partly) Hash the proper partition table into the DISA struct.
+            
+            */
+
+            byte[] temp;
+            MemoryStream ms = new MemoryStream();
+
+            //Write the file header
+            temp = MarshalTool.StructureToByteArray<SFHeader>(cxt.fileHeader);
+            ms.Write(temp, 0, temp.Length);
+
+            //Update & Write the blockmap (straight)
+            for (byte i = 0; i < cxt.MemoryMap.Length ; i++)
+                cxt.MemoryMap[i] = i;
+            cxt.Journal = new SFLongSectorEntry[0];
+            cxt.JournalSize = 0;
+            int blockmapEntrySize = Marshal.SizeOf(typeof(SFHeaderEntry));
+            byte[] blockmapBlock = new byte[blockmapEntrySize * cxt.Blockmap.Length];
+            for (byte i = 0; i < cxt.Blockmap.Length; i++)
+            {
+                cxt.Blockmap[i].AllocationCount = 0;
+                cxt.Blockmap[i].PhysicalSector = (byte)(i + 0x81); //checksum flag + 1 (offset from file header)
+                for (int j = 0; j < cxt.Blockmap[i].CheckSums.Length; j++)
+                    cxt.Blockmap[i].CheckSums[j] = CRC16.CS(CRC16.GetCRC(cxt.image, 0x1000 * i + 0x200 * j, 0x200));
+                temp = MarshalTool.StructureToByteArray<SFHeaderEntry>(cxt.Blockmap[i]);
+                Buffer.BlockCopy(temp,0,blockmapBlock, i * blockmapEntrySize,blockmapEntrySize);
+            }
+            ms.Write(blockmapBlock, 0, blockmapBlock.Length);
+
+            //Write the CRC16
+            ms.Write(CRC16.GetCRC(blockmapBlock), 0, 2);
+
+            //Write an empty journal
+            while (ms.Position < 0x1000)
+                ms.WriteByte(0xFF);
+
+            //Write the image
+            ms.Write(cxt.image, 0, cxt.image.Length);
+            byte[] buffer = ms.ToArray();
+
+            //XOR with the key
+            XorByteArray(buffer, cxt.Key, 0x1000);
+            
+            return buffer;
         }
     }
 }

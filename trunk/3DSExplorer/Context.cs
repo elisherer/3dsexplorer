@@ -10,7 +10,7 @@ namespace _3DSExplorer
     {
     }
 
-    class CCIContext : Context
+    public class CCIContext : Context
     {
         public CCI cci;
         public CXI[] cxis;
@@ -18,9 +18,11 @@ namespace _3DSExplorer
         public int currentNcch;
     }
 
-    class Partition
+    public class Partition
     {
         public const int HASH_LENGTH = 0x20;
+
+        public long offsetInImage;
 
         public DIFI Difi;
         public IVFC Ivfc;
@@ -30,7 +32,7 @@ namespace _3DSExplorer
         public byte[][] HashTable;
     }
 
-    class SFContext : Context
+    public class SFContext : Context
     {
         public const int IMAGE_HASH_LENGTH = 0x10;
 
@@ -47,6 +49,8 @@ namespace _3DSExplorer
         
         //Image stuff
 
+        public bool isData;
+
         public byte[] ImageHash; //0x10 - ??
         public DISA Disa;
         
@@ -58,7 +62,7 @@ namespace _3DSExplorer
         public long fileBase;
     }
 
-    class TMDCertContext
+    public class TMDCertContext
     {
         
         public TMDCertificate cert;
@@ -66,7 +70,7 @@ namespace _3DSExplorer
         public byte[] tmdSHA;
     }
 
-    class TMDContext : Context
+    public class TMDContext : Context
     {
         public TMDHeader head;
         public TMDSignatureType SignatureType;

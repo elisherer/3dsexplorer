@@ -111,7 +111,7 @@ namespace _3DSExplorer
                     ret[j] = Convert.ToByte(baString.Substring(i, 2), 16);
                 return ret;
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
