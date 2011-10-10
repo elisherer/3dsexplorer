@@ -28,13 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmHashTool));
             this.txtList = new System.Windows.Forms.TextBox();
             this.btnHash = new System.Windows.Forms.Button();
             this.lblSize = new System.Windows.Forms.Label();
             this.txtSize = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.progressBar = new System.Windows.Forms.ProgressBar();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.cbAlgo = new System.Windows.Forms.ComboBox();
             this.lblAlgo = new System.Windows.Forms.Label();
             this.txtOffset = new System.Windows.Forms.TextBox();
             this.lblOffset = new System.Windows.Forms.Label();
@@ -103,19 +104,20 @@
             this.progressBar.Step = 1;
             this.progressBar.TabIndex = 4;
             // 
-            // comboBox1
+            // cbAlgo
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
+            this.cbAlgo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbAlgo.FormattingEnabled = true;
+            this.cbAlgo.Items.AddRange(new object[] {
             "SHA-2, 256bit",
             "SHA-2, 512bit",
             "SHA-1",
+            "MD-5",
             "CRC16 MODBUS"});
-            this.comboBox1.Location = new System.Drawing.Point(479, 12);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(134, 21);
-            this.comboBox1.TabIndex = 5;
-            this.comboBox1.Text = "SHA-2, 256bit";
+            this.cbAlgo.Location = new System.Drawing.Point(479, 14);
+            this.cbAlgo.Name = "cbAlgo";
+            this.cbAlgo.Size = new System.Drawing.Size(134, 21);
+            this.cbAlgo.TabIndex = 5;
             // 
             // lblAlgo
             // 
@@ -214,18 +216,17 @@
             this.Controls.Add(this.lblOffset);
             this.Controls.Add(this.txtOffset);
             this.Controls.Add(this.lblAlgo);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.cbAlgo);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.txtSize);
             this.Controls.Add(this.lblSize);
             this.Controls.Add(this.btnHash);
             this.Controls.Add(this.txtList);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(640, 480);
             this.Name = "frmHashTool";
-            this.ShowIcon = false;
-            this.ShowInTaskbar = false;
             this.Text = "HashTool";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -240,7 +241,7 @@
         private System.Windows.Forms.TextBox txtSize;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.ProgressBar progressBar;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox cbAlgo;
         private System.Windows.Forms.Label lblAlgo;
         private System.Windows.Forms.TextBox txtOffset;
         private System.Windows.Forms.Label lblOffset;

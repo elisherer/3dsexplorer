@@ -67,15 +67,21 @@ namespace _3DSExplorer
         public long PrimaryTableOffset;
         public long SecondaryTableOffset;
         public long TableLength;
-        public long Padding;
-        public long HashSize;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x30)]
-        public byte[] Unknown1;
+        public long SAVEEntryOffset;
+        public long SAVEEntryLength;
+        public long DATAEntryOffset;
+        public long DATAEntryLength;
+        public long SAVEPartitionOffset;
+        public long SAVEPartitionLength;
+        public long DATAPartitionOffset;
+        public long DATAPartitionLength;
+
         public uint ActiveTable;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x20)]
         public byte[] Hash;
+
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x74)]
-        public byte[] Unknown2;
+        public byte[] Unknown7;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

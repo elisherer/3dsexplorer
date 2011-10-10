@@ -282,12 +282,18 @@ namespace _3DSExplorer
             makeNewListItem("0x010", "8", "Primary Table offset", cxt.Disa.PrimaryTableOffset.ToString());
             makeNewListItem("0x018", "8", "Secondary Table offset", cxt.Disa.SecondaryTableOffset.ToString());
             makeNewListItem("0x020", "8", "Table Length", cxt.Disa.TableLength.ToString());
-            makeNewListItem("0x028", "8", "Padding?", cxt.Disa.Padding.ToString());
-            makeNewListItem("0x030", "8", "Hashed size", cxt.Disa.HashSize.ToString());
-            makeNewListItem("0x038", "0x30", "Unknown", byteArrayToString(cxt.Disa.Unknown1));
-            makeNewListItem("0x03C", "4", "Active Table", ((cxt.Disa.ActiveTable & 1) == 1 ? "Primary" : "Secondary") + "  (=" + cxt.Disa.ActiveTable + ")");
-            makeNewListItem("0x040", "0x20", "Hash", byteArrayToString(cxt.Disa.Hash));
-            makeNewListItem("0x060", "0x74", "Unknown", byteArrayToString(cxt.Disa.Unknown2));
+            makeNewListItem("0x028", "8", "SAVE Entry Table offset", cxt.Disa.SAVEEntryOffset.ToString());
+            makeNewListItem("0x030", "8", "DATA Entry Table offset", cxt.Disa.SAVEEntryLength.ToString());
+            makeNewListItem("0x038", "8", "DATA Entry Table offset", cxt.Disa.DATAEntryOffset.ToString());
+            makeNewListItem("0x040", "8", "DATA Entry Table offset", cxt.Disa.DATAEntryLength.ToString());
+            makeNewListItem("0x048", "8", "SAVE Partition Offset", cxt.Disa.SAVEPartitionOffset.ToString());
+            makeNewListItem("0x050", "8", "SAVE Partition Length", cxt.Disa.SAVEPartitionLength.ToString());
+            makeNewListItem("0x058", "8", "DATA Partition Offset", cxt.Disa.DATAPartitionOffset.ToString());
+            makeNewListItem("0x060", "8", "DATA Partition Length", cxt.Disa.DATAPartitionLength.ToString());
+
+            makeNewListItem("0x068", "4", "Active Table", ((cxt.Disa.ActiveTable & 1) == 1 ? "Primary" : "Secondary") + "  (=" + cxt.Disa.ActiveTable + ")");
+            makeNewListItem("0x06C", "0x20", "Hash", byteArrayToString(cxt.Disa.Hash));
+            makeNewListItem("0x08C", "0x74", "Unknown", byteArrayToString(cxt.Disa.Unknown7));
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
@@ -482,107 +488,90 @@ namespace _3DSExplorer
                         long startOfDifi = ims.Position;
                         cxt.Partitions[i] = new Partition();
                         cxt.Partitions[i].Difi = MarshalTool.ReadStruct<DIFI>(ims);
-                        ims.Seek(startOfDifi + cxt.Partitions[i].Difi.IVFCOffset, SeekOrigin.Begin);
+                        //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.IVFCOffset, SeekOrigin.Begin);
                         cxt.Partitions[i].Ivfc = MarshalTool.ReadStruct<IVFC>(ims);
-                        ims.Seek(startOfDifi + cxt.Partitions[i].Difi.DPFSOffset, SeekOrigin.Begin);
+                        //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.DPFSOffset, SeekOrigin.Begin);
                         cxt.Partitions[i].Dpfs = MarshalTool.ReadStruct<DPFS>(ims);
-                        ims.Seek(startOfDifi + cxt.Partitions[i].Difi.HashOffset, SeekOrigin.Begin);
+                        //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.HashOffset, SeekOrigin.Begin);
                         cxt.Partitions[i].Hash = ReadByteArray(ims, Partition.HASH_LENGTH);
                         ims.Seek(4, SeekOrigin.Current); // skip garbage
                     }
 
-                    //Get SAVE Partition
-                    ims.Seek(0x2000, SeekOrigin.Begin);
-
-                    //jump to backup if needed (SAVE partition is written twice)
-                    //Always Needed???
-                    //if ((cxt.imageHeader.DISA.ActiveTable & 1) == 1)
-                    ims.Seek(cxt.Partitions[0].Dpfs.OffsetToNextPartition, SeekOrigin.Current);
-
-                    cxt.Partitions[0].offsetInImage = ims.Position;
-
-                    long partStart = ims.Position;
-
-                    //Get hashes table
-                    ims.Seek(cxt.Partitions[0].Ivfc.HashTableOffset, SeekOrigin.Current);
-                    cxt.Partitions[0].HashTable = new byte[cxt.Partitions[0].Ivfc.HashTableLength / 0x20][];
-                    for (int i = 0; i < cxt.Partitions[0].HashTable.Length; i++)
-                        cxt.Partitions[0].HashTable[i] = ReadByteArray(ims, 0x20);
-
-                    topNode.Nodes.Add("SAVE Partition");
-                    ims.Seek(partStart + cxt.Partitions[0].Ivfc.FileSystemOffset, SeekOrigin.Begin);
-                    cxt.Save = MarshalTool.ReadStruct<SAVE>(ims);
-                    //add SAVE information (if exists) (suppose to...)
-                    if (SaveTool.isSaveMagic(cxt.Save.Magic)) //read 
+                    for (int p = 0; p < cxt.Partitions.Length; p++)
                     {
-                        //go to FST
-                        if (!cxt.isData)
+                        if (p == 0)
                         {
-                            cxt.fileBase = partStart + cxt.Partitions[0].Ivfc.FileSystemOffset + cxt.Save.LocalFileBaseOffset;
-                            ims.Seek(cxt.fileBase + cxt.Save.FSTBlockOffset * 0x200, SeekOrigin.Begin);
+                            topNode.Nodes.Add("SAVE Partition");
+                            ims.Seek(cxt.Disa.SAVEPartitionOffset + 0x1000, SeekOrigin.Begin);
                         }
-                        else //file base is remote
+                        else
                         {
-                            cxt.fileBase = 0x2000 + 2 * cxt.Partitions[0].Dpfs.OffsetToNextPartition + cxt.Partitions[1].Difi.FileBase;
-                            ims.Seek(partStart + cxt.Partitions[0].Ivfc.FileSystemOffset + cxt.Save.FSTExactOffset, SeekOrigin.Begin);
+                            topNode.Nodes.Add("DATA Partition");
+                            ims.Seek(cxt.Disa.DATAPartitionOffset + 0x1000, SeekOrigin.Begin);
                         }
 
-                        FileSystemEntry root = MarshalTool.ReadStruct<FileSystemEntry>(ims);
-                        lvFileSystem.Items.Clear();
-                        if ((root.NodeCount > 1) && (root.Magic == 0)) //if has files
+                        cxt.Partitions[p].offsetInImage = ims.Position;
+
+                        //Get hashes table
+                        ims.Seek(cxt.Partitions[p].Ivfc.HashTableOffset, SeekOrigin.Current);
+                        cxt.Partitions[p].HashTable = new byte[cxt.Partitions[p].Ivfc.HashTableLength / 0x20][];
+                        for (int i = 0; i < cxt.Partitions[p].HashTable.Length; i++)
+                            cxt.Partitions[p].HashTable[i] = ReadByteArray(ims, 0x20);
+
+                        if (p == 0)
                         {
-                            cxt.Files = new FileSystemEntry[root.NodeCount - 1];
-                            ListViewItem lvItem;
-                            FileSystemEntry fse;
-                            for (int i = 0; i < cxt.Files.Length; i++)
+                            ims.Seek(cxt.Partitions[0].offsetInImage, SeekOrigin.Begin);
+                            //jump to backup if needed (SAVE partition is written twice)
+                            //Always Needed???
+                            //if ((cxt.imageHeader.DISA.ActiveTable & 1) == 1)
+                            ims.Seek(cxt.Partitions[0].Dpfs.OffsetToNextPartition, SeekOrigin.Current);
+
+                            ims.Seek(cxt.Partitions[0].Ivfc.FileSystemOffset, SeekOrigin.Current);
+                            long saveOffset = ims.Position;
+                            
+                            cxt.Save = MarshalTool.ReadStruct<SAVE>(ims);
+                            //add SAVE information (if exists) (suppose to...)
+                            if (SaveTool.isSaveMagic(cxt.Save.Magic)) //read 
                             {
-                                fse = MarshalTool.ReadStruct<FileSystemEntry>(ims);
-                                lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename));
-                                lvItem.SubItems.Add(fse.FileSize.ToString());
-                                lvItem.SubItems.Add(toHexString(6,(ulong)(cxt.fileBase + 0x200 * fse.BlockOffset)));
-                                lvItem.ImageIndex = 0;
-                                lvItem.Tag = fse;
-                                
-                                cxt.Files[i] = fse;
+                                //go to FST
+                                if (!cxt.isData)
+                                {
+                                    cxt.fileBase = saveOffset + cxt.Save.LocalFileBaseOffset;
+                                    ims.Seek(cxt.fileBase + cxt.Save.FSTBlockOffset * 0x200, SeekOrigin.Begin);
+                                }
+                                else //file base is remote
+                                {
+                                    cxt.fileBase = cxt.Disa.DATAPartitionOffset + cxt.Partitions[1].Difi.FileBase;
+                                    ims.Seek(saveOffset + cxt.Save.FSTExactOffset, SeekOrigin.Begin);
+                                }
+
+                                FileSystemEntry root = MarshalTool.ReadStruct<FileSystemEntry>(ims);
+                                lvFileSystem.Items.Clear();
+                                if ((root.NodeCount > 1) && (root.Magic == 0)) //if has files
+                                {
+                                    cxt.Files = new FileSystemEntry[root.NodeCount - 1];
+                                    ListViewItem lvItem;
+                                    FileSystemEntry fse;
+                                    for (int i = 0; i < cxt.Files.Length; i++)
+                                    {
+                                        fse = MarshalTool.ReadStruct<FileSystemEntry>(ims);
+                                        lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename));
+                                        lvItem.SubItems.Add(fse.FileSize.ToString());
+                                        lvItem.SubItems.Add(toHexString(6, (ulong)(cxt.fileBase + 0x200 * fse.BlockOffset)));
+                                        lvItem.ImageIndex = 0;
+                                        lvItem.Tag = fse;
+
+                                        cxt.Files[i] = fse;
+                                    }
+                                }
+                                else //empty
+                                    cxt.Files = new FileSystemEntry[0];
                             }
-                        }
-                        else //empty
-                            cxt.Files = new FileSystemEntry[0];
-                    }
-                    else
-                        cxt.Files = new FileSystemEntry[0]; //Not a legal SAVE filesystem
-                    //go to next partition
-                    ims.Seek(partStart + cxt.Partitions[0].Dpfs.OffsetToNextPartition, SeekOrigin.Begin);
+                            else
+                                cxt.Files = new FileSystemEntry[0]; //Not a legal SAVE filesystem
 
-                    /*/if we didn't use backup then we need to skip it...
-                    if ((cxt.imageHeader.DISA.ActiveTable & 1) == 0)
-                        ims.Seek(cxt.difis[0].OffsetToNextPartition, SeekOrigin.Current);
-                    */
-
-                    //There's always a 0x1000 padding (if DATA partitions exists)
-                    ims.Seek(0x1000, SeekOrigin.Current);
-                    partStart = ims.Position;
-
-                    try
-                    {
-
-                        for (int i = 1; i < cxt.Partitions.Length; i++)
-                        {
-                            topNode.Nodes.Add("DATA Partition " + i);
-
-                            cxt.Partitions[0].offsetInImage = ims.Position;
-
-                            ims.Seek(cxt.Partitions[i].Ivfc.HashTableOffset, SeekOrigin.Current);
-                            cxt.Partitions[i].HashTable = new byte[cxt.Partitions[i].Ivfc.HashTableLength / 0x20][];
-                            for (int j = 0; j < cxt.Partitions[i].HashTable.Length; j++)
-                                cxt.Partitions[i].HashTable[j] = ReadByteArray(ims, 0x20);
-                            ims.Seek(partStart + cxt.Partitions[i].Dpfs.OffsetToNextPartition, SeekOrigin.Begin);
-                            ims.Seek(0x1000, SeekOrigin.Current); //0x1000 padding
-                            partStart = ims.Position;
-                        }
-                    }
-                    catch
-                    { }
+                        } // end if (p == 0)
+                    } //end foreach (partitions)
                 }
                 ims.Close();
 
@@ -847,22 +836,15 @@ namespace _3DSExplorer
             else if (currentContext is SFContext)
             {
                 SFContext cxt = (SFContext)currentContext;
-                if (e.Node.Text.StartsWith("Save"))
+                switch (e.Node.Text[1])
                 {
-                    showSave();
-                }
-                else if (e.Node.Text.StartsWith("SAVE"))
-                {
-                    cxt.currentPartition = 0;
-                    showPartition();
-                }
-                else if (e.Node.Text.StartsWith("DATA"))
-                {
-                    cxt.currentPartition = e.Node.Text[15] - '0';
-                    showPartition();
-                }
-                else if (e.Node.Text.StartsWith("File"))
-                {
+                    case 'a': //Save
+                        showSave();
+                        break;
+                    case 'A': //SAVE/DATA Partition
+                        cxt.currentPartition = e.Node.Text[2]=='V' ? 0 : 1;
+                        showPartition();
+                        break;
                 }
             }
             else if (currentContext is TMDContext)
