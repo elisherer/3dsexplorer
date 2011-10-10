@@ -61,4 +61,5 @@ After changing a file in the partition.
   # (Partly) Hash the proper partition table into the DISA struct.
   # Rearrange the 0x1000 blocks according to the Memory Map.
   # Chechsum every 0x1000 block according to 3DBrew.
-  # XOR the whole thing with the key-file.
+  # CRC16 (Modbus) the blockmap
+  # XOR the whole thing from 0x1000 with the key-file.
