@@ -31,5 +31,10 @@ namespace _3DSExplorer
             }
             return BitConverter.GetBytes(CRCFull);
         }
+
+        public static byte CS(byte[] crcBytes)
+        {
+            return (byte)(crcBytes[0] ^ crcBytes[1]);
+        }
     }
 }

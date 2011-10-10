@@ -4,7 +4,8 @@ using System.Runtime.InteropServices;
 
 namespace _3DSExplorer
 {
-    enum TMDSignatureType {
+    public enum TMDSignatureType
+    {
         RSA_2048_SHA256 = 0x04000100,
         RSA_4096_SHA256 = 0x03000100,
         RSA_2048_SHA1   = 0x01000100,

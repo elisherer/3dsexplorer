@@ -36,84 +36,12 @@ namespace _3DSExplorer
 
         }
 
-        #region Stream Readers
-
         public byte[] ReadByteArray(Stream fs, int size)
         {
             byte[] buffer = new byte[size];
             fs.Read(buffer, 0, size);
             return buffer;
         }
-
-        public T ReadStruct<T>(Stream fs)
-        {
-            byte[] buffer = new byte[Marshal.SizeOf(typeof(T))];
-
-            fs.Read(buffer, 0, Marshal.SizeOf(typeof(T)));
-            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-            T temp = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
-            handle.Free();
-            return temp;
-        }
-        public T ReadStructBE<T>(Stream fs)
-        {
-            byte[] buffer = new byte[Marshal.SizeOf(typeof(T))];
-
-            fs.Read(buffer, 0, Marshal.SizeOf(typeof(T)));
-            GCHandle handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-            T temp = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
-            handle.Free();
-            System.Type t = temp.GetType();
-            FieldInfo[] fieldInfo = t.GetFields();
-            foreach (FieldInfo fi in fieldInfo)
-            {                 
-                if (fi.FieldType == typeof(System.Int16))
-                {
-                    Int16 i16 = (Int16)fi.GetValue(temp);
-                    byte[] b16 = BitConverter.GetBytes(i16);
-                    byte[] b16r = b16.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToInt16(b16r, 0));
-                }
-                else if (fi.FieldType == typeof(System.Int32))
-                {
-                    Int32 i32 = (Int32)fi.GetValue(temp);
-                    byte[] b32 = BitConverter.GetBytes(i32);
-                    byte[] b32r = b32.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToInt32(b32r, 0));
-                }
-                else if (fi.FieldType == typeof(System.Int64))
-                {
-                    Int64 i64 = (Int64)fi.GetValue(temp);
-                    byte[] b64 = BitConverter.GetBytes(i64);
-                    byte[] b64r = b64.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToInt64(b64r, 0));
-                }
-                else if (fi.FieldType == typeof(System.UInt16))
-                {
-                    UInt16 i16 = (UInt16)fi.GetValue(temp);
-                    byte[] b16 = BitConverter.GetBytes(i16);
-                    byte[] b16r = b16.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToUInt16(b16r, 0));
-                }
-                else if (fi.FieldType == typeof(System.UInt32))
-                {
-                    UInt32 i32 = (UInt32)fi.GetValue(temp);
-                    byte[] b32 = BitConverter.GetBytes(i32);
-                    byte[] b32r = b32.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToUInt32(b32r, 0));
-                }
-                else if (fi.FieldType == typeof(System.UInt64))
-                {
-                    UInt64 i64 = (UInt64)fi.GetValue(temp);
-                    byte[] b64 = BitConverter.GetBytes(i64);
-                    byte[] b64r = b64.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToUInt64(b64r, 0));
-                }
-            }
-            return temp;
-        }
-
-        #endregion
 
         private void makeNewListItem(string text, string sub1,string sub2, string sub3)
         {
@@ -269,7 +197,7 @@ namespace _3DSExplorer
 
             FileStream fs = File.OpenRead(path);
 
-            cxt.cci = ReadStruct<CCI>(fs);
+            cxt.cci = MarshalTool.ReadStruct<CCI>(fs);
 
             //Build Tree
             treeView.Nodes.Clear();
@@ -284,7 +212,7 @@ namespace _3DSExplorer
             if (cxt.cci.FirstNCCHSize > 0)
             {
                 fs.Seek(cxt.cci.FirstNCCHOffset * 0x200, SeekOrigin.Begin);
-                cxt.cxis[0] = ReadStruct<CXI>(fs);
+                cxt.cxis[0] = MarshalTool.ReadStruct<CXI>(fs);
                 childNodes[0] = topNode.Nodes.Add("NCCH0 (" + (new String(cxt.cxis[0].ProductCode)).Substring(0, 10) + ")");
                 // get Plaing Region
                 fs.Seek((cxt.cxis[0].PlainRegionOffset + cxt.cci.FirstNCCHOffset) * 0x200, SeekOrigin.Begin);
@@ -302,7 +230,7 @@ namespace _3DSExplorer
             if (cxt.cci.SecondNCCHSize > 0)
             {
                 fs.Seek(cxt.cci.SecondNCCHOffset * 0x200, SeekOrigin.Begin);
-                cxt.cxis[1] = ReadStruct<CXI>(fs);
+                cxt.cxis[1] = MarshalTool.ReadStruct<CXI>(fs);
                 childNodes[1] = topNode.Nodes.Add("NCCH1 (" + (new String(cxt.cxis[1].ProductCode)).Substring(0, 10) + ")");
                 // get Plaing Region
                 fs.Seek((cxt.cxis[1].PlainRegionOffset + cxt.cci.SecondNCCHOffset) * 0x200, SeekOrigin.Begin);
@@ -314,7 +242,7 @@ namespace _3DSExplorer
             if (cxt.cci.ThirdNCCHSize > 0)
             {
                 fs.Seek(cxt.cci.ThirdNCCHOffset * 0x200, SeekOrigin.Begin);
-                cxt.cxis[2] = ReadStruct<CXI>(fs);
+                cxt.cxis[2] = MarshalTool.ReadStruct<CXI>(fs);
                 childNodes[2] = topNode.Nodes.Add("NCCH2 (" + (new String(cxt.cxis[2].ProductCode)).Substring(0, 10) + ")");
                 // get Plaing Region
                 fs.Seek((cxt.cxis[2].PlainRegionOffset + cxt.cci.ThirdNCCHOffset) * 0x200, SeekOrigin.Begin);
@@ -478,16 +406,15 @@ namespace _3DSExplorer
                 }
             }
 
-            cxt.fileHeader = ReadStruct<SFHeader>(ms);
+            cxt.fileHeader = MarshalTool.ReadStruct<SFHeader>(ms);
 
             //get the blockmap headers
             int bmSize = (int)(ms.Length >> 12) - 1;
             cxt.Blockmap = new SFHeaderEntry[bmSize];
             cxt.MemoryMap = new byte[bmSize];
-
             for (int i=0;i<cxt.Blockmap.Length;i++)
             {
-                cxt.Blockmap[i] = ReadStruct<SFHeaderEntry>(ms);
+                cxt.Blockmap[i] = MarshalTool.ReadStruct<SFHeaderEntry>(ms);
                 cxt.MemoryMap[i] = cxt.Blockmap[i].PhysicalSector;
             }
             //Check crc16
@@ -509,7 +436,7 @@ namespace _3DSExplorer
                 int jc = 0;
                 while (ms.Position < 0x1000) //assure stopping
                 {
-                    cxt.Journal[jc] = ReadStruct<SFLongSectorEntry>(ms);
+                    cxt.Journal[jc] = MarshalTool.ReadStruct<SFLongSectorEntry>(ms);
                     if (!SaveTool.isFF(cxt.Journal[jc].Sector.CheckSums)) //check if we got a valid checksum
                     {
                         cxt.MemoryMap[cxt.Journal[jc].Sector.VirtualSector] = cxt.Journal[jc].Sector.PhysicalSector;
@@ -530,8 +457,8 @@ namespace _3DSExplorer
                 cxt.ImageHash = ReadByteArray(ims, SFContext.IMAGE_HASH_LENGTH);
                 //Go to start of image
                 ims.Seek(0x100, SeekOrigin.Begin);
-                cxt.Disa = ReadStruct<DISA>(ims);
-
+                cxt.Disa = MarshalTool.ReadStruct<DISA>(ims);
+                cxt.isData = cxt.Disa.TableSize > 1;
                 if (!SaveTool.isDisaMagic(cxt.Disa.Magic))
                 {
                     MessageBox.Show("Corrupt Save File!");
@@ -554,11 +481,11 @@ namespace _3DSExplorer
                     {
                         long startOfDifi = ims.Position;
                         cxt.Partitions[i] = new Partition();
-                        cxt.Partitions[i].Difi = ReadStruct<DIFI>(ims);
+                        cxt.Partitions[i].Difi = MarshalTool.ReadStruct<DIFI>(ims);
                         ims.Seek(startOfDifi + cxt.Partitions[i].Difi.IVFCOffset, SeekOrigin.Begin);
-                        cxt.Partitions[i].Ivfc = ReadStruct<IVFC>(ims);
+                        cxt.Partitions[i].Ivfc = MarshalTool.ReadStruct<IVFC>(ims);
                         ims.Seek(startOfDifi + cxt.Partitions[i].Difi.DPFSOffset, SeekOrigin.Begin);
-                        cxt.Partitions[i].Dpfs = ReadStruct<DPFS>(ims);
+                        cxt.Partitions[i].Dpfs = MarshalTool.ReadStruct<DPFS>(ims);
                         ims.Seek(startOfDifi + cxt.Partitions[i].Difi.HashOffset, SeekOrigin.Begin);
                         cxt.Partitions[i].Hash = ReadByteArray(ims, Partition.HASH_LENGTH);
                         ims.Seek(4, SeekOrigin.Current); // skip garbage
@@ -572,6 +499,8 @@ namespace _3DSExplorer
                     //if ((cxt.imageHeader.DISA.ActiveTable & 1) == 1)
                     ims.Seek(cxt.Partitions[0].Dpfs.OffsetToNextPartition, SeekOrigin.Current);
 
+                    cxt.Partitions[0].offsetInImage = ims.Position;
+
                     long partStart = ims.Position;
 
                     //Get hashes table
@@ -582,12 +511,12 @@ namespace _3DSExplorer
 
                     topNode.Nodes.Add("SAVE Partition");
                     ims.Seek(partStart + cxt.Partitions[0].Ivfc.FileSystemOffset, SeekOrigin.Begin);
-                    cxt.Save = ReadStruct<SAVE>(ims);
+                    cxt.Save = MarshalTool.ReadStruct<SAVE>(ims);
                     //add SAVE information (if exists) (suppose to...)
                     if (SaveTool.isSaveMagic(cxt.Save.Magic)) //read 
                     {
                         //go to FST
-                        if ((cxt.Save.FSTBlockOffset != 0) || (cxt.Save.LocalFileBaseOffset != 0))
+                        if (!cxt.isData)
                         {
                             cxt.fileBase = partStart + cxt.Partitions[0].Ivfc.FileSystemOffset + cxt.Save.LocalFileBaseOffset;
                             ims.Seek(cxt.fileBase + cxt.Save.FSTBlockOffset * 0x200, SeekOrigin.Begin);
@@ -598,7 +527,7 @@ namespace _3DSExplorer
                             ims.Seek(partStart + cxt.Partitions[0].Ivfc.FileSystemOffset + cxt.Save.FSTExactOffset, SeekOrigin.Begin);
                         }
 
-                        FileSystemEntry root = ReadStruct<FileSystemEntry>(ims);
+                        FileSystemEntry root = MarshalTool.ReadStruct<FileSystemEntry>(ims);
                         lvFileSystem.Items.Clear();
                         if ((root.NodeCount > 1) && (root.Magic == 0)) //if has files
                         {
@@ -607,7 +536,7 @@ namespace _3DSExplorer
                             FileSystemEntry fse;
                             for (int i = 0; i < cxt.Files.Length; i++)
                             {
-                                fse = ReadStruct<FileSystemEntry>(ims);
+                                fse = MarshalTool.ReadStruct<FileSystemEntry>(ims);
                                 lvItem = lvFileSystem.Items.Add(charArrayToString(fse.Filename));
                                 lvItem.SubItems.Add(fse.FileSize.ToString());
                                 lvItem.SubItems.Add(toHexString(6,(ulong)(cxt.fileBase + 0x200 * fse.BlockOffset)));
@@ -634,17 +563,26 @@ namespace _3DSExplorer
                     ims.Seek(0x1000, SeekOrigin.Current);
                     partStart = ims.Position;
 
-                    for (int i = 1; i < cxt.Partitions.Length; i++)
+                    try
                     {
-                        topNode.Nodes.Add("DATA Partition " + i);
-                        
-                        ims.Seek(cxt.Partitions[i].Ivfc.HashTableOffset, SeekOrigin.Current);
-                        cxt.Partitions[i].HashTable = new byte[cxt.Partitions[i].Ivfc.HashTableLength / 0x20][];
-                        for (int j = 0; j < cxt.Partitions[i].HashTable.Length; j++)
-                            cxt.Partitions[i].HashTable[j] = ReadByteArray(ims, 0x20);
-                        ims.Seek(partStart + cxt.Partitions[i].Dpfs.OffsetToNextPartition, SeekOrigin.Begin);
-                        partStart = ims.Position;
+
+                        for (int i = 1; i < cxt.Partitions.Length; i++)
+                        {
+                            topNode.Nodes.Add("DATA Partition " + i);
+
+                            cxt.Partitions[0].offsetInImage = ims.Position;
+
+                            ims.Seek(cxt.Partitions[i].Ivfc.HashTableOffset, SeekOrigin.Current);
+                            cxt.Partitions[i].HashTable = new byte[cxt.Partitions[i].Ivfc.HashTableLength / 0x20][];
+                            for (int j = 0; j < cxt.Partitions[i].HashTable.Length; j++)
+                                cxt.Partitions[i].HashTable[j] = ReadByteArray(ims, 0x20);
+                            ims.Seek(partStart + cxt.Partitions[i].Dpfs.OffsetToNextPartition, SeekOrigin.Begin);
+                            ims.Seek(0x1000, SeekOrigin.Current); //0x1000 padding
+                            partStart = ims.Position;
+                        }
                     }
+                    catch
+                    { }
                 }
                 ims.Close();
 
@@ -659,8 +597,7 @@ namespace _3DSExplorer
 
         private void saveSAVFile(string filepath)
         {
-            //TODO: rearrange the image to the original blockmap and journal
-            //TODO: create new checksums for the blockmap and journal
+            File.WriteAllBytes(filepath, SaveTool.createSAV((SFContext)currentContext));
         }
 
         #endregion
@@ -775,13 +712,13 @@ namespace _3DSExplorer
             {
                 fs.Read(cxt.tmdSHA, 0, cxt.tmdSHA.Length);
                 //Continue reading header
-                cxt.head = ReadStructBE<TMDHeader>(fs); //read header
+                cxt.head = MarshalTool.ReadStructBE<TMDHeader>(fs); //read header
                 cxt.ContentInfoRecords = new TMDContentInfoRecord[64];
                 for (int i = 0; i < cxt.ContentInfoRecords.Length; i++)
-                    cxt.ContentInfoRecords[i] = ReadStructBE<TMDContentInfoRecord>(fs);
+                    cxt.ContentInfoRecords[i] = MarshalTool.ReadStructBE<TMDContentInfoRecord>(fs);
                 cxt.chunks = new ArrayList();
                 for (int i = 0; i < cxt.head.ContentCount; i++)
-                    cxt.chunks.Add(ReadStructBE<TMDContentChunkRecord>(fs));
+                    cxt.chunks.Add(MarshalTool.ReadStructBE<TMDContentChunkRecord>(fs));
                 //start reading certificates
                 cxt.certs = new ArrayList();
                 while (fs.Position != fs.Length)
@@ -795,7 +732,7 @@ namespace _3DSExplorer
                     else if (tcert.SignatureType == TMDSignatureType.RSA_4096_SHA256 || tcert.SignatureType == TMDSignatureType.RSA_4096_SHA1)
                         tcert.tmdSHA = new byte[512];
                     fs.Read(tcert.tmdSHA, 0, tcert.tmdSHA.Length);
-                    tcert.cert = ReadStructBE<TMDCertificate>(fs);
+                    tcert.cert = MarshalTool.ReadStructBE<TMDCertificate>(fs);
                     cxt.certs.Add(tcert);
                 }
                 //Build Tree
