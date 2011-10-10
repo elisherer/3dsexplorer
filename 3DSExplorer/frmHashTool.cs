@@ -20,6 +20,7 @@ namespace _3DSExplorer
         public frmHashTool()
         {
             InitializeComponent();
+            cbAlgo.SelectedIndex = 0;
         }
 
         private string byteArrayToString(byte[] array)
@@ -43,7 +44,7 @@ namespace _3DSExplorer
                 byte[] block = new byte[blockSize];
                 byte[] hash;
                 HashAlgorithm ha = null;
-                switch (comboBox1.SelectedIndex)
+                switch (cbAlgo.SelectedIndex)
                 {
                     case 0:
                         ha = SHA256.Create();
@@ -55,6 +56,9 @@ namespace _3DSExplorer
                         ha = SHA1.Create();
                         break;
                     case 3:
+                        ha = MD5.Create();
+                        break;
+                    case 4:
                         //stays null for Modbus-CRC16
                         break;
                 }
@@ -133,7 +137,7 @@ namespace _3DSExplorer
                     byte[] block = new byte[blockSize];
                     byte[] hash;
                     HashAlgorithm ha = null;
-                    switch (comboBox1.SelectedIndex)
+                    switch (cbAlgo.SelectedIndex)
                     {
                         case 0:
                             ha = SHA256.Create();
@@ -145,6 +149,9 @@ namespace _3DSExplorer
                             ha = SHA1.Create();
                             break;
                         case 3:
+                            ha = MD5.Create();
+                            break;
+                        case 4:
                             //stays null for Modbus-CRC16
                             break;
                     }

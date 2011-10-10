@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmXORTool));
             this.txtFirst = new System.Windows.Forms.TextBox();
             this.btnFirst = new System.Windows.Forms.Button();
             this.txtSecond = new System.Windows.Forms.TextBox();
@@ -147,10 +148,10 @@
             this.Controls.Add(this.btnFirst);
             this.Controls.Add(this.txtFirst);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "frmXORTool";
-            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "XOR Tool (XOR 2 Files)";
             this.ResumeLayout(false);
