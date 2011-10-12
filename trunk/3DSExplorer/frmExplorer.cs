@@ -268,6 +268,7 @@ namespace _3DSExplorer
         private void showSave()
         {
             SFContext cxt = (SFContext)currentContext;
+            DISA disa = cxt.Disa;
             lstInfo.Items.Clear();
             makeNewListItem("0x000", "4", "Unknown 1", cxt.fileHeader.Unknown1.ToString());
             makeNewListItem("0x004", "4", "Unknown 2", cxt.fileHeader.Unknown2.ToString());
@@ -276,24 +277,50 @@ namespace _3DSExplorer
             makeEmptyListItem();
             makeNewListItem("[Image]", "", "", "");
             makeNewListItem("", "0x10", "Image Hash", byteArrayToString(cxt.ImageHash));
-            makeNewListItem("0x000", "4", "DISA Magic", charArrayToString(cxt.Disa.Magic));
-            makeNewListItem("0x004", "4", "Unknown", cxt.Disa.Unknown0.ToString());
-            makeNewListItem("0x008", "8", "Table Size", cxt.Disa.TableSize.ToString());
-            makeNewListItem("0x010", "8", "Primary Table offset", cxt.Disa.PrimaryTableOffset.ToString());
-            makeNewListItem("0x018", "8", "Secondary Table offset", cxt.Disa.SecondaryTableOffset.ToString());
-            makeNewListItem("0x020", "8", "Table Length", cxt.Disa.TableLength.ToString());
-            makeNewListItem("0x028", "8", "SAVE Entry Table offset", cxt.Disa.SAVEEntryOffset.ToString());
-            makeNewListItem("0x030", "8", "DATA Entry Table offset", cxt.Disa.SAVEEntryLength.ToString());
-            makeNewListItem("0x038", "8", "DATA Entry Table offset", cxt.Disa.DATAEntryOffset.ToString());
-            makeNewListItem("0x040", "8", "DATA Entry Table offset", cxt.Disa.DATAEntryLength.ToString());
-            makeNewListItem("0x048", "8", "SAVE Partition Offset", cxt.Disa.SAVEPartitionOffset.ToString());
-            makeNewListItem("0x050", "8", "SAVE Partition Length", cxt.Disa.SAVEPartitionLength.ToString());
-            makeNewListItem("0x058", "8", "DATA Partition Offset", cxt.Disa.DATAPartitionOffset.ToString());
-            makeNewListItem("0x060", "8", "DATA Partition Length", cxt.Disa.DATAPartitionLength.ToString());
+            makeNewListItem("0x000", "4", "DISA Magic", charArrayToString(disa.Magic));
+            makeNewListItem("0x004", "4", "Unknown", disa.Unknown0.ToString());
+            makeNewListItem("0x008", "8", "Table Size", disa.TableSize.ToString());
+            makeNewListItem("0x010", "8", "Primary Table offset", disa.PrimaryTableOffset.ToString());
+            makeNewListItem("0x018", "8", "Secondary Table offset", disa.SecondaryTableOffset.ToString());
+            makeNewListItem("0x020", "8", "Table Length", disa.TableLength.ToString());
+            makeNewListItem("0x028", "8", "SAVE Entry Table offset", disa.SAVEEntryOffset.ToString());
+            makeNewListItem("0x030", "8", "SAVE Entry Table length", disa.SAVEEntryLength.ToString());
+            makeNewListItem("0x038", "8", "DATA Entry Table offset", disa.DATAEntryOffset.ToString());
+            makeNewListItem("0x040", "8", "DATA Entry Table length", disa.DATAEntryLength.ToString());
+            makeNewListItem("0x048", "8", "SAVE Partition Offset", disa.SAVEPartitionOffset.ToString());
+            makeNewListItem("0x050", "8", "SAVE Partition Length", disa.SAVEPartitionLength.ToString());
+            makeNewListItem("0x058", "8", "DATA Partition Offset", disa.DATAPartitionOffset.ToString());
+            makeNewListItem("0x060", "8", "DATA Partition Length", disa.DATAPartitionLength.ToString());
 
-            makeNewListItem("0x068", "4", "Active Table", ((cxt.Disa.ActiveTable & 1) == 1 ? "Primary" : "Secondary") + "  (=" + cxt.Disa.ActiveTable + ")");
-            makeNewListItem("0x06C", "0x20", "Hash", byteArrayToString(cxt.Disa.Hash));
-            makeNewListItem("0x08C", "0x74", "Unknown", byteArrayToString(cxt.Disa.Unknown7));
+            makeNewListItem("0x068", "4", "Active Table", ((disa.ActiveTable & 1) == 1 ? "Primary" : "Secondary") + "  (=" + disa.ActiveTable + ")");
+            makeNewListItem("0x06C", "0x20", "Hash", byteArrayToString(disa.Hash));
+
+            makeNewListItem("0x0", "4", "Zero Padding 0(to 8 bytes)", toHexString(8, (ulong)disa.ZeroPad0));
+            makeNewListItem("0x0", "4", "Flag 0 ?", toHexString(8, (ulong)disa.Flag0));
+            makeNewListItem("0x0", "4", "Zero Padding 1(to 8 bytes)", toHexString(8, (ulong)disa.ZeroPad1));
+            makeNewListItem("0x0", "4", "Unknown 1", toHexString(8, (ulong)disa.Unknown1));
+            makeNewListItem("0x0", "4", "Unknown 2 (Magic?)", toHexString(8, (ulong)disa.Unknown2));
+            makeNewListItem("0x0", "8", "Data FS Length", toHexString(16, (ulong)disa.DataFsLength));
+            makeNewListItem("0x0", "8", "Unknown 3", toHexString(16, (ulong)disa.Unknown3));
+            makeNewListItem("0x0", "4", "Unknown 4", toHexString(8, (ulong)disa.Unknown4));
+            makeNewListItem("0x0", "4", "Unknown 5", toHexString(8, (ulong)disa.Unknown5));
+            makeNewListItem("0x0", "4", "Unknown 6", toHexString(8, (ulong)disa.Unknown6));
+            makeNewListItem("0x0", "4", "Unknown 7", toHexString(8, (ulong)disa.Unknown7));
+            makeNewListItem("0x0", "4", "Unknown 8", toHexString(8, (ulong)disa.Unknown8));
+            makeNewListItem("0x0", "4", "Flag 1 ?", toHexString(8, (ulong)disa.Flag1));
+            makeNewListItem("0x0", "4", "Flag 2 ?", toHexString(8, (ulong)disa.Flag2));
+            makeNewListItem("0x0", "4", "Flag 3 ?", toHexString(8, (ulong)disa.Flag3));
+            makeNewListItem("0x0", "4", "Flag 4 ?", toHexString(8, (ulong)disa.Flag4));
+            makeNewListItem("0x0", "4", "Unknown 14", toHexString(8, (ulong)disa.Unknown8));
+            makeNewListItem("0x0", "4", "Flag 5 ?", toHexString(8, (ulong)disa.Flag5));
+            makeNewListItem("0x0", "4", "Unknown 16", toHexString(8, (ulong)disa.Unknown8));
+            makeNewListItem("0x0", "8", "Magic 17", toHexString(16, (ulong)disa.Magic17));
+            makeNewListItem("0x0", "4", "Flag 6 ?", toHexString(8, (ulong)disa.Flag6));
+            makeNewListItem("0x0", "4", "Flag 7 ?", toHexString(8, (ulong)disa.Flag7));
+            makeNewListItem("0x0", "4", "Flag 8 ?", toHexString(8, (ulong)disa.Flag8));
+            makeNewListItem("0x0", "4", "Unknown 21", toHexString(8, (ulong)disa.Unknown21));
+            makeNewListItem("0x0", "4", "Unknown 22", toHexString(8, (ulong)disa.Unknown22));
+            makeNewListItem("0x0", "4", "Unknown 23", toHexString(8, (ulong)disa.Unknown23));
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
