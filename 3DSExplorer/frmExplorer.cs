@@ -265,7 +265,7 @@ namespace _3DSExplorer
 
         #region SFContext
 
-        private void showSave()
+        private void showImage()
         {
             SFContext cxt = (SFContext)currentContext;
             DISA disa = cxt.Disa;
@@ -372,29 +372,31 @@ namespace _3DSExplorer
                 makeNewListItem("[SAVE]", "", "", "");
                 makeNewListItem("0x000", "4", "SAVE Magic", charArrayToString(save.Magic));
                 makeNewListItem("0x004", "4", "Unknown 0", save.Unknown0.ToString());
-                makeNewListItem("0x008", "4", "Unknown 1", save.Unknown1.ToString());
-                makeNewListItem("0x00C", "4", "Unknown 2", save.Unknown2.ToString());
-                makeNewListItem("0x010", "4", "Size of data partition [medias]", save.PartitionSize + " (=" + save.PartitionSize * 0x200 + ")");
-
-                makeNewListItem("0x014", "4", "Unknown 3", save.Unknown3.ToString());
-                makeNewListItem("0x018", "4", "Unknown 4", save.Unknown4.ToString());
-                makeNewListItem("0x01C", "4", "Unknown 5", save.Unknown5.ToString());
-                makeNewListItem("0x020", "4", "Unknown 6", save.Unknown6.ToString());
-                makeNewListItem("0x024", "4", "Unknown 7", save.Unknown7.ToString());
-                makeNewListItem("0x028", "4", "Unknown 8", save.Unknown8.ToString());
-
-                makeNewListItem("0x02C", "0x2C", "Unknown 9", byteArrayToString(save.Unknown9));
-                makeNewListItem("0x058", "4", "Local File Base Offset (form SAVE)", save.LocalFileBaseOffset.ToString());
-
-                makeNewListItem("0x05C", "4", "Unknown 10", save.Unknown10.ToString());
-                makeNewListItem("0x060", "4", "Size of data partition [medias] (used?)", save.Unknown11 + " (=" + save.Unknown11 * 0x200 + ")");
-                makeNewListItem("0x064", "4", "Unknown 12", save.Unknown12.ToString());
-                makeNewListItem("0x068", "4", "Unknown 13 Offset (form SAVE)", save.Unknown13.ToString());
-
-                makeNewListItem("0x06C", "4", "FileSystem Table Block Offset (block=0x200 bytes)", save.FSTBlockOffset.ToString());
-                makeNewListItem("0x070", "4", "Unknown 14", save.Unknown14.ToString());
-                makeNewListItem("0x074", "4", "Unknown 15", save.Unknown15.ToString());
+                makeNewListItem("0x008", "8", "Unknown 1", save.Unknown1.ToString());
+                makeNewListItem("0x010", "8", "Size of data partition [medias]", save.PartitionSize + " (=" + save.PartitionSize * 0x200 + ")");
+                makeNewListItem("0x018", "4", "Unknown 2", save.Unknown2.ToString());
+                makeNewListItem("0x01C", "8", "Unknown 3", save.Unknown3.ToString());
+                makeNewListItem("0x024", "4", "Unknown 4", save.Unknown4.ToString());
+                makeNewListItem("0x028", "8", "Unknown 5 (first table offset)", save.Unknown5.ToString());
+                makeNewListItem("0x030", "4", "Unknown 6 (num of u32)", save.Unknown6.ToString());
+                makeNewListItem("0x034", "4", "Unknown 7 (size of media?)", save.Unknown7.ToString());
+                makeNewListItem("0x038", "8", "Unknown 8 (second table offset)", save.Unknown8.ToString());
+                makeNewListItem("0x040", "4", "Unknown 9 (num of u32)", save.Unknown9.ToString());
+                makeNewListItem("0x044", "4", "Unknown 10 (size of media?)", save.Unknown10.ToString());
+                makeNewListItem("0x048", "8", "Unknown 11 (third table offset)", save.Unknown11.ToString());
+                makeNewListItem("0x050", "4", "Unknown 12 (num of u32)", save.Unknown12.ToString());
+                makeNewListItem("0x054", "4", "Unknown 13 (size of media?)", save.Unknown13.ToString());
+                makeNewListItem("0x058", "8", "Local File Base Offset (form SAVE)", save.LocalFileBaseOffset.ToString());
+                makeNewListItem("0x060", "4", "Filestore Length (medias)", save.FileStoreLength.ToString());
+                makeNewListItem("0x064", "4", "Unknown 16", save.Unknown16.ToString());
+                makeNewListItem("0x068", "4", "Unknown 17 Offset (form SAVE)", save.Unknown17.ToString());
+                makeNewListItem("0x06C", "4", "FileSystem Table Offset (medias)", save.FSTBlockOffset.ToString());
+                makeNewListItem("0x070", "4", "Unknown 18", save.Unknown18.ToString());
+                makeNewListItem("0x074", "4", "Unknown 19", save.Unknown19.ToString());
                 makeNewListItem("0x078", "4", "FileSystem Table Exact Offset", save.FSTExactOffset.ToString());
+                makeNewListItem("0x07C", "4", "Unknown 20", save.Unknown20.ToString());
+                makeNewListItem("0x080", "4", "Unknown 21", save.Unknown21.ToString());
+                makeNewListItem("0x084", "4", "Unknown 22", save.Unknown22.ToString());
 
                 if (save.Magic != null & SaveTool.isSaveMagic(save.Magic))
                 {
@@ -407,11 +409,10 @@ namespace _3DSExplorer
                         makeNewListItem(i++.ToString(), fse.FileSize.ToString(), charArrayToString(fse.Filename), "");
                         makeNewListItem("", "4", "NodeCount", fse.NodeCount.ToString());
                         makeNewListItem("", "4", "FileIndex", fse.Index.ToString());
-                        makeNewListItem("", "4", "Magic? (Unknown 1)", fse.Magic.ToString() + "(=" + toHexString(4, (ulong)fse.Magic) + ")");
-                        makeNewListItem("", "4", "FileBlockOffset", (fse.BlockOffset < 0 ? "Negative" : fse.BlockOffset.ToString()));
-                        makeNewListItem("", "4", "Unknown 2", fse.Unknown2.ToString());
-                        makeNewListItem("", "4", "Unknown 3", fse.Unknown3.ToString() + " (=" + toHexString(4, (ulong)fse.Unknown3) + ")");
-                        makeNewListItem("", "4", "Unknown 4", fse.Unknown4.ToString());
+                        makeNewListItem("", "4", "Magic? (Unknown 1)", fse.Magic.ToString() + "(=" + toHexString(8, (ulong)fse.Magic) + ")");
+                        makeNewListItem("", "8", "FileBlockOffset (if size>0)", fse.BlockOffset.ToString());
+                        makeNewListItem("", "4", "Unknown 2", fse.Unknown2.ToString() + " (=" + toHexString(8, (ulong)fse.Unknown2) + ")");
+                        makeNewListItem("", "4", "Unknown 3", fse.Unknown3.ToString());
                     }
                 }
             }
@@ -422,11 +423,13 @@ namespace _3DSExplorer
         {
             SFContext cxt = new SFContext();
 
+            cxt.Encrypted = encrypted;
+
             //get the file into buffer to find the key if needed
             byte[] fileBuffer = File.ReadAllBytes(path);
             MemoryStream ms = new MemoryStream(fileBuffer);
 
-            if (encrypted)
+            if (cxt.Encrypted)
             {
                 byte[] key = SaveTool.FindKey(fileBuffer);
                 if (key == null)
@@ -500,7 +503,7 @@ namespace _3DSExplorer
                 {
                     //Build Tree
                     treeView.Nodes.Clear();
-                    topNode = treeView.Nodes.Add("Save Flash " + (encrypted ? "(Encrypted)" : ""));
+                    topNode = treeView.Nodes.Add("Save Flash " + (cxt.Encrypted ? "(Encrypted)" : ""));
                     LoadText(path);
 
                     //Which table to read
@@ -548,10 +551,10 @@ namespace _3DSExplorer
                         if (p == 0)
                         {
                             ims.Seek(cxt.Partitions[0].offsetInImage, SeekOrigin.Begin);
+
                             //jump to backup if needed (SAVE partition is written twice)
-                            //Always Needed???
-                            //if ((cxt.imageHeader.DISA.ActiveTable & 1) == 1)
-                            ims.Seek(cxt.Partitions[0].Dpfs.OffsetToNextPartition, SeekOrigin.Current);
+                            if (cxt.isData) //Apperantly in 2 Partition files the second SAVE is more updated ???
+                                ims.Seek(cxt.Partitions[0].Dpfs.OffsetToNextPartition, SeekOrigin.Current);
 
                             ims.Seek(cxt.Partitions[0].Ivfc.FileSystemOffset, SeekOrigin.Current);
                             long saveOffset = ims.Position;
@@ -777,8 +780,8 @@ namespace _3DSExplorer
         {
             filePath = path;
             FileStream fs = File.OpenRead(filePath);
-            bool encrypted = false;
             byte[] magic = new byte[4];
+            bool encrypted = false;
 
             //Determin what kind of file it is
             int type = -1;
@@ -866,7 +869,7 @@ namespace _3DSExplorer
                 switch (e.Node.Text[1])
                 {
                     case 'a': //Save
-                        showSave();
+                        showImage();
                         break;
                     case 'A': //SAVE/DATA Partition
                         cxt.currentPartition = e.Node.Text[2]=='V' ? 0 : 1;
