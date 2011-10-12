@@ -36,6 +36,8 @@ namespace _3DSExplorer
     {
         public const int IMAGE_HASH_LENGTH = 0x10;
 
+        public bool Encrypted;
+
         //Wear-Level stuff
 
         public byte[] Key;

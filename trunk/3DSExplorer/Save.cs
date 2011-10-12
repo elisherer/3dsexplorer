@@ -51,10 +51,9 @@ namespace _3DSExplorer
         public int Index;
         public uint Magic;
         public int BlockOffset;
-        public int FileSize;
-        public int Unknown2;
-        public int Unknown3; // flags and/or date?
-        public int Unknown4;
+        public long FileSize;
+        public int Unknown2; // flags and/or date?
+        public int Unknown3;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -161,31 +160,31 @@ namespace _3DSExplorer
         public char[] Magic;
 
         public uint Unknown0;
-        public uint Unknown1;
+        public long Unknown1;
+        public long PartitionSize;
         public uint Unknown2;
-        public uint PartitionSize;
-
-        public uint Unknown3;
+        public long Unknown3;
         public uint Unknown4;
-        public uint Unknown5;
+        public long Unknown5; //length of header?
         public uint Unknown6;
-        public uint Unknown7;
-        public uint Unknown8;
-        
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x2C)]
-        public byte[] Unknown9;
-        
-        
-        public int LocalFileBaseOffset;
-        public uint Unknown10;
-        public uint Unknown11;
+        public uint Unknown7; 
+        public long Unknown8; //offset?
+        public uint Unknown9; //length?
+        public uint Unknown10; 
+        public long Unknown11; //offset to table
         public uint Unknown12;
         public uint Unknown13;
-        public int FSTBlockOffset; //FST is in [BlockOffset] * 0x200 + [Offset]
-        //or
-        public uint Unknown14;
-        public uint Unknown15; 
+        public long LocalFileBaseOffset;
+        public uint FileStoreLength;
+        public uint Unknown16;
+        public uint Unknown17;
+        public int FSTBlockOffset;
+        public uint Unknown18;
+        public uint Unknown19; 
         public int FSTExactOffset;
+        public uint Unknown20;
+        public uint Unknown21;
+        public uint Unknown22;
     }
 
     public class SaveTool
