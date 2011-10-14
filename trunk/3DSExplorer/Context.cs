@@ -6,6 +6,15 @@ using System.Text;
 
 namespace _3DSExplorer
 {
+    public static class Sizes
+    {
+        public const int SHA256 = 0x20;
+        public const int SHA512 = 0x40;
+        public const int SHA1 = 0x10;
+        public const int MD5 = 0x10;
+        public const int CRC16 = 0x02;
+    }
+
     interface Context
     {
     }
@@ -20,8 +29,6 @@ namespace _3DSExplorer
 
     public class Partition
     {
-        public const int HASH_LENGTH = 0x20;
-
         public long offsetInImage;
 
         public DIFI Difi;
@@ -34,8 +41,6 @@ namespace _3DSExplorer
 
     public class SFContext : Context
     {
-        public const int IMAGE_HASH_LENGTH = 0x10;
-
         public bool Encrypted;
 
         //Wear-Level stuff

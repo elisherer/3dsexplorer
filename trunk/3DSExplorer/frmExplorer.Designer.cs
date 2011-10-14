@@ -29,6 +29,14 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Save Flash", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Image", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("DIFI", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("IVFC", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("DPFS", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Hash", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("SAVE", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("Files", System.Windows.Forms.HorizontalAlignment.Left);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.lstInfo = new System.Windows.Forms.ListView();
@@ -90,9 +98,35 @@
             this.columnHeader4});
             this.lstInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstInfo.FullRowSelect = true;
-            this.lstInfo.GridLines = true;
+            listViewGroup1.Header = "Save Flash";
+            listViewGroup1.Name = "lvgSaveFlash";
+            listViewGroup2.Header = "Image";
+            listViewGroup2.Name = "lvgImage";
+            listViewGroup3.Header = "DIFI";
+            listViewGroup3.Name = "lvgDifi";
+            listViewGroup4.Header = "IVFC";
+            listViewGroup4.Name = "lvgIvfc";
+            listViewGroup5.Header = "DPFS";
+            listViewGroup5.Name = "lvgDpfs";
+            listViewGroup6.Header = "Hash";
+            listViewGroup6.Name = "lvgHash";
+            listViewGroup7.Header = "SAVE";
+            listViewGroup7.Name = "lvgSave";
+            listViewGroup8.Header = "Files";
+            listViewGroup8.Name = "lvgFiles";
+            this.lstInfo.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3,
+            listViewGroup4,
+            listViewGroup5,
+            listViewGroup6,
+            listViewGroup7,
+            listViewGroup8});
+            this.lstInfo.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lstInfo.HideSelection = false;
             this.lstInfo.Location = new System.Drawing.Point(0, 0);
+            this.lstInfo.MultiSelect = false;
             this.lstInfo.Name = "lstInfo";
             this.lstInfo.Size = new System.Drawing.Size(809, 425);
             this.lstInfo.TabIndex = 1;
@@ -192,7 +226,7 @@
             this.lvFileSystem.TabIndex = 0;
             this.lvFileSystem.UseCompatibleStateImageBehavior = false;
             this.lvFileSystem.View = System.Windows.Forms.View.Details;
-            this.lvFileSystem.ItemActivate += new System.EventHandler(this.lvFileSystem_ItemActivate);
+            this.lvFileSystem.DoubleClick += new System.EventHandler(this.lvFileSystem_DoubleClick);
             // 
             // clName
             // 

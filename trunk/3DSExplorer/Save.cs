@@ -128,16 +128,22 @@ namespace _3DSExplorer
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x20)]
-        public byte[] Unknown2_0;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x1C)]
-        public byte[] Unknown2_1;
+        public uint MagicPadding;
+        public long Unknown1;
+
+        public long FirstHashTableOffset;
+        public long FirstHashTableLength;
+        public long FirstHashTableBlock;
+        public long SecondHashTableOffset;
+        public long SecondHashTableLength;
+        public long SecondHashTableBlock;
+
         public long HashTableOffset;
         public long HashTableLength;
-        public long Unknown2_2;
+        public long HashTableBlock;
         public long FileSystemOffset;
         public long FileSystemLength;
-        public long HashedBlockLength; //shift
+        public long FileSystemBlock;
         public long Unknown3; //0x78
     }
 
@@ -146,12 +152,18 @@ namespace _3DSExplorer
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x20)]
-        public byte[] DPFSData_0;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x1C)]
-        public byte[] DPFSData_1;
+        public uint MagicPadding;
+
+        public long Unknown1;
+        public long Unknown2;
+        public long Unknown3;
+        public long Unknown4;
+        public long Unknown5;
+        public long Unknown6;
+        public long Unknown7;
+        
         public long OffsetToNextPartition;
-        public long DPFSUnknown;
+        public long Unknown9;
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SAVE
@@ -159,7 +171,7 @@ namespace _3DSExplorer
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
 
-        public uint Unknown0;
+        public uint MagicPadding;
         public long Unknown1;
         public long PartitionSize;
         public uint Unknown2;
@@ -327,7 +339,7 @@ namespace _3DSExplorer
             for (int i = 0; i < cxt.Partitions.Length; i++)
             {
                 // itrerate thorugh the hashes table
-                hashSize = (1 << (int)cxt.Partitions[i].Ivfc.HashedBlockLength);
+                hashSize = (1 << (int)cxt.Partitions[i].Ivfc.FileSystemBlock);
                 for (int j = 0; j < cxt.Partitions[i].HashTable.Length; j++)
                     if (!is00(cxt.Partitions[i].HashTable[j])) //hash isn't zero
                     {
@@ -336,18 +348,31 @@ namespace _3DSExplorer
                         cxt.Partitions[i].HashTable[j] = ha.ComputeHash(cxt.image, offset, hashSize);
                         //write it into the image
                         offset = (int)(cxt.Partitions[i].offsetInImage + cxt.Partitions[i].Ivfc.HashTableOffset);
-                        offset += j * Partition.HASH_LENGTH;
-                        Buffer.BlockCopy(cxt.Partitions[i].HashTable[j], 0, cxt.image, offset, Partition.HASH_LENGTH);
+                        offset += j * Sizes.SHA256;
+                        Buffer.BlockCopy(cxt.Partitions[i].HashTable[j], 0, cxt.image, offset, Sizes.SHA256);
                     }
             }
+
+            SHA256 sha256 = SHA256.Create();
 
             /*TODO:
             
             [ ] (Unknwon) Make the 'Partition Hash Table Header'
             [ ] (Unknown) Correct The Partition table hashes (DIFIs).
-            [ ] (Partly) Hash the proper partition table into the DISA struct.
             
             */
+
+            offset = (int)((cxt.Disa.ActiveTable & 1) == 1 ? cxt.Disa.PrimaryTableOffset : cxt.Disa.SecondaryTableOffset);
+            byte[] newDisaHash = sha256.ComputeHash(cxt.image, offset, (int)cxt.Disa.TableLength);
+            Buffer.BlockCopy(newDisaHash, 0, cxt.Disa.Hash, 0, Sizes.SHA256); //fix context
+            Buffer.BlockCopy(newDisaHash, 0, cxt.image, 0x16C, Sizes.SHA256); //fix image
+
+            /*TODO:
+            
+            [ ] (Unknown) Correct The Image 128bit hash.
+            
+            */
+
 
             byte[] temp;
             MemoryStream ms = new MemoryStream();
