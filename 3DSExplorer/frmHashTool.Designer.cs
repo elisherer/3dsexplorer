@@ -32,7 +32,6 @@
             this.txtList = new System.Windows.Forms.TextBox();
             this.btnHash = new System.Windows.Forms.Button();
             this.lblSize = new System.Windows.Forms.Label();
-            this.txtSize = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.cbAlgo = new System.Windows.Forms.ComboBox();
@@ -45,6 +44,8 @@
             this.txtSearch = new System.Windows.Forms.TextBox();
             this.btnBrute = new System.Windows.Forms.Button();
             this.btnOpen = new System.Windows.Forms.Button();
+            this.txtSize = new System.Windows.Forms.ComboBox();
+            this.cbOption = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // txtList
@@ -76,19 +77,11 @@
             // lblSize
             // 
             this.lblSize.AutoSize = true;
-            this.lblSize.Location = new System.Drawing.Point(285, 17);
+            this.lblSize.Location = new System.Drawing.Point(240, 17);
             this.lblSize.Name = "lblSize";
             this.lblSize.Size = new System.Drawing.Size(58, 13);
             this.lblSize.TabIndex = 2;
             this.lblSize.Text = "Block size:";
-            // 
-            // txtSize
-            // 
-            this.txtSize.Location = new System.Drawing.Point(349, 14);
-            this.txtSize.Name = "txtSize";
-            this.txtSize.Size = new System.Drawing.Size(65, 20);
-            this.txtSize.TabIndex = 3;
-            this.txtSize.Text = "512";
             // 
             // openFileDialog
             // 
@@ -111,18 +104,18 @@
             this.cbAlgo.Items.AddRange(new object[] {
             "SHA-2, 256bit",
             "SHA-2, 512bit",
-            "SHA-1",
-            "MD-5",
-            "CRC16 MODBUS"});
-            this.cbAlgo.Location = new System.Drawing.Point(479, 14);
+            "SHA-1, 160bit",
+            "MD-5, 128bit",
+            "CRC16 Modbus"});
+            this.cbAlgo.Location = new System.Drawing.Point(439, 14);
             this.cbAlgo.Name = "cbAlgo";
-            this.cbAlgo.Size = new System.Drawing.Size(134, 21);
+            this.cbAlgo.Size = new System.Drawing.Size(107, 21);
             this.cbAlgo.TabIndex = 5;
             // 
             // lblAlgo
             // 
             this.lblAlgo.AutoSize = true;
-            this.lblAlgo.Location = new System.Drawing.Point(420, 17);
+            this.lblAlgo.Location = new System.Drawing.Point(380, 17);
             this.lblAlgo.Name = "lblAlgo";
             this.lblAlgo.Size = new System.Drawing.Size(53, 13);
             this.lblAlgo.TabIndex = 6;
@@ -147,7 +140,7 @@
             // 
             // txtBlocks
             // 
-            this.txtBlocks.Location = new System.Drawing.Point(222, 14);
+            this.txtBlocks.Location = new System.Drawing.Point(177, 14);
             this.txtBlocks.Name = "txtBlocks";
             this.txtBlocks.Size = new System.Drawing.Size(57, 20);
             this.txtBlocks.TabIndex = 9;
@@ -156,7 +149,7 @@
             // lblBlocks
             // 
             this.lblBlocks.AutoSize = true;
-            this.lblBlocks.Location = new System.Drawing.Point(148, 17);
+            this.lblBlocks.Location = new System.Drawing.Point(107, 17);
             this.lblBlocks.Name = "lblBlocks";
             this.lblBlocks.Size = new System.Drawing.Size(64, 13);
             this.lblBlocks.TabIndex = 10;
@@ -196,17 +189,48 @@
             // 
             this.btnOpen.Location = new System.Drawing.Point(10, 11);
             this.btnOpen.Name = "btnOpen";
-            this.btnOpen.Size = new System.Drawing.Size(128, 24);
+            this.btnOpen.Size = new System.Drawing.Size(86, 24);
             this.btnOpen.TabIndex = 14;
             this.btnOpen.Text = "&Open File...";
             this.btnOpen.UseVisualStyleBackColor = true;
             this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+            // 
+            // txtSize
+            // 
+            this.txtSize.FormattingEnabled = true;
+            this.txtSize.Items.AddRange(new object[] {
+            "256",
+            "512",
+            "1024",
+            "2048",
+            "4096",
+            "8192"});
+            this.txtSize.Location = new System.Drawing.Point(304, 14);
+            this.txtSize.Name = "txtSize";
+            this.txtSize.Size = new System.Drawing.Size(65, 21);
+            this.txtSize.TabIndex = 15;
+            this.txtSize.Text = "512";
+            // 
+            // cbOption
+            // 
+            this.cbOption.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbOption.FormattingEnabled = true;
+            this.cbOption.Items.AddRange(new object[] {
+            "Regular",
+            "CNG",
+            "HMAC"});
+            this.cbOption.Location = new System.Drawing.Point(553, 14);
+            this.cbOption.Name = "cbOption";
+            this.cbOption.Size = new System.Drawing.Size(60, 21);
+            this.cbOption.TabIndex = 17;
             // 
             // frmHashTool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(624, 442);
+            this.Controls.Add(this.cbOption);
+            this.Controls.Add(this.txtSize);
             this.Controls.Add(this.btnOpen);
             this.Controls.Add(this.btnBrute);
             this.Controls.Add(this.txtSearch);
@@ -218,7 +242,6 @@
             this.Controls.Add(this.lblAlgo);
             this.Controls.Add(this.cbAlgo);
             this.Controls.Add(this.progressBar);
-            this.Controls.Add(this.txtSize);
             this.Controls.Add(this.lblSize);
             this.Controls.Add(this.btnHash);
             this.Controls.Add(this.txtList);
@@ -238,7 +261,6 @@
         private System.Windows.Forms.TextBox txtList;
         private System.Windows.Forms.Button btnHash;
         private System.Windows.Forms.Label lblSize;
-        private System.Windows.Forms.TextBox txtSize;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.ComboBox cbAlgo;
@@ -251,5 +273,7 @@
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.Button btnBrute;
         private System.Windows.Forms.Button btnOpen;
+        private System.Windows.Forms.ComboBox txtSize;
+        private System.Windows.Forms.ComboBox cbOption;
     }
 }

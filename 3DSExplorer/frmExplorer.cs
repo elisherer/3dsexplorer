@@ -43,12 +43,23 @@ namespace _3DSExplorer
             return buffer;
         }
 
-        private void makeNewListItem(string text, string sub1,string sub2, string sub3)
+        //Only for TMD & CCI for now
+        private void makeNewListItem(string text, string sub1, string sub2, string sub3)
         {
             ListViewItem lvi = new ListViewItem(text);
             lvi.SubItems.Add(sub1);
             lvi.SubItems.Add(sub2);
             lvi.SubItems.Add(sub3);
+            lstInfo.Items.Add(lvi);
+        }
+
+        private void makeNewListItem(string text, string sub1,string sub2, string sub3, string grp)
+        {
+            ListViewItem lvi = new ListViewItem(text);
+            lvi.SubItems.Add(sub1);
+            lvi.SubItems.Add(sub2);
+            lvi.SubItems.Add(sub3);
+            lvi.Group = lstInfo.Groups[grp];
             lstInfo.Items.Add(lvi);
         }
 
@@ -270,57 +281,55 @@ namespace _3DSExplorer
             SFContext cxt = (SFContext)currentContext;
             DISA disa = cxt.Disa;
             lstInfo.Items.Clear();
-            makeNewListItem("0x000", "4", "Unknown 1", cxt.fileHeader.Unknown1.ToString());
-            makeNewListItem("0x004", "4", "Unknown 2", cxt.fileHeader.Unknown2.ToString());
-            makeNewListItem("", "", "Blockmap length", cxt.Blockmap.Length.ToString());
-            makeNewListItem("", "", "Journal size", cxt.JournalSize.ToString());
-            makeEmptyListItem();
-            makeNewListItem("[Image]", "", "", "");
-            makeNewListItem("", "0x10", "Image Hash", byteArrayToString(cxt.ImageHash));
-            makeNewListItem("0x000", "4", "DISA Magic", charArrayToString(disa.Magic));
-            makeNewListItem("0x004", "4", "Unknown", disa.Unknown0.ToString());
-            makeNewListItem("0x008", "8", "Table Size", disa.TableSize.ToString());
-            makeNewListItem("0x010", "8", "Primary Table offset", disa.PrimaryTableOffset.ToString());
-            makeNewListItem("0x018", "8", "Secondary Table offset", disa.SecondaryTableOffset.ToString());
-            makeNewListItem("0x020", "8", "Table Length", disa.TableLength.ToString());
-            makeNewListItem("0x028", "8", "SAVE Entry Table offset", disa.SAVEEntryOffset.ToString());
-            makeNewListItem("0x030", "8", "SAVE Entry Table length", disa.SAVEEntryLength.ToString());
-            makeNewListItem("0x038", "8", "DATA Entry Table offset", disa.DATAEntryOffset.ToString());
-            makeNewListItem("0x040", "8", "DATA Entry Table length", disa.DATAEntryLength.ToString());
-            makeNewListItem("0x048", "8", "SAVE Partition Offset", disa.SAVEPartitionOffset.ToString());
-            makeNewListItem("0x050", "8", "SAVE Partition Length", disa.SAVEPartitionLength.ToString());
-            makeNewListItem("0x058", "8", "DATA Partition Offset", disa.DATAPartitionOffset.ToString());
-            makeNewListItem("0x060", "8", "DATA Partition Length", disa.DATAPartitionLength.ToString());
+            makeNewListItem("0x000", "4", "Unknown 1", cxt.fileHeader.Unknown1.ToString(), "lvgSaveFlash");
+            makeNewListItem("0x004", "4", "Unknown 2", cxt.fileHeader.Unknown2.ToString(), "lvgSaveFlash");
+            makeNewListItem("", "", "Blockmap length", cxt.Blockmap.Length.ToString(), "lvgSaveFlash");
+            makeNewListItem("", "", "Journal size", cxt.JournalSize.ToString(), "lvgSaveFlash");
 
-            makeNewListItem("0x068", "4", "Active Table", ((disa.ActiveTable & 1) == 1 ? "Primary" : "Secondary") + "  (=" + disa.ActiveTable + ")");
-            makeNewListItem("0x06C", "0x20", "Hash", byteArrayToString(disa.Hash));
+            makeNewListItem("", "0x10", "Image Hash", byteArrayToString(cxt.ImageHash),"lvgImage");
 
-            makeNewListItem("0x0", "4", "Zero Padding 0(to 8 bytes)", toHexString(8, (ulong)disa.ZeroPad0));
-            makeNewListItem("0x0", "4", "Flag 0 ?", toHexString(8, (ulong)disa.Flag0));
-            makeNewListItem("0x0", "4", "Zero Padding 1(to 8 bytes)", toHexString(8, (ulong)disa.ZeroPad1));
-            makeNewListItem("0x0", "4", "Unknown 1", toHexString(8, (ulong)disa.Unknown1));
-            makeNewListItem("0x0", "4", "Unknown 2 (Magic?)", toHexString(8, (ulong)disa.Unknown2));
-            makeNewListItem("0x0", "8", "Data FS Length", toHexString(16, (ulong)disa.DataFsLength));
-            makeNewListItem("0x0", "8", "Unknown 3", toHexString(16, (ulong)disa.Unknown3));
-            makeNewListItem("0x0", "4", "Unknown 4", toHexString(8, (ulong)disa.Unknown4));
-            makeNewListItem("0x0", "4", "Unknown 5", toHexString(8, (ulong)disa.Unknown5));
-            makeNewListItem("0x0", "4", "Unknown 6", toHexString(8, (ulong)disa.Unknown6));
-            makeNewListItem("0x0", "4", "Unknown 7", toHexString(8, (ulong)disa.Unknown7));
-            makeNewListItem("0x0", "4", "Unknown 8", toHexString(8, (ulong)disa.Unknown8));
-            makeNewListItem("0x0", "4", "Flag 1 ?", toHexString(8, (ulong)disa.Flag1));
-            makeNewListItem("0x0", "4", "Flag 2 ?", toHexString(8, (ulong)disa.Flag2));
-            makeNewListItem("0x0", "4", "Flag 3 ?", toHexString(8, (ulong)disa.Flag3));
-            makeNewListItem("0x0", "4", "Flag 4 ?", toHexString(8, (ulong)disa.Flag4));
-            makeNewListItem("0x0", "4", "Unknown 14", toHexString(8, (ulong)disa.Unknown8));
-            makeNewListItem("0x0", "4", "Flag 5 ?", toHexString(8, (ulong)disa.Flag5));
-            makeNewListItem("0x0", "4", "Unknown 16", toHexString(8, (ulong)disa.Unknown8));
-            makeNewListItem("0x0", "8", "Magic 17", toHexString(16, (ulong)disa.Magic17));
-            makeNewListItem("0x0", "4", "Flag 6 ?", toHexString(8, (ulong)disa.Flag6));
-            makeNewListItem("0x0", "4", "Flag 7 ?", toHexString(8, (ulong)disa.Flag7));
-            makeNewListItem("0x0", "4", "Flag 8 ?", toHexString(8, (ulong)disa.Flag8));
-            makeNewListItem("0x0", "4", "Unknown 21", toHexString(8, (ulong)disa.Unknown21));
-            makeNewListItem("0x0", "4", "Unknown 22", toHexString(8, (ulong)disa.Unknown22));
-            makeNewListItem("0x0", "4", "Unknown 23", toHexString(8, (ulong)disa.Unknown23));
+            makeNewListItem("0x000", "4", "DISA Magic", charArrayToString(disa.Magic), "lvgImage");
+            makeNewListItem("0x004", "4", "Unknown", disa.Unknown0.ToString(), "lvgImage");
+            makeNewListItem("0x008", "8", "Table Size", disa.TableSize.ToString(), "lvgImage");
+            makeNewListItem("0x010", "8", "Primary Table offset", disa.PrimaryTableOffset.ToString(), "lvgImage");
+            makeNewListItem("0x018", "8", "Secondary Table offset", disa.SecondaryTableOffset.ToString(), "lvgImage");
+            makeNewListItem("0x020", "8", "Table Length", disa.TableLength.ToString(), "lvgImage");
+            makeNewListItem("0x028", "8", "SAVE Entry Table offset", disa.SAVEEntryOffset.ToString(), "lvgImage");
+            makeNewListItem("0x030", "8", "SAVE Entry Table length", disa.SAVEEntryLength.ToString(), "lvgImage");
+            makeNewListItem("0x038", "8", "DATA Entry Table offset", disa.DATAEntryOffset.ToString(), "lvgImage");
+            makeNewListItem("0x040", "8", "DATA Entry Table length", disa.DATAEntryLength.ToString(), "lvgImage");
+            makeNewListItem("0x048", "8", "SAVE Partition Offset", disa.SAVEPartitionOffset.ToString(), "lvgImage");
+            makeNewListItem("0x050", "8", "SAVE Partition Length", disa.SAVEPartitionLength.ToString(), "lvgImage");
+            makeNewListItem("0x058", "8", "DATA Partition Offset", disa.DATAPartitionOffset.ToString(), "lvgImage");
+            makeNewListItem("0x060", "8", "DATA Partition Length", disa.DATAPartitionLength.ToString(), "lvgImage");
+            makeNewListItem("0x068", "4", "Active Table", ((disa.ActiveTable & 1) == 1 ? "Primary" : "Secondary") + "  (=" + disa.ActiveTable + ")", "lvgImage");
+            makeNewListItem("0x06C", "0x20", "Hash", byteArrayToString(disa.Hash), "lvgImage");
+            makeNewListItem("0x08C", "4", "Zero Padding 0(to 8 bytes)", toHexString(8, (ulong)disa.ZeroPad0), "lvgImage");
+            makeNewListItem("0x090", "4", "Flag 0 ?", toHexString(8, (ulong)disa.Flag0), "lvgImage");
+            makeNewListItem("0x094", "4", "Zero Padding 1(to 8 bytes)", toHexString(8, (ulong)disa.ZeroPad1), "lvgImage");
+            makeNewListItem("0x098", "4", "Unknown 1", toHexString(8, (ulong)disa.Unknown1), "lvgImage");
+            makeNewListItem("0x09C", "4", "Unknown 2 (Magic?)", toHexString(8, (ulong)disa.Unknown2), "lvgImage");
+            makeNewListItem("0x0A0", "8", "Data FS Length", toHexString(16, (ulong)disa.DataFsLength), "lvgImage");
+            makeNewListItem("0x0A8", "8", "Unknown 3", toHexString(16, (ulong)disa.Unknown3), "lvgImage");
+            makeNewListItem("0x0B0", "4", "Unknown 4", toHexString(8, (ulong)disa.Unknown4), "lvgImage");
+            makeNewListItem("0x0B4", "4", "Unknown 5", toHexString(8, (ulong)disa.Unknown5), "lvgImage");
+            makeNewListItem("0x0B8", "4", "Unknown 6", toHexString(8, (ulong)disa.Unknown6), "lvgImage");
+            makeNewListItem("0x0BC", "4", "Unknown 7", toHexString(8, (ulong)disa.Unknown7), "lvgImage");
+            makeNewListItem("0x0C0", "4", "Unknown 8", toHexString(8, (ulong)disa.Unknown8), "lvgImage");
+            makeNewListItem("0x0C4", "4", "Flag 1 ?", toHexString(8, (ulong)disa.Flag1), "lvgImage");
+            makeNewListItem("0x0C8", "4", "Flag 2 ?", toHexString(8, (ulong)disa.Flag2), "lvgImage");
+            makeNewListItem("0x0CC", "4", "Flag 3 ?", toHexString(8, (ulong)disa.Flag3), "lvgImage");
+            makeNewListItem("0x0D0", "4", "Flag 4 ?", toHexString(8, (ulong)disa.Flag4), "lvgImage");
+            makeNewListItem("0x0D4", "4", "Unknown 14", toHexString(8, (ulong)disa.Unknown8), "lvgImage");
+            makeNewListItem("0x0D8", "4", "Flag 5 ?", toHexString(8, (ulong)disa.Flag5), "lvgImage");
+            makeNewListItem("0x0DC", "4", "Unknown 16", toHexString(8, (ulong)disa.Unknown8), "lvgImage");
+            makeNewListItem("0x0E0", "8", "Magic 17", toHexString(16, (ulong)disa.Magic17), "lvgImage");
+            makeNewListItem("0x0E8", "4", "Flag 6 ?", toHexString(8, (ulong)disa.Flag6), "lvgImage");
+            makeNewListItem("0x0EC", "4", "Flag 7 ?", toHexString(8, (ulong)disa.Flag7), "lvgImage");
+            makeNewListItem("0x0F0", "4", "Flag 8 ?", toHexString(8, (ulong)disa.Flag8), "lvgImage");
+            makeNewListItem("0x0F4", "4", "Unknown 21", toHexString(8, (ulong)disa.Unknown21), "lvgImage");
+            makeNewListItem("0x0F8", "4", "Unknown 22", toHexString(8, (ulong)disa.Unknown22), "lvgImage");
+            makeNewListItem("0x0FC", "4", "Unknown 23", toHexString(8, (ulong)disa.Unknown23), "lvgImage");
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
@@ -333,86 +342,90 @@ namespace _3DSExplorer
             DPFS dpfs = cxt.Partitions[cxt.currentPartition].Dpfs;
             SAVE save = cxt.Save;
 
-            makeNewListItem("0x000", "4", "Magic DIFI", charArrayToString(difi.Magic));
-            makeNewListItem("0x004", "4", "Unknown 0", difi.Unknown0.ToString());
+            makeNewListItem("0x000", "4", "Magic DIFI", charArrayToString(difi.Magic), "lvgDifi");
+            makeNewListItem("0x004", "4", "Unknown 0", difi.Unknown0.ToString(), "lvgDifi");
+            makeNewListItem("0x008", "8", "IVFC Offset", difi.IVFCOffset.ToString(), "lvgDifi");
+            makeNewListItem("0x010", "8", "IVFC Size", difi.IVFCSize.ToString(), "lvgDifi");
+            makeNewListItem("0x018", "8", "DPFS Offset", difi.DPFSOffset.ToString(), "lvgDifi");
+            makeNewListItem("0x020", "8", "DPFS Size", difi.DPFSSize.ToString(), "lvgDifi");
+            makeNewListItem("0x028", "8", "Hash Offset", difi.HashOffset.ToString(), "lvgDifi");
+            makeNewListItem("0x030", "8", "Hash Size", difi.HashSize.ToString(), "lvgDifi");
+            makeNewListItem("0x038", "4", "Flags", toHexString(8, (ulong)difi.Flags), "lvgDifi");
+            makeNewListItem("0x03C", "8", "File Base (for DATA partitions)", difi.FileBase.ToString(), "lvgDifi");
 
-            makeNewListItem("0x008", "8", "IVFC Offset", difi.IVFCOffset.ToString());
-            makeNewListItem("0x010", "8", "IVFC Size", difi.IVFCSize.ToString());
-            makeNewListItem("0x018", "8", "DPFS Offset", difi.DPFSOffset.ToString());
-            makeNewListItem("0x020", "8", "DPFS Size", difi.DPFSSize.ToString());
-            makeNewListItem("0x028", "8", "Hash Offset", difi.HashOffset.ToString());
-            makeNewListItem("0x030", "8", "Hash Size", difi.HashSize.ToString());
-            makeNewListItem("0x038", "4", "Flags", toHexString(8,(ulong)difi.Flags));
-            makeNewListItem("0x03C", "8", "File Base (for DATA partitions)", difi.FileBase.ToString());
+            makeNewListItem("0x000", "4", "Magic IVFC", charArrayToString(ivfc.Magic), "lvgIvfc");
+            makeNewListItem("0x004", "4", "Magic Padding (zeros)", ivfc.MagicPadding.ToString(), "lvgIvfc");
+            makeNewListItem("0x008", "8", "Unknown 1", ivfc.Unknown1.ToString(), "lvgIvfc");
+            makeNewListItem("0x010", "8", "FirstHashTableOffset", ivfc.FirstHashTableOffset.ToString(), "lvgIvfc");
+            makeNewListItem("0x018", "8", "FirstHashTableLength", ivfc.FirstHashTableLength.ToString(), "lvgIvfc");
+            makeNewListItem("0x020", "8", "FirstHashTableBlock", ivfc.FirstHashTableBlock + " (=" + (1 << (int)ivfc.FirstHashTableBlock) + ")", "lvgIvfc");
+            makeNewListItem("0x028", "8", "SecondHashTableOffset", ivfc.SecondHashTableOffset.ToString(), "lvgIvfc");
+            makeNewListItem("0x030", "8", "SecondHashTableLength", ivfc.SecondHashTableLength.ToString(), "lvgIvfc");
+            makeNewListItem("0x038", "8", "SecondHashTableBlock", ivfc.SecondHashTableBlock + " (=" + (1 << (int)ivfc.SecondHashTableBlock) + ")", "lvgIvfc");
+            makeNewListItem("0x040", "8", "HashTable Offset", ivfc.HashTableOffset.ToString(), "lvgIvfc");
+            makeNewListItem("0x048", "8", "HashTable Length", ivfc.HashTableLength.ToString(), "lvgIvfc");
+            makeNewListItem("0x050", "8", "HashTable Block", ivfc.HashTableBlock + " (=" + (1 << (int)ivfc.HashTableBlock) + ")", "lvgIvfc");
+            makeNewListItem("0x058", "8", "FileSystem Offset", ivfc.FileSystemOffset.ToString(), "lvgIvfc");
+            makeNewListItem("0x060", "8", "FileSystem Length", ivfc.FileSystemLength.ToString(), "lvgIvfc");
+            makeNewListItem("0x068", "8", "FileSystem Block", ivfc.FileSystemBlock + " (=" + (1 << (int)ivfc.FileSystemBlock) + ")", "lvgIvfc");
+            makeNewListItem("0x070", "8", "Unknown 3", ivfc.Unknown3.ToString(), "lvgIvfc");
+
+            makeNewListItem("0x000", "4", "Magic DPFS", charArrayToString(dpfs.Magic), "lvgDpfs");
+            makeNewListItem("0x004", "4", "Magic Padding (zeros)", dpfs.MagicPadding.ToString(), "lvgDpfs");
+            makeNewListItem("0x008", "8", "Unknown 1", dpfs.Unknown1.ToString(), "lvgDpfs");
+            makeNewListItem("0x010", "8", "Unknown 2", dpfs.Unknown2.ToString(), "lvgDpfs");
+            makeNewListItem("0x018", "8", "Unknown 3", dpfs.Unknown3.ToString(), "lvgDpfs");
+            makeNewListItem("0x020", "8", "Unknown 4", dpfs.Unknown4.ToString(), "lvgDpfs");
+            makeNewListItem("0x028", "8", "Unknown 5", dpfs.Unknown5.ToString(), "lvgDpfs");
+            makeNewListItem("0x030", "8", "Unknown 6", dpfs.Unknown6.ToString(), "lvgDpfs");
+            makeNewListItem("0x038", "8", "Unknown 7", dpfs.Unknown7.ToString(), "lvgDpfs");
+            makeNewListItem("0x040", "8", "Offset to next partition", dpfs.OffsetToNextPartition.ToString(), "lvgDpfs");
+            makeNewListItem("0x048", "8", "Unknown 9", dpfs.Unknown9.ToString(), "lvgDpfs");
             
-            makeNewListItem("0x044", "4", "Magic IVFC", charArrayToString(ivfc.Magic));
-            makeNewListItem("0x048", "0x20", "Unknown 2_0", byteArrayToString(ivfc.Unknown2_0));
-            makeNewListItem("0x068", "0x1C", "Unknown 2_1", byteArrayToString(ivfc.Unknown2_1));
-
-            makeNewListItem("0x084", "8", "HashTable Offset", ivfc.HashTableOffset.ToString());
-            makeNewListItem("0x08C", "8", "HashTable Length", ivfc.HashTableLength.ToString());
-            makeNewListItem("0x094", "8", "Unknown 2_2", ivfc.Unknown2_2.ToString());
-            makeNewListItem("0x09C", "8", "FileSystem Offset", ivfc.FileSystemOffset.ToString());
-            makeNewListItem("0x0A4", "8", "FileSystem Length", ivfc.FileSystemLength.ToString());
-
-            makeNewListItem("0x0AC", "8", "HashedBlockLength", ivfc.HashedBlockLength + " (=" + (1 << (int)ivfc.HashedBlockLength) + ")");
-            makeNewListItem("0x0B4", "8", "Unknown 3", ivfc.Unknown3.ToString());
-
-            makeNewListItem("0x0BC", "4", "Magic DPFS", charArrayToString(dpfs.Magic));
-            makeNewListItem("0x0C0", "0x20", "DPFS Data 0", byteArrayToString(dpfs.DPFSData_0));
-            makeNewListItem("0x0E0", "0x20", "DPFS Data 1", byteArrayToString(dpfs.DPFSData_1));
-            makeNewListItem("0x0FC", "8", "OffsetToNextPartition", dpfs.OffsetToNextPartition.ToString());
-            makeNewListItem("0x104", "8", "DPFS Data Unknown", dpfs.DPFSUnknown.ToString());
-            
-            makeNewListItem("0x10C", "0x20", "Hash", byteArrayToString(cxt.Partitions[cxt.currentPartition].Hash));
+            makeNewListItem("0x000", "0x20", "Hash", byteArrayToString(cxt.Partitions[cxt.currentPartition].Hash), "lvgHash");
             
             if (cxt.currentPartition == 0)
             {
-                makeEmptyListItem();
-                makeNewListItem("[SAVE]", "", "", "");
-                makeNewListItem("0x000", "4", "SAVE Magic", charArrayToString(save.Magic));
-                makeNewListItem("0x004", "4", "Unknown 0", save.Unknown0.ToString());
-                makeNewListItem("0x008", "8", "Unknown 1", save.Unknown1.ToString());
-                makeNewListItem("0x010", "8", "Size of data partition [medias]", save.PartitionSize + " (=" + save.PartitionSize * 0x200 + ")");
-                makeNewListItem("0x018", "4", "Unknown 2", save.Unknown2.ToString());
-                makeNewListItem("0x01C", "8", "Unknown 3", save.Unknown3.ToString());
-                makeNewListItem("0x024", "4", "Unknown 4", save.Unknown4.ToString());
-                makeNewListItem("0x028", "8", "Unknown 5 (first table offset)", save.Unknown5.ToString());
-                makeNewListItem("0x030", "4", "Unknown 6 (num of u32)", save.Unknown6.ToString());
-                makeNewListItem("0x034", "4", "Unknown 7 (size of media?)", save.Unknown7.ToString());
-                makeNewListItem("0x038", "8", "Unknown 8 (second table offset)", save.Unknown8.ToString());
-                makeNewListItem("0x040", "4", "Unknown 9 (num of u32)", save.Unknown9.ToString());
-                makeNewListItem("0x044", "4", "Unknown 10 (size of media?)", save.Unknown10.ToString());
-                makeNewListItem("0x048", "8", "Unknown 11 (third table offset)", save.Unknown11.ToString());
-                makeNewListItem("0x050", "4", "Unknown 12 (num of u32)", save.Unknown12.ToString());
-                makeNewListItem("0x054", "4", "Unknown 13 (size of media?)", save.Unknown13.ToString());
-                makeNewListItem("0x058", "8", "Local File Base Offset (form SAVE)", save.LocalFileBaseOffset.ToString());
-                makeNewListItem("0x060", "4", "Filestore Length (medias)", save.FileStoreLength.ToString());
-                makeNewListItem("0x064", "4", "Unknown 16", save.Unknown16.ToString());
-                makeNewListItem("0x068", "4", "Unknown 17 Offset (form SAVE)", save.Unknown17.ToString());
-                makeNewListItem("0x06C", "4", "FileSystem Table Offset (medias)", save.FSTBlockOffset.ToString());
-                makeNewListItem("0x070", "4", "Unknown 18", save.Unknown18.ToString());
-                makeNewListItem("0x074", "4", "Unknown 19", save.Unknown19.ToString());
-                makeNewListItem("0x078", "4", "FileSystem Table Exact Offset", save.FSTExactOffset.ToString());
-                makeNewListItem("0x07C", "4", "Unknown 20", save.Unknown20.ToString());
-                makeNewListItem("0x080", "4", "Unknown 21", save.Unknown21.ToString());
-                makeNewListItem("0x084", "4", "Unknown 22", save.Unknown22.ToString());
+                makeNewListItem("0x000", "4", "SAVE Magic", charArrayToString(save.Magic), "lvgSave");
+                makeNewListItem("0x004", "4", "Magic Padding", save.MagicPadding.ToString(), "lvgSave");
+                makeNewListItem("0x008", "8", "Unknown 1", save.Unknown1.ToString(), "lvgSave");
+                makeNewListItem("0x010", "8", "Size of data partition [medias]", save.PartitionSize + " (=" + save.PartitionSize * 0x200 + ")", "lvgSave");
+                makeNewListItem("0x018", "4", "Unknown 2", save.Unknown2.ToString(), "lvgSave");
+                makeNewListItem("0x01C", "8", "Unknown 3", save.Unknown3.ToString(), "lvgSave");
+                makeNewListItem("0x024", "4", "Unknown 4", save.Unknown4.ToString(), "lvgSave");
+                makeNewListItem("0x028", "8", "Unknown 5 (first table offset)", save.Unknown5.ToString(), "lvgSave");
+                makeNewListItem("0x030", "4", "Unknown 6 (num of u32)", save.Unknown6.ToString(), "lvgSave");
+                makeNewListItem("0x034", "4", "Unknown 7 (size of media?)", save.Unknown7.ToString(), "lvgSave");
+                makeNewListItem("0x038", "8", "Unknown 8 (second table offset)", save.Unknown8.ToString(), "lvgSave");
+                makeNewListItem("0x040", "4", "Unknown 9 (num of u32)", save.Unknown9.ToString(), "lvgSave");
+                makeNewListItem("0x044", "4", "Unknown 10 (size of media?)", save.Unknown10.ToString(), "lvgSave");
+                makeNewListItem("0x048", "8", "Unknown 11 (third table offset)", save.Unknown11.ToString(), "lvgSave");
+                makeNewListItem("0x050", "4", "Unknown 12 (num of u32)", save.Unknown12.ToString(), "lvgSave");
+                makeNewListItem("0x054", "4", "Unknown 13 (size of media?)", save.Unknown13.ToString(), "lvgSave");
+                makeNewListItem("0x058", "8", "Local File Base Offset (form SAVE)", save.LocalFileBaseOffset.ToString(), "lvgSave");
+                makeNewListItem("0x060", "4", "Filestore Length (medias)", save.FileStoreLength.ToString(), "lvgSave");
+                makeNewListItem("0x064", "4", "Unknown 16", save.Unknown16.ToString(), "lvgSave");
+                makeNewListItem("0x068", "4", "Unknown 17 Offset (form SAVE)", save.Unknown17.ToString(), "lvgSave");
+                makeNewListItem("0x06C", "4", "FileSystem Table Offset (medias)", save.FSTBlockOffset.ToString(), "lvgSave");
+                makeNewListItem("0x070", "4", "Unknown 18", save.Unknown18.ToString(), "lvgSave");
+                makeNewListItem("0x074", "4", "Unknown 19", save.Unknown19.ToString(), "lvgSave");
+                makeNewListItem("0x078", "4", "FileSystem Table Exact Offset", save.FSTExactOffset.ToString(), "lvgSave");
+                makeNewListItem("0x07C", "4", "Unknown 20", save.Unknown20.ToString(), "lvgSave");
+                makeNewListItem("0x080", "4", "Unknown 21", save.Unknown21.ToString(), "lvgSave");
+                makeNewListItem("0x084", "4", "Unknown 22", save.Unknown22.ToString(), "lvgSave");
 
                 if (save.Magic != null & SaveTool.isSaveMagic(save.Magic))
                 {
-                    makeEmptyListItem();
-                    makeNewListItem("[FILES]", "", "", "");
-
                     int i = 0;
                     foreach (FileSystemEntry fse in cxt.Files)
                     {
-                        makeNewListItem(i++.ToString(), fse.FileSize.ToString(), charArrayToString(fse.Filename), "");
-                        makeNewListItem("", "4", "NodeCount", fse.NodeCount.ToString());
-                        makeNewListItem("", "4", "FileIndex", fse.Index.ToString());
-                        makeNewListItem("", "4", "Magic? (Unknown 1)", fse.Magic.ToString() + "(=" + toHexString(8, (ulong)fse.Magic) + ")");
-                        makeNewListItem("", "8", "FileBlockOffset (if size>0)", fse.BlockOffset.ToString());
-                        makeNewListItem("", "4", "Unknown 2", fse.Unknown2.ToString() + " (=" + toHexString(8, (ulong)fse.Unknown2) + ")");
-                        makeNewListItem("", "4", "Unknown 3", fse.Unknown3.ToString());
+                        makeNewListItem(i++.ToString(), fse.FileSize.ToString(), charArrayToString(fse.Filename), "", "lvgFiles");
+                        makeNewListItem("", "4", "NodeCount", fse.NodeCount.ToString(), "lvgFiles");
+                        makeNewListItem("", "4", "FileIndex", fse.Index.ToString(), "lvgFiles");
+                        makeNewListItem("", "4", "Magic? (Unknown 1)", fse.Magic.ToString() + "(=" + toHexString(8, (ulong)fse.Magic) + ")", "lvgFiles");
+                        makeNewListItem("", "8", "FileBlockOffset (if size>0)", fse.BlockOffset.ToString(), "lvgFiles");
+                        makeNewListItem("", "4", "Unknown 2", fse.Unknown2.ToString() + " (=" + toHexString(8, (ulong)fse.Unknown2) + ")", "lvgFiles");
+                        makeNewListItem("", "4", "Unknown 3", fse.Unknown3.ToString(), "lvgFiles");
                     }
                 }
             }
@@ -490,7 +503,7 @@ namespace _3DSExplorer
 
                 MemoryStream ims = new MemoryStream(cxt.image);
 
-                cxt.ImageHash = ReadByteArray(ims, SFContext.IMAGE_HASH_LENGTH);
+                cxt.ImageHash = ReadByteArray(ims, Sizes.MD5);
                 //Go to start of image
                 ims.Seek(0x100, SeekOrigin.Begin);
                 cxt.Disa = MarshalTool.ReadStruct<DISA>(ims);
@@ -523,7 +536,7 @@ namespace _3DSExplorer
                         //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.DPFSOffset, SeekOrigin.Begin);
                         cxt.Partitions[i].Dpfs = MarshalTool.ReadStruct<DPFS>(ims);
                         //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.HashOffset, SeekOrigin.Begin);
-                        cxt.Partitions[i].Hash = ReadByteArray(ims, Partition.HASH_LENGTH);
+                        cxt.Partitions[i].Hash = ReadByteArray(ims, Sizes.SHA256);
                         ims.Seek(4, SeekOrigin.Current); // skip garbage
                     }
 
@@ -680,7 +693,7 @@ namespace _3DSExplorer
             makeNewListItem("", "", "Content Info Records Hash", byteArrayToString(head.ContentInfoRecordsHash));
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileSystem.Clear();
+            lvFileSystem.Items.Clear();
         }
 
         private void showTMDCertificate(int i)
@@ -704,7 +717,7 @@ namespace _3DSExplorer
             makeNewListItem("", "52", "Padding", byteArrayToString(cert.Padding));
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileSystem.Clear();
+            lvFileSystem.Items.Clear();
         }
 
         private void OpenTMD(string path)
@@ -920,67 +933,71 @@ namespace _3DSExplorer
             return retArray;
         }
 
-        private void lvFileSystem_ItemActivate(object sender, EventArgs e)
+        private void lvFileSystem_DoubleClick(object sender, EventArgs e)
         {
-            ListViewItem item = lvFileSystem.SelectedItems[0];
-            if (item.Tag != null)
+            if (lvFileSystem.SelectedIndices.Count > 0)
             {
-                saveFileDialog.Filter = "All Files (*.*)|*.*";
-                if (item.Tag is FileSystemEntry)
-                {   FileSystemEntry entry = (FileSystemEntry)item.Tag;
-                    SFContext cxt = (SFContext)currentContext;
-                    saveFileDialog.FileName = charArrayToString(entry.Filename);
-                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        MemoryStream fs = new MemoryStream(cxt.image);
-                        fs.Seek(cxt.fileBase + entry.BlockOffset * 0x200, SeekOrigin.Begin);
-                        //read entry.filesize
-                        byte[] fileBuffer = new byte[entry.FileSize];
-                        fs.Read(fileBuffer, 0, fileBuffer.Length);
-                        File.WriteAllBytes(saveFileDialog.FileName, fileBuffer);
-                        fs.Close();
-                    }
-                }
-                else if (item.Tag is CXI)
+                ListViewItem item = lvFileSystem.SelectedItems[0];
+                if (item.Tag != null)
                 {
-                    CXI cxi = (CXI)item.Tag;
-                    CCIContext cxt = (CCIContext)currentContext;
-                    saveFileDialog.FileName = item.Text;
-                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    saveFileDialog.Filter = "All Files (*.*)|*.*";
+                    if (item.Tag is FileSystemEntry)
                     {
-                        string strKey = InputBox.ShowDialog("Please Enter Key:\nPress OK with empty key to save encrypted");
-                        if (strKey != null)
+                        FileSystemEntry entry = (FileSystemEntry)item.Tag;
+                        SFContext cxt = (SFContext)currentContext;
+                        saveFileDialog.FileName = charArrayToString(entry.Filename);
+                        if (saveFileDialog.ShowDialog() == DialogResult.OK)
                         {
-                            byte[] key = parseKeyStringToByteArray(strKey);
+                            MemoryStream fs = new MemoryStream(cxt.image);
+                            fs.Seek(cxt.fileBase + entry.BlockOffset * 0x200, SeekOrigin.Begin);
+                            //read entry.filesize
+                            byte[] fileBuffer = new byte[entry.FileSize];
+                            fs.Read(fileBuffer, 0, fileBuffer.Length);
+                            File.WriteAllBytes(saveFileDialog.FileName, fileBuffer);
+                            fs.Close();
+                        }
+                    }
+                    else if (item.Tag is CXI)
+                    {
+                        CXI cxi = (CXI)item.Tag;
+                        CCIContext cxt = (CCIContext)currentContext;
+                        saveFileDialog.FileName = item.Text;
+                        if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            string strKey = InputBox.ShowDialog("Please Enter Key:\nPress OK with empty key to save encrypted");
+                            if (strKey != null)
+                            {
+                                byte[] key = parseKeyStringToByteArray(strKey);
 
-                            if (key == null)
-                                MessageBox.Show("Error parsing key string, (must be a multiple of 2 and made of hex letters.");
-                            else
-                            {            
-                                string inpath = saveFileDialog.FileName;
-                                FileStream infs = File.OpenRead(inpath);
-                                bool isExeFS = item.Text.StartsWith("Exe");
-
-                                long offset = isExeFS ? cxi.ExeFSOffset : cxi.RomFSOffset;
-                                if (cxt.currentNcch == 0) offset += cxt.cci.FirstNCCHOffset;
-                                else if (cxt.currentNcch == 1) offset += cxt.cci.SecondNCCHOffset;
-                                else offset += cxt.cci.ThirdNCCHOffset;
-                                offset *= 0x200; //media units
-
-                                infs.Seek(offset, SeekOrigin.Begin);
-                                long bufferSize = isExeFS ? cxi.ExeFSSize * 0x200 : cxi.RomFSSize * 0x200;
-                                byte[] buffer = new byte[bufferSize];
-                                infs.Read(buffer, 0, buffer.Length);
-                                infs.Close();
-                                if (key.Length > 0)
+                                if (key == null)
+                                    MessageBox.Show("Error parsing key string, (must be a multiple of 2 and made of hex letters.");
+                                else
                                 {
-                                    AES128CTR aes = new AES128CTR(key);
-                                    aes.Decrypt(buffer);
+                                    string inpath = saveFileDialog.FileName;
+                                    FileStream infs = File.OpenRead(inpath);
+                                    bool isExeFS = item.Text.StartsWith("Exe");
+
+                                    long offset = isExeFS ? cxi.ExeFSOffset : cxi.RomFSOffset;
+                                    if (cxt.currentNcch == 0) offset += cxt.cci.FirstNCCHOffset;
+                                    else if (cxt.currentNcch == 1) offset += cxt.cci.SecondNCCHOffset;
+                                    else offset += cxt.cci.ThirdNCCHOffset;
+                                    offset *= 0x200; //media units
+
+                                    infs.Seek(offset, SeekOrigin.Begin);
+                                    long bufferSize = isExeFS ? cxi.ExeFSSize * 0x200 : cxi.RomFSSize * 0x200;
+                                    byte[] buffer = new byte[bufferSize];
+                                    infs.Read(buffer, 0, buffer.Length);
+                                    infs.Close();
+                                    if (key.Length > 0)
+                                    {
+                                        AES128CTR aes = new AES128CTR(key);
+                                        aes.Decrypt(buffer);
+                                    }
+                                    string outpath = saveFileDialog.FileName;
+                                    FileStream outfs = File.OpenWrite(outpath);
+                                    outfs.Write(buffer, 0, buffer.Length);
+                                    outfs.Close();
                                 }
-                                string outpath = saveFileDialog.FileName;
-                                FileStream outfs = File.OpenWrite(outpath);
-                                outfs.Write(buffer, 0, buffer.Length);
-                                outfs.Close();
                             }
                         }
                     }
@@ -1119,7 +1136,7 @@ namespace _3DSExplorer
 
         private void cxtFileSaveAs_Click(object sender, EventArgs e)
         {
-            lvFileSystem_ItemActivate(null, null);
+            lvFileSystem_DoubleClick(null, null);
         }
 
         private void cxtFileReplaceWith_Click(object sender, EventArgs e)

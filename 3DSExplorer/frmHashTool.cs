@@ -21,6 +21,7 @@ namespace _3DSExplorer
         {
             InitializeComponent();
             cbAlgo.SelectedIndex = 0;
+            cbOption.SelectedIndex = 0;
         }
 
         private string byteArrayToString(byte[] array)
@@ -30,6 +31,63 @@ namespace _3DSExplorer
             for (i = 0; i < array.Length ; i++)
                 arraystring += array[i].ToString("X2");
             return arraystring;
+        }
+
+        private HashAlgorithm getHashAlgorithm()
+        {
+            HashAlgorithm ha = null;
+                switch (cbAlgo.SelectedIndex)
+                {
+                    case 0:
+                        switch (cbOption.SelectedIndex)
+                        {
+                            case 0: ha = SHA256.Create();
+                                break;
+                            case 1: ha = SHA256Cng.Create();
+                                break;
+                            case 2: ha = HMACSHA256.Create();
+                                break;
+
+                        }
+                        break;
+                    case 1:
+                        switch (cbOption.SelectedIndex)
+                        {
+                            case 0: ha = SHA512.Create();
+                                break;
+                            case 1: ha = SHA512Cng.Create();
+                                break;
+                            case 2: ha = HMACSHA512.Create();
+                                break;
+                        }
+                        break;
+                    case 2:
+                        switch (cbOption.SelectedIndex)
+                        {
+                            case 0: ha = SHA1.Create();
+                                break;
+                            case 1: ha = SHA1Cng.Create();
+                                break;
+                            case 2: ha = HMACSHA1.Create();
+                                break;
+                        }
+                        break;
+                    case 3:
+                        switch (cbOption.SelectedIndex)
+                        {
+                            case 0: ha = MD5.Create();
+                                break;
+                            case 1: ha = MD5Cng.Create();
+                                break;
+                            case 2: ha = HMACMD5.Create();
+                                break;
+                        }
+                        break;
+                    case 4:
+                        //stays null for Modbus-CRC16
+                        break;
+                }
+            return ha;
         }
 
         private void btnOpenGo_Click(object sender, EventArgs e)
@@ -43,26 +101,7 @@ namespace _3DSExplorer
 
                 byte[] block = new byte[blockSize];
                 byte[] hash;
-                HashAlgorithm ha = null;
-                switch (cbAlgo.SelectedIndex)
-                {
-                    case 0:
-                        ha = SHA256.Create();
-                        break;
-                    case 1:
-                        ha = SHA512.Create();
-                        break;
-                    case 2:
-                        ha = SHA1.Create();
-                        break;
-                    case 3:
-                        ha = MD5.Create();
-                        break;
-                    case 4:
-                        //stays null for Modbus-CRC16
-                        break;
-                }
-                
+                HashAlgorithm ha = getHashAlgorithm();
                 
                 progressBar.Maximum = (blocks > 0 ? blocks : (int)fs.Length / blockSize);
                 progressBar.Value = 0;
@@ -136,26 +175,7 @@ namespace _3DSExplorer
 
                     byte[] block = new byte[blockSize];
                     byte[] hash;
-                    HashAlgorithm ha = null;
-                    switch (cbAlgo.SelectedIndex)
-                    {
-                        case 0:
-                            ha = SHA256.Create();
-                            break;
-                        case 1:
-                            ha = SHA512.Create();
-                            break;
-                        case 2:
-                            ha = SHA1.Create();
-                            break;
-                        case 3:
-                            ha = MD5.Create();
-                            break;
-                        case 4:
-                            //stays null for Modbus-CRC16
-                            break;
-                    }
-                    
+                    HashAlgorithm ha = getHashAlgorithm();
 
                     progressBar.Maximum = blocks * blockSize;
                     progressBar.Value = 0;
