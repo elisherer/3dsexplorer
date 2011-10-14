@@ -19,7 +19,7 @@ namespace _3DSExplorer
     {
     }
 
-    public class CCIContext : Context
+    public class RomContext : Context
     {
         public CCI cci;
         public CXI[] cxis;

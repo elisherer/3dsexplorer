@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{91B5ECFA-3A39-43D2-B8D3-60080AAC52BE}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -17,9 +17,9 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
@@ -51,10 +51,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AES128CTR.cs" />
-    <Compile Include="CCI.cs" />
+    <Compile Include="Rom.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="CRC16.cs" />
-    <Compile Include="CXI.cs" />
     <Compile Include="frmXORTool.cs">
       <SubType>Form</SubType>
     </Compile>

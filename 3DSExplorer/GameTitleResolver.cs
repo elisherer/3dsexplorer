@@ -7,8 +7,9 @@ namespace _3DSExplorer
 {
     class GameTitleResolver
     {
-        public static string Resolve(string productCode)
+        public static string Resolve(char[] chars)
         {
+            string productCode = chars[7].ToString() + chars[8].ToString();
             switch (productCode)
             {
                 case "SF": return "Asphalt 3D";

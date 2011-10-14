@@ -49,7 +49,7 @@ namespace _3DSExplorer
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x10)]
         public char[] Filename;
         public int Index;
-        public uint Magic;
+        public int Magic;
         public int BlockOffset;
         public long FileSize;
         public int Unknown2; // flags and/or date?
@@ -80,31 +80,31 @@ namespace _3DSExplorer
         public byte[] Hash;
 
         public int ZeroPad0;
-        public uint Flag0;
-        public uint Unknown1;
-        public uint ZeroPad1; 
-        public uint Unknown2; //Magic
+        public int Flag0;
+        public int Unknown1;
+        public int ZeroPad1; 
+        public int Unknown2; //Magic
         public long DataFsLength; //Why??
         public long Unknown3;
-        public uint Unknown4; 
-        public uint Unknown5; 
-        public uint Unknown6;
-        public uint Unknown7;
-        public uint Unknown8;
-        public uint Flag1;
-        public uint Flag2;
-        public uint Flag3;
-        public uint Flag4;
-        public uint Unknown14;
-        public uint Flag5;
-        public uint Unknown16;
-        public ulong Magic17;
-        public uint Flag6;
-        public uint Flag7;
-        public uint Flag8;
-        public uint Unknown21;
-        public uint Unknown22;
-        public uint Unknown23;
+        public int Unknown4; 
+        public int Unknown5; 
+        public int Unknown6;
+        public int Unknown7;
+        public int Unknown8;
+        public int Flag1;
+        public int Flag2;
+        public int Flag3;
+        public int Flag4;
+        public int Unknown14;
+        public int Flag5;
+        public int Unknown16;
+        public long Magic17;
+        public int Flag6;
+        public int Flag7;
+        public int Flag8;
+        public int Unknown21;
+        public int Unknown22;
+        public int Unknown23;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -128,15 +128,15 @@ namespace _3DSExplorer
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
-        public uint MagicPadding;
+        public int MagicPadding;
         public long Unknown1;
 
-        public long FirstHashTableOffset;
-        public long FirstHashTableLength;
-        public long FirstHashTableBlock;
-        public long SecondHashTableOffset;
-        public long SecondHashTableLength;
-        public long SecondHashTableBlock;
+        public long FirstHashOffset;
+        public long FirstHashLength;
+        public long FirstHashBlock;
+        public long SecondHashOffset;
+        public long SecondHashLength;
+        public long SecondHashBlock;
 
         public long HashTableOffset;
         public long HashTableLength;
@@ -152,7 +152,7 @@ namespace _3DSExplorer
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
-        public uint MagicPadding;
+        public int MagicPadding;
 
         public long Unknown1;
         public long Unknown2;
@@ -171,32 +171,32 @@ namespace _3DSExplorer
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
 
-        public uint MagicPadding;
+        public int MagicPadding;
         public long Unknown1;
         public long PartitionSize;
-        public uint Unknown2;
+        public int Unknown2;
         public long Unknown3;
-        public uint Unknown4;
+        public int Unknown4;
         public long Unknown5; //length of header?
-        public uint Unknown6;
-        public uint Unknown7; 
+        public int Unknown6;
+        public int Unknown7; 
         public long Unknown8; //offset?
-        public uint Unknown9; //length?
-        public uint Unknown10; 
+        public int Unknown9; //length?
+        public int Unknown10; 
         public long Unknown11; //offset to table
-        public uint Unknown12;
-        public uint Unknown13;
+        public int Unknown12;
+        public int Unknown13;
         public long LocalFileBaseOffset;
-        public uint FileStoreLength;
-        public uint Unknown16;
-        public uint Unknown17;
+        public int FileStoreLength;
+        public int Unknown16;
+        public int Unknown17;
         public int FSTBlockOffset;
-        public uint Unknown18;
-        public uint Unknown19; 
+        public int Unknown18;
+        public int Unknown19; 
         public int FSTExactOffset;
-        public uint Unknown20;
-        public uint Unknown21;
-        public uint Unknown22;
+        public int Unknown20;
+        public int Unknown21;
+        public int Unknown22;
     }
 
     public class SaveTool
@@ -329,7 +329,199 @@ namespace _3DSExplorer
             return outbuf;
         }
 
+        public static bool isEncrypted(string path)
+        {
+            //check if encrypted
+            FileStream fs = File.OpenRead(path);
+            byte[] magic = new byte[4];
+            fs.Seek(0x1000, SeekOrigin.Begin); //Start of information
+            while ((fs.Length - fs.Position > 0x200) & !SaveTool.isSaveMagic(magic))
+            {
+                fs.Read(magic, 0, 4);
+                fs.Seek(0x200 - 4, SeekOrigin.Current);
+            }
+            long result = fs.Length - fs.Position;
+            fs.Close();
+            return (result <= 0x200);
+        }
 
+        public static byte[] ReadByteArray(Stream fs, int size)
+        {
+            byte[] buffer = new byte[size];
+            fs.Read(buffer, 0, size);
+            return buffer;
+        }
+
+
+        public static SFContext Open(string path, ref string errorMessage)
+        {
+            SFContext cxt = new SFContext();
+
+            cxt.Encrypted = isEncrypted(path);
+
+            //get the file into buffer to find the key if needed
+            byte[] fileBuffer = File.ReadAllBytes(path);
+            MemoryStream ms = new MemoryStream(fileBuffer);
+
+            if (cxt.Encrypted)
+            {
+                byte[] key = FindKey(fileBuffer);
+                if (key == null)
+                {
+                    ms.Close();
+                    errorMessage = "Can't find key in binary file.";
+                    return null;
+                }
+                else
+                {
+                    XorByteArray(fileBuffer, key, 0x1000);
+                    //XorExperimental(fileBuffer, key, 0x1000);
+                    cxt.Key = key;
+                }
+            }
+            cxt.fileHeader = MarshalTool.ReadStruct<SFHeader>(ms);
+
+            //get the blockmap headers
+            int bmSize = (int)(ms.Length >> 12) - 1;
+            cxt.Blockmap = new SFHeaderEntry[bmSize];
+            cxt.MemoryMap = new byte[bmSize];
+            for (int i = 0; i < cxt.Blockmap.Length; i++)
+            {
+                cxt.Blockmap[i] = MarshalTool.ReadStruct<SFHeaderEntry>(ms);
+                cxt.MemoryMap[i] = cxt.Blockmap[i].PhysicalSector;
+            }
+            //Check crc16
+            byte[] twoBytes = new byte[2], crcBytes = new byte[2];
+            ms.Read(crcBytes, 0, 2);
+            twoBytes = CRC16.GetCRC(fileBuffer, 0, ms.Position - 2);
+            if (crcBytes[0] != twoBytes[0] || crcBytes[1] != twoBytes[1])
+            {
+                errorMessage = "CRC Error or Corrupt Save file.";
+                ms.Close();
+                return null;
+            }
+            else
+            {
+                //get journal updates
+                int jSize = (int)(0x1000 - ms.Position) / Marshal.SizeOf(typeof(SFLongSectorEntry));
+                cxt.Journal = new SFLongSectorEntry[jSize];
+                cxt.JournalSize = 0;
+                int jc = 0;
+                while (ms.Position < 0x1000) //assure stopping
+                {
+                    cxt.Journal[jc] = MarshalTool.ReadStruct<SFLongSectorEntry>(ms);
+                    if (!SaveTool.isFF(cxt.Journal[jc].Sector.CheckSums)) //check if we got a valid checksum
+                    {
+                        cxt.MemoryMap[cxt.Journal[jc].Sector.VirtualSector] = cxt.Journal[jc].Sector.PhysicalSector;
+                        jc++;
+                    }
+                    else //if not then it's probably the end of the journal
+                        break;
+                }
+                cxt.JournalSize = jc;
+
+                //rearragne by virtual
+                cxt.image = new byte[fileBuffer.Length - 0x1000];
+                for (int i = 0; i < cxt.MemoryMap.Length; i++)
+                    Buffer.BlockCopy(fileBuffer, (cxt.MemoryMap[i] & 0x7F) * 0x1000, cxt.image, i * 0x1000, 0x1000);
+
+                MemoryStream ims = new MemoryStream(cxt.image);
+
+                cxt.ImageHash = ReadByteArray(ims, Sizes.MD5);
+                //Go to start of image
+                ims.Seek(0x100, SeekOrigin.Begin);
+                cxt.Disa = MarshalTool.ReadStruct<DISA>(ims);
+                cxt.isData = cxt.Disa.TableSize > 1;
+                if (!SaveTool.isDisaMagic(cxt.Disa.Magic))
+                {
+                    errorMessage = "Corrupt Save File!";
+                    ms.Close();
+                    ims.Close();
+                    return null;
+                }
+                else
+                {
+                    //Which table to read
+                    if ((cxt.Disa.ActiveTable & 1) == 1) //second table
+                        ims.Seek(cxt.Disa.PrimaryTableOffset, SeekOrigin.Begin);
+                    else
+                        ims.Seek(cxt.Disa.SecondaryTableOffset, SeekOrigin.Begin);
+
+                    cxt.Partitions = new Partition[cxt.Disa.TableSize];
+                    for (int i = 0; i < cxt.Partitions.Length; i++)
+                    {
+                        long startOfDifi = ims.Position;
+                        cxt.Partitions[i] = new Partition();
+                        cxt.Partitions[i].Difi = MarshalTool.ReadStruct<DIFI>(ims);
+                        //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.IVFCOffset, SeekOrigin.Begin);
+                        cxt.Partitions[i].Ivfc = MarshalTool.ReadStruct<IVFC>(ims);
+                        //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.DPFSOffset, SeekOrigin.Begin);
+                        cxt.Partitions[i].Dpfs = MarshalTool.ReadStruct<DPFS>(ims);
+                        //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.HashOffset, SeekOrigin.Begin);
+                        cxt.Partitions[i].Hash = ReadByteArray(ims, Sizes.SHA256);
+                        ims.Seek(4, SeekOrigin.Current); // skip garbage
+                    }
+
+                    for (int p = 0; p < cxt.Partitions.Length; p++)
+                    {
+                        if (p == 0)
+                            ims.Seek(cxt.Disa.SAVEPartitionOffset + 0x1000, SeekOrigin.Begin);
+                        else
+                            ims.Seek(cxt.Disa.DATAPartitionOffset + 0x1000, SeekOrigin.Begin);
+
+                        cxt.Partitions[p].offsetInImage = ims.Position;
+
+                        //Get hashes table
+                        ims.Seek(cxt.Partitions[p].Ivfc.HashTableOffset, SeekOrigin.Current);
+                        cxt.Partitions[p].HashTable = new byte[cxt.Partitions[p].Ivfc.HashTableLength / 0x20][];
+                        for (int i = 0; i < cxt.Partitions[p].HashTable.Length; i++)
+                            cxt.Partitions[p].HashTable[i] = ReadByteArray(ims, 0x20);
+
+                        if (p == 0)
+                        {
+                            ims.Seek(cxt.Partitions[0].offsetInImage, SeekOrigin.Begin);
+
+                            //jump to backup if needed (SAVE partition is written twice)
+                            if (cxt.isData) //Apperantly in 2 Partition files the second SAVE is more updated ???
+                                ims.Seek(cxt.Partitions[0].Dpfs.OffsetToNextPartition, SeekOrigin.Current);
+
+                            ims.Seek(cxt.Partitions[0].Ivfc.FileSystemOffset, SeekOrigin.Current);
+                            long saveOffset = ims.Position;
+
+                            cxt.Save = MarshalTool.ReadStruct<SAVE>(ims);
+                            //add SAVE information (if exists) (suppose to...)
+                            if (SaveTool.isSaveMagic(cxt.Save.Magic)) //read 
+                            {
+                                //go to FST
+                                if (!cxt.isData)
+                                {
+                                    cxt.fileBase = saveOffset + cxt.Save.LocalFileBaseOffset;
+                                    ims.Seek(cxt.fileBase + cxt.Save.FSTBlockOffset * 0x200, SeekOrigin.Begin);
+                                }
+                                else //file base is remote
+                                {
+                                    cxt.fileBase = cxt.Disa.DATAPartitionOffset + cxt.Partitions[1].Difi.FileBase;
+                                    ims.Seek(saveOffset + cxt.Save.FSTExactOffset, SeekOrigin.Begin);
+                                }
+
+                                FileSystemEntry root = MarshalTool.ReadStruct<FileSystemEntry>(ims);
+                                cxt.Files = new FileSystemEntry[root.NodeCount - 1];
+                                if ((root.NodeCount > 1) && (root.Magic == 0)) //if has files
+                                    for (int i = 0; i < cxt.Files.Length; i++)
+                                        cxt.Files[i] = MarshalTool.ReadStruct<FileSystemEntry>(ims);
+                            }
+                            else
+                                cxt.Files = new FileSystemEntry[0]; //Not a legal SAVE filesystem
+
+                        } // end if (p == 0)
+                    } //end foreach (partitions)
+                }
+                ims.Close();
+            } //end if crc is ok
+            ms.Close();
+
+            return cxt;
+        }
 
         public static byte[] createSAV(SFContext cxt)
         {
@@ -374,20 +566,22 @@ namespace _3DSExplorer
             */
 
 
-            byte[] temp;
             MemoryStream ms = new MemoryStream();
 
-            //Write the file header
-            temp = MarshalTool.StructureToByteArray<SFHeader>(cxt.fileHeader);
-            ms.Write(temp, 0, temp.Length);
+            int blockmapEntrySize = Marshal.SizeOf(typeof(SFHeaderEntry));
+            int sfHeaderSize = Marshal.SizeOf(typeof(SFHeader));
+            byte[] crcBlock = new byte[blockmapEntrySize * cxt.Blockmap.Length + sfHeaderSize];
+            
+            //Prepare the file header
+            byte[] temp = MarshalTool.StructureToByteArray<SFHeader>(cxt.fileHeader);
+            Buffer.BlockCopy(temp, 0, crcBlock, 0, temp.Length);
 
-            //Update & Write the blockmap (straight)
+            //Update & Prepare the blockmap (straight)
             for (byte i = 0; i < cxt.MemoryMap.Length ; i++)
                 cxt.MemoryMap[i] = i;
             cxt.Journal = new SFLongSectorEntry[0];
             cxt.JournalSize = 0;
-            int blockmapEntrySize = Marshal.SizeOf(typeof(SFHeaderEntry));
-            byte[] blockmapBlock = new byte[blockmapEntrySize * cxt.Blockmap.Length];
+            
             for (byte i = 0; i < cxt.Blockmap.Length; i++)
             {
                 cxt.Blockmap[i].AllocationCount = 0;
@@ -395,12 +589,13 @@ namespace _3DSExplorer
                 for (int j = 0; j < cxt.Blockmap[i].CheckSums.Length; j++)
                     cxt.Blockmap[i].CheckSums[j] = CRC16.CS(CRC16.GetCRC(cxt.image, 0x1000 * i + 0x200 * j, 0x200));
                 temp = MarshalTool.StructureToByteArray<SFHeaderEntry>(cxt.Blockmap[i]);
-                Buffer.BlockCopy(temp,0,blockmapBlock, i * blockmapEntrySize,blockmapEntrySize);
+                Buffer.BlockCopy(temp,0,crcBlock, sfHeaderSize + i * blockmapEntrySize,blockmapEntrySize);
             }
-            ms.Write(blockmapBlock, 0, blockmapBlock.Length);
+            //Write the header and the blockmap
+            ms.Write(crcBlock, 0, crcBlock.Length);
 
             //Write the CRC16
-            ms.Write(CRC16.GetCRC(blockmapBlock), 0, 2);
+            ms.Write(CRC16.GetCRC(crcBlock), 0, 2);
 
             //Write an empty journal
             while (ms.Position < 0x1000)

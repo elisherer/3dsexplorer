@@ -7,8 +7,9 @@ namespace _3DSExplorer
 {
     class MakerResolver
     {
-        public static string Resolve(string makerCode)
+        public static string Resolve(char[] chars)
         {
+            String makerCode = chars[0].ToString() + chars[1].ToString();
             switch (makerCode)
             {
                 case "00": return "Nintendo";
