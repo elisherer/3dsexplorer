@@ -37,13 +37,17 @@
             System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Hash", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("SAVE", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("Files", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("TMD", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("NCSD", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("NCCH", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("Plain Regios", System.Windows.Forms.HorizontalAlignment.Left);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.lstInfo = new System.Windows.Forms.ListView();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
+            this.chOffset = new System.Windows.Forms.ColumnHeader();
+            this.chSize = new System.Windows.Forms.ColumnHeader();
+            this.chDescription = new System.Windows.Forms.ColumnHeader();
+            this.chValue = new System.Windows.Forms.ColumnHeader();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.splitContainerLeft = new System.Windows.Forms.SplitContainer();
             this.treeView = new System.Windows.Forms.TreeView();
@@ -73,6 +77,7 @@
             this.menuHelpVisit3DBrew = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.chHexValue = new System.Windows.Forms.ColumnHeader();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
@@ -92,10 +97,11 @@
             // lstInfo
             // 
             this.lstInfo.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3,
-            this.columnHeader4});
+            this.chOffset,
+            this.chSize,
+            this.chDescription,
+            this.chValue,
+            this.chHexValue});
             this.lstInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstInfo.FullRowSelect = true;
             listViewGroup1.Header = "Save Flash";
@@ -114,6 +120,14 @@
             listViewGroup7.Name = "lvgSave";
             listViewGroup8.Header = "Files";
             listViewGroup8.Name = "lvgFiles";
+            listViewGroup9.Header = "TMD";
+            listViewGroup9.Name = "lvgTmd";
+            listViewGroup10.Header = "NCSD";
+            listViewGroup10.Name = "lvgNCSD";
+            listViewGroup11.Header = "NCCH";
+            listViewGroup11.Name = "lvgNCCH";
+            listViewGroup12.Header = "Plain Regios";
+            listViewGroup12.Name = "lvgPlainRegions";
             this.lstInfo.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
             listViewGroup1,
             listViewGroup2,
@@ -122,7 +136,11 @@
             listViewGroup5,
             listViewGroup6,
             listViewGroup7,
-            listViewGroup8});
+            listViewGroup8,
+            listViewGroup9,
+            listViewGroup10,
+            listViewGroup11,
+            listViewGroup12});
             this.lstInfo.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lstInfo.HideSelection = false;
             this.lstInfo.Location = new System.Drawing.Point(0, 0);
@@ -134,24 +152,24 @@
             this.lstInfo.View = System.Windows.Forms.View.Details;
             this.lstInfo.DoubleClick += new System.EventHandler(this.lstInfo_DoubleClick);
             // 
-            // columnHeader1
+            // chOffset
             // 
-            this.columnHeader1.Text = "Offset";
-            this.columnHeader1.Width = 48;
+            this.chOffset.Text = "Offset";
+            this.chOffset.Width = 48;
             // 
-            // columnHeader2
+            // chSize
             // 
-            this.columnHeader2.Text = "Size";
+            this.chSize.Text = "Size";
             // 
-            // columnHeader3
+            // chDescription
             // 
-            this.columnHeader3.Text = "Description";
-            this.columnHeader3.Width = 407;
+            this.chDescription.Text = "Description";
+            this.chDescription.Width = 254;
             // 
-            // columnHeader4
+            // chValue
             // 
-            this.columnHeader4.Text = "Value";
-            this.columnHeader4.Width = 269;
+            this.chValue.Text = "Decimal Value";
+            this.chValue.Width = 139;
             // 
             // splitContainer
             // 
@@ -275,15 +293,17 @@
             // 
             // menuStrip
             // 
+            this.menuStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible;
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
             this.menuTools,
             this.menuHelp});
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
+            this.menuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
             this.menuStrip.Size = new System.Drawing.Size(1076, 24);
             this.menuStrip.TabIndex = 3;
-            this.menuStrip.Text = "menuStrip1";
+            this.menuStrip.Text = "Main Menu";
             // 
             // menuFile
             // 
@@ -367,7 +387,7 @@
             // 
             this.menuToolsXORTool.Image = global::_3DSExplorer.Properties.Resources.select_by_intersection;
             this.menuToolsXORTool.Name = "menuToolsXORTool";
-            this.menuToolsXORTool.Size = new System.Drawing.Size(128, 22);
+            this.menuToolsXORTool.Size = new System.Drawing.Size(152, 22);
             this.menuToolsXORTool.Text = "&XOR Tool";
             this.menuToolsXORTool.Click += new System.EventHandler(this.menuToolsXORTool_Click);
             // 
@@ -375,7 +395,7 @@
             // 
             this.menuToolsHashTool.Image = global::_3DSExplorer.Properties.Resources.magnifier;
             this.menuToolsHashTool.Name = "menuToolsHashTool";
-            this.menuToolsHashTool.Size = new System.Drawing.Size(128, 22);
+            this.menuToolsHashTool.Size = new System.Drawing.Size(152, 22);
             this.menuToolsHashTool.Text = "&Hash Tool";
             this.menuToolsHashTool.Click += new System.EventHandler(this.menuToolsHashTool_Click);
             // 
@@ -411,6 +431,11 @@
             this.menuHelpAbout.Text = "by elisherer";
             this.menuHelpAbout.Click += new System.EventHandler(this.menuHelpAbout_Click);
             // 
+            // chHexValue
+            // 
+            this.chHexValue.Text = "Hex Value";
+            this.chHexValue.Width = 278;
+            // 
             // frmExplorer
             // 
             this.AllowDrop = true;
@@ -442,10 +467,10 @@
 
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.ListView lstInfo;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader chOffset;
+        private System.Windows.Forms.ColumnHeader chSize;
+        private System.Windows.Forms.ColumnHeader chDescription;
+        private System.Windows.Forms.ColumnHeader chValue;
         private System.Windows.Forms.SplitContainer splitContainer;
         private System.Windows.Forms.TreeView treeView;
         private System.Windows.Forms.ImageList imageList;
@@ -475,6 +500,7 @@
         private System.Windows.Forms.ToolStripMenuItem cxtFileSaveAs;
         private System.Windows.Forms.ToolStripMenuItem cxtFileReplaceWith;
         private System.Windows.Forms.ColumnHeader clOffset;
+        private System.Windows.Forms.ColumnHeader chHexValue;
     }
 }
 
