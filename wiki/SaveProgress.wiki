@@ -45,11 +45,11 @@ This page will show the progress made for saving altered save files.
   * Disa & Partition table
 
 After changing a file in the partition.
-  # [Done] Go over the partitions and rehash the hashtable entries (that aren't 0)
+  # (Done) Go over the partitions and rehash the hashtable entries (that aren't 0)
   # (Unknwon) Make the 'Partition Hash Table Header'
   # (Unknown) Go over the Partition table and and make the proper hash (for SAVE & DATA).
-  # [Done] Hash the active partition table into the DISA struct.
-  # [Done] Rearrange the 0x1000 blocks according to the Memory Map.
-  # [Done] Chechsum every 0x1000 block according to 3DBrew.
-  # [Done] CRC16 (Modbus) the blockmap
-  # [Done] XOR the whole thing from 0x1000 with the key-file.
+  # (Done) Hash the active partition table into the DISA struct.
+  # (Done) Rearrange the 0x1000 blocks according to the Memory Map.
+  # (Done) Chechsum every 0x1000 block according to 3DBrew.
+  # (Done) CRC16 (Modbus) the blockmap
+  # (Done) XOR the whole thing from 0x1000 with the key-file.
