@@ -46,6 +46,7 @@
             this.btnOpen = new System.Windows.Forms.Button();
             this.txtSize = new System.Windows.Forms.ComboBox();
             this.cbOption = new System.Windows.Forms.ComboBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtList
@@ -224,11 +225,23 @@
             this.cbOption.Size = new System.Drawing.Size(60, 21);
             this.cbOption.TabIndex = 17;
             // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(346, 47);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(130, 24);
+            this.button1.TabIndex = 18;
+            this.button1.Text = "SuperBrute";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // frmHashTool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(624, 442);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.cbOption);
             this.Controls.Add(this.txtSize);
             this.Controls.Add(this.btnOpen);
@@ -275,5 +288,6 @@
         private System.Windows.Forms.Button btnOpen;
         private System.Windows.Forms.ComboBox txtSize;
         private System.Windows.Forms.ComboBox cbOption;
+        private System.Windows.Forms.Button button1;
     }
 }

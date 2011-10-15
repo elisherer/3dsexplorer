@@ -214,5 +214,51 @@ namespace _3DSExplorer
                 }
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            byte[] key = parseByteArray(txtSearch.Text);
+            if (key == null)
+                MessageBox.Show("Error with search string!");
+            else
+            {
+                try
+                {
+                    byte[] fileBuffer = File.ReadAllBytes(filePath);
+                    byte[] hash;
+                    HashAlgorithm ha = getHashAlgorithm();
+
+                    //int offset = Int32.Parse(txtOffset.Text);
+
+                    progressBar.Maximum = fileBuffer.Length - 1;
+                    progressBar.Value = 0;
+                    StringBuilder sb = new StringBuilder();
+                    for (int offset = 0; offset < fileBuffer.Length - 1; offset++)
+                    {
+                        for (int i = 1; i <= fileBuffer.Length - offset; i++) // Each iteration the starting offset is different
+                        {
+                            if (ha != null)
+                                hash = ha.ComputeHash(fileBuffer, offset, i);
+                            else
+                                return;
+                            if (key[0] == hash[0]) // 1:256 probability
+                            if (memcmp(key, hash, key.Length) == 0) //are equal
+                            {
+                                txtList.Text = "@" + offset.ToString("X7") + " of " + i + " : " + byteArrayToString(hash);
+                                return;
+                            }
+                            //sb.Append("@" + offset.ToString("X7") + " of " + i + " : " + byteArrayToString(hash) + Environment.NewLine);
+                        }
+                        progressBar.PerformStep();
+                        Application.DoEvents();
+                    }
+                    txtList.Text = sb.ToString();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
     }
 }

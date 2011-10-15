@@ -154,16 +154,15 @@ namespace _3DSExplorer
         public char[] Magic;
         public int MagicPadding;
 
-        public long Unknown1;
-        public long Unknown2;
-        public long Unknown3;
-        public long Unknown4;
-        public long Unknown5;
-        public long Unknown6;
-        public long Unknown7;
-        
-        public long OffsetToNextPartition;
-        public long Unknown9;
+        public long OffsetToFirstTable;
+        public long FirstTableLength;
+        public long FirstTableBlock;
+        public long OffsetToSecondTable;
+        public long SecondTableLength;
+        public long SecondTableBlock;
+        public long OffsetToData;
+        public long DataLength;
+        public long DataBlock;
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SAVE
@@ -465,9 +464,9 @@ namespace _3DSExplorer
                     for (int p = 0; p < cxt.Partitions.Length; p++)
                     {
                         if (p == 0)
-                            ims.Seek(cxt.Disa.SAVEPartitionOffset + 0x1000, SeekOrigin.Begin);
+                            ims.Seek(cxt.Disa.SAVEPartitionOffset + cxt.Partitions[p].Dpfs.OffsetToData, SeekOrigin.Begin);
                         else
-                            ims.Seek(cxt.Disa.DATAPartitionOffset + 0x1000, SeekOrigin.Begin);
+                            ims.Seek(cxt.Disa.DATAPartitionOffset + cxt.Partitions[p].Dpfs.OffsetToData, SeekOrigin.Begin);
 
                         cxt.Partitions[p].offsetInImage = ims.Position;
 
@@ -483,7 +482,7 @@ namespace _3DSExplorer
 
                             //jump to backup if needed (SAVE partition is written twice)
                             if (cxt.isData) //Apperantly in 2 Partition files the second SAVE is more updated ???
-                                ims.Seek(cxt.Partitions[0].Dpfs.OffsetToNextPartition, SeekOrigin.Current);
+                                ims.Seek(cxt.Partitions[0].Dpfs.DataLength, SeekOrigin.Current);
 
                             ims.Seek(cxt.Partitions[0].Ivfc.FileSystemOffset, SeekOrigin.Current);
                             long saveOffset = ims.Position;
