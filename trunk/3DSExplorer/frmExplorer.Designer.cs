@@ -48,6 +48,7 @@
             this.chSize = new System.Windows.Forms.ColumnHeader();
             this.chDescription = new System.Windows.Forms.ColumnHeader();
             this.chValue = new System.Windows.Forms.ColumnHeader();
+            this.chHexValue = new System.Windows.Forms.ColumnHeader();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.splitContainerLeft = new System.Windows.Forms.SplitContainer();
             this.treeView = new System.Windows.Forms.TreeView();
@@ -77,7 +78,6 @@
             this.menuHelpVisit3DBrew = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.chHexValue = new System.Windows.Forms.ColumnHeader();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
@@ -170,6 +170,11 @@
             // 
             this.chValue.Text = "Decimal Value";
             this.chValue.Width = 139;
+            // 
+            // chHexValue
+            // 
+            this.chHexValue.Text = "Hex Value";
+            this.chHexValue.Width = 278;
             // 
             // splitContainer
             // 
@@ -387,7 +392,7 @@
             // 
             this.menuToolsXORTool.Image = global::_3DSExplorer.Properties.Resources.select_by_intersection;
             this.menuToolsXORTool.Name = "menuToolsXORTool";
-            this.menuToolsXORTool.Size = new System.Drawing.Size(152, 22);
+            this.menuToolsXORTool.Size = new System.Drawing.Size(128, 22);
             this.menuToolsXORTool.Text = "&XOR Tool";
             this.menuToolsXORTool.Click += new System.EventHandler(this.menuToolsXORTool_Click);
             // 
@@ -395,7 +400,7 @@
             // 
             this.menuToolsHashTool.Image = global::_3DSExplorer.Properties.Resources.magnifier;
             this.menuToolsHashTool.Name = "menuToolsHashTool";
-            this.menuToolsHashTool.Size = new System.Drawing.Size(152, 22);
+            this.menuToolsHashTool.Size = new System.Drawing.Size(128, 22);
             this.menuToolsHashTool.Text = "&Hash Tool";
             this.menuToolsHashTool.Click += new System.EventHandler(this.menuToolsHashTool_Click);
             // 
@@ -430,11 +435,6 @@
             this.menuHelpAbout.Size = new System.Drawing.Size(165, 22);
             this.menuHelpAbout.Text = "by elisherer";
             this.menuHelpAbout.Click += new System.EventHandler(this.menuHelpAbout_Click);
-            // 
-            // chHexValue
-            // 
-            this.chHexValue.Text = "Hex Value";
-            this.chHexValue.Width = 278;
             // 
             // frmExplorer
             // 

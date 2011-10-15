@@ -169,10 +169,12 @@
             // 
             this.txtSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSearch.Location = new System.Drawing.Point(86, 81);
+            this.txtSearch.Font = new System.Drawing.Font("Courier New", 7.5F);
+            this.txtSearch.Location = new System.Drawing.Point(77, 81);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(390, 20);
+            this.txtSearch.Size = new System.Drawing.Size(399, 19);
             this.txtSearch.TabIndex = 12;
+            this.txtSearch.Text = "0011223344556677889900112233445566778899001122334455667788990011";
             // 
             // btnBrute
             // 
@@ -234,6 +236,7 @@
             this.button1.TabIndex = 18;
             this.button1.Text = "SuperBrute";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // frmHashTool
