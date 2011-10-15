@@ -296,15 +296,15 @@ namespace _3DSExplorer
 
             AddListItem(0x000, 4, "Magic DPFS", dpfs.Magic, "lvgDpfs");
             AddListItem(0x004, 4, "Magic Padding (zeros)", dpfs.MagicPadding, "lvgDpfs");
-            AddListItem(0x008, 8, "Unknown 1", dpfs.Unknown1, "lvgDpfs");
-            AddListItem(0x010, 8, "Unknown 2", dpfs.Unknown2, "lvgDpfs");
-            AddListItem(0x018, 8, "Unknown 3", dpfs.Unknown3, "lvgDpfs");
-            AddListItem(0x020, 8, "Unknown 4", dpfs.Unknown4, "lvgDpfs");
-            AddListItem(0x028, 8, "Unknown 5", dpfs.Unknown5, "lvgDpfs");
-            AddListItem(0x030, 8, "Unknown 6", dpfs.Unknown6, "lvgDpfs");
-            AddListItem(0x038, 8, "Unknown 7", dpfs.Unknown7, "lvgDpfs");
-            AddListItem(0x040, 8, "Offset to next partition", dpfs.OffsetToNextPartition, "lvgDpfs");
-            AddListItem(0x048, 8, "Unknown 9", dpfs.Unknown9, "lvgDpfs");
+            AddListItem(0x008, 8, "Offset to First Table", dpfs.OffsetToFirstTable, "lvgDpfs");
+            AddListItem(0x010, 8, "First Table Length", dpfs.FirstTableLength, "lvgDpfs");
+            AddListItem(0x018, 8, "First Table Block", dpfs.FirstTableBlock, "lvgDpfs");
+            AddListItem(0x020, 8, "Offset to Second Table", dpfs.OffsetToSecondTable, "lvgDpfs");
+            AddListItem(0x028, 8, "Second Table Length", dpfs.SecondTableLength, "lvgDpfs");
+            AddListItem(0x030, 8, "Second Table Block", dpfs.SecondTableBlock, "lvgDpfs");
+            AddListItem(0x038, 8, "Offset to Data", dpfs.OffsetToData, "lvgDpfs");
+            AddListItem(0x040, 8, "Data Length", dpfs.DataLength, "lvgDpfs");
+            AddListItem(0x048, 8, "Data Block", dpfs.DataBlock, "lvgDpfs");
             
             AddListItem(0x000, 0x20, "Hash", cxt.Partitions[cxt.currentPartition].Hash, "lvgHash");
             
@@ -751,8 +751,14 @@ namespace _3DSExplorer
         {
             if (lstInfo.SelectedIndices.Count > 0)
             {
-                Clipboard.SetText(lstInfo.SelectedItems[0].SubItems[3].Text);
+                string toClip = "";
+                if (lstInfo.SelectedItems[0].SubItems[3].Text == "")
+                    toClip = lstInfo.SelectedItems[0].SubItems[4].Text;
+                else
+                    toClip = lstInfo.SelectedItems[0].SubItems[3].Text;
+                Clipboard.SetText(toClip);
                 MessageBox.Show("Value copied to clipboard!");
+
             }
         }
 

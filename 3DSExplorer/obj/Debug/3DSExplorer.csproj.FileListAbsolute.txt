@@ -51,3 +51,12 @@ D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmXORTool.resources
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmXORTool.resources
 D:\dev\3DS\3DSExplorer\3DSExplorer\bin\3DSExplorer.exe
 D:\dev\3DS\3DSExplorer\3DSExplorer\bin\3DSExplorer.pdb
+\\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.exe
+\\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.pdb
+\\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\ResolveAssemblyReference.cache
+\\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmXORTool.resources
+\\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmExplorer.resources
+\\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmHashTool.resources
+\\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.InputBox.resources
+\\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.Properties.Resources.resources
+\\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.csproj.GenerateResource.Cache
