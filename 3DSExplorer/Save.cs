@@ -79,32 +79,33 @@ namespace _3DSExplorer
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x20)]
         public byte[] Hash;
 
-        public int ZeroPad0;
-        public int Flag0;
-        public int Unknown1;
-        public int ZeroPad1; 
-        public int Unknown2; //Magic
+        public uint ZeroPad0;
+        public uint Flag0;
+        public uint Unknown1;
+        public uint ZeroPad1; 
+        public uint Unknown2; //Magic
         public long DataFsLength; //Why??
         public long Unknown3;
-        public int Unknown4; 
-        public int Unknown5; 
-        public int Unknown6;
-        public int Unknown7;
-        public int Unknown8;
-        public int Flag1;
-        public int Flag2;
-        public int Flag3;
-        public int Flag4;
-        public int Unknown14;
-        public int Flag5;
-        public int Unknown16;
-        public long Magic17;
-        public int Flag6;
-        public int Flag7;
-        public int Flag8;
-        public int Unknown21;
-        public int Unknown22;
-        public int Unknown23;
+        public uint Unknown4; 
+        public uint Unknown5; 
+        public uint Unknown6;
+        public uint Unknown7;
+        public uint Unknown8;
+        public uint Flag1;
+        public uint Flag2;
+        public uint Flag3;
+        public uint Flag4;
+        public uint Unknown14;
+        public uint Flag5;
+        public uint Unknown16;
+        public uint Magic17;
+        public uint Unknown18;
+        public uint Flag6;
+        public uint Flag7;
+        public uint Flag8;
+        public uint Unknown21;
+        public uint Unknown22;
+        public uint Unknown23;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

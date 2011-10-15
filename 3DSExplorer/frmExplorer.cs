@@ -244,10 +244,11 @@ namespace _3DSExplorer
             AddListItem(0x0C8, 4, "Flag 2 ?", disa.Flag2, "lvgImage");
             AddListItem(0x0CC, 4, "Flag 3 ?", disa.Flag3, "lvgImage");
             AddListItem(0x0D0, 4, "Flag 4 ?", disa.Flag4, "lvgImage");
-            AddListItem(0x0D4, 4, "Unknown 14", disa.Unknown8, "lvgImage");
+            AddListItem(0x0D4, 4, "Unknown 14", disa.Unknown14, "lvgImage");
             AddListItem(0x0D8, 4, "Flag 5 ?", disa.Flag5, "lvgImage");
-            AddListItem(0x0DC, 4, "Unknown 16", disa.Unknown8, "lvgImage");
-            AddListItem(0x0E0, 8, "Magic 17", disa.Magic17, "lvgImage");
+            AddListItem(0x0DC, 4, "Unknown 16", disa.Unknown16, "lvgImage");
+            AddListItem(0x0E0, 4, "Magic 17", disa.Magic17, "lvgImage");
+            AddListItem(0x0E4, 4, "Unknown 18", disa.Unknown18, "lvgImage");
             AddListItem(0x0E8, 4, "Flag 6 ?", disa.Flag6, "lvgImage");
             AddListItem(0x0EC, 4, "Flag 7 ?", disa.Flag7, "lvgImage");
             AddListItem(0x0F0, 4, "Flag 8 ?", disa.Flag8, "lvgImage");
