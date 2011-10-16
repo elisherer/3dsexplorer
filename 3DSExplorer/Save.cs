@@ -43,9 +43,23 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct FileSystemEntry
+    public struct FileSystemFolderEntry
     {
-        public int NodeCount;
+        public int ParentFolderIndex;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x10)]
+        public char[] FolderName;
+        public int Index;
+        public int Unknown1;
+        public int Flags; //??
+        public int Unknown2;
+        public int Unknown3;
+    }
+
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct FileSystemFileEntry
+    {
+        public int ParentFolderIndex;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x10)]
         public char[] Filename;
         public int Index;
@@ -189,7 +203,7 @@ namespace _3DSExplorer
         public long LocalFileBaseOffset;
         public int FileStoreLength;
         public int Unknown16;
-        public int Unknown17;
+        public int FolderTableOffset;
         public int FSTBlockOffset;
         public int Unknown18;
         public int Unknown19; 
@@ -477,12 +491,14 @@ namespace _3DSExplorer
                         for (int i = 0; i < cxt.Partitions[p].HashTable.Length; i++)
                             cxt.Partitions[p].HashTable[i] = ReadByteArray(ims, 0x20);
 
-                        if (p == 0)
+                        if (p == 0)                        
                         {
+                            cxt.FirstSave = (cxt.image[0x100B] & 0x20) == 0x20; //*** EXPERIMENTAL ***
+
                             ims.Seek(cxt.Partitions[0].offsetInImage, SeekOrigin.Begin);
 
                             //jump to backup if needed (SAVE partition is written twice)
-                            if (cxt.isData) //Apperantly in 2 Partition files the second SAVE is more updated ???
+                            if (!cxt.FirstSave) //Apperantly in 2 Partition files the second SAVE is more updated ???
                                 ims.Seek(cxt.Partitions[0].Dpfs.DataLength, SeekOrigin.Current);
 
                             ims.Seek(cxt.Partitions[0].Ivfc.FileSystemOffset, SeekOrigin.Current);
@@ -492,26 +508,38 @@ namespace _3DSExplorer
                             //add SAVE information (if exists) (suppose to...)
                             if (SaveTool.isSaveMagic(cxt.Save.Magic)) //read 
                             {
-                                //go to FST
+                                //-- Get folders -- (and set filebase 'while at it')
                                 if (!cxt.isData)
                                 {
                                     cxt.fileBase = saveOffset + cxt.Save.LocalFileBaseOffset;
-                                    ims.Seek(cxt.fileBase + cxt.Save.FSTBlockOffset * 0x200, SeekOrigin.Begin);
+                                    ims.Seek(cxt.fileBase, SeekOrigin.Begin);
                                 }
-                                else //file base is remote
-                                {
+                                else
+                                {   //file base is remote
                                     cxt.fileBase = cxt.Disa.DATAPartitionOffset + cxt.Partitions[1].Difi.FileBase;
-                                    ims.Seek(saveOffset + cxt.Save.FSTExactOffset, SeekOrigin.Begin);
+                                    ims.Seek(saveOffset + cxt.Save.FolderTableOffset, SeekOrigin.Begin);
                                 }
+                                FileSystemFolderEntry froot = MarshalTool.ReadStruct<FileSystemFolderEntry>(ims);
+                                cxt.Folders = new FileSystemFolderEntry[froot.ParentFolderIndex - 1];
+                                if (froot.ParentFolderIndex > 1) //if has folders
+                                    for (int i = 0; i < cxt.Folders.Length; i++)
+                                        cxt.Folders[i] = MarshalTool.ReadStruct<FileSystemFolderEntry>(ims);
 
-                                FileSystemEntry root = MarshalTool.ReadStruct<FileSystemEntry>(ims);
-                                cxt.Files = new FileSystemEntry[root.NodeCount - 1];
-                                if ((root.NodeCount > 1) && (root.Magic == 0)) //if has files
+                                //-- Get files --
+                                //go to FST
+                                if (!cxt.isData)
+                                    ims.Seek(cxt.fileBase + cxt.Save.FSTBlockOffset * 0x200, SeekOrigin.Begin);
+                                else //file base is remote
+                                    ims.Seek(saveOffset + cxt.Save.FSTExactOffset, SeekOrigin.Begin);
+
+                                FileSystemFileEntry root = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
+                                cxt.Files = new FileSystemFileEntry[root.ParentFolderIndex - 1];
+                                if ((root.ParentFolderIndex > 1) && (root.Magic == 0)) //if has files
                                     for (int i = 0; i < cxt.Files.Length; i++)
-                                        cxt.Files[i] = MarshalTool.ReadStruct<FileSystemEntry>(ims);
+                                        cxt.Files[i] = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
                             }
                             else
-                                cxt.Files = new FileSystemEntry[0]; //Not a legal SAVE filesystem
+                                cxt.Files = new FileSystemFileEntry[0]; //Not a legal SAVE filesystem
 
                         } // end if (p == 0)
                     } //end foreach (partitions)

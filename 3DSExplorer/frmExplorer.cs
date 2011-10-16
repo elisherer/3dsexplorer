@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Reflection;
+using TreeListView;
 
 namespace _3DSExplorer
 {
@@ -135,7 +136,7 @@ namespace _3DSExplorer
             AddListItem(0x300, 4, "Used ROM size [bytes]", cxt.cci.UsedRomSize, "lvgNCSD");
             AddListItem(0x320, 16, "Unknown", cxt.cci.Unknown, "lvgNCSD");
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileSystem.Items.Clear();
+            lvFileTree.Nodes.Clear();;
         }
 
         private void showNCCH(int i)
@@ -166,21 +167,21 @@ namespace _3DSExplorer
             AddListItem(0x1C0, 0x20, "ExeFS superblock hash", cxt.cxis[i].ExeFSSuperBlockhash, "lvgNCCH");
             AddListItem(0x1E0, 0x20, "RomFS superblock hash", cxt.cxis[i].RomFSSuperBlockhash, "lvgNCCH");
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileSystem.Items.Clear();
-            ListViewItem lvItem;
+            lvFileTree.Nodes.Clear();;
+            TreeNode lvItem;
             if (cxt.cxis[i].ExeFSSize > 0)
             {
-                lvItem = lvFileSystem.Items.Add("ExeFS" + i + ".bin");
-                lvItem.SubItems.Add((cxt.cxis[i].ExeFSSize * 0x200).ToString());
-                lvItem.SubItems.Add(toHexString(6, (ulong)(cxt.cxis[i].ExeFSOffset * 0x200)));
+                lvItem = lvFileTree.Nodes.Add("ExeFS" + i + ".bin");
+                lvFileTree.AddSubItem(lvItem,(cxt.cxis[i].ExeFSSize * 0x200).ToString());
+                lvFileTree.AddSubItem(lvItem, toHexString(6, (ulong)(cxt.cxis[i].ExeFSOffset * 0x200)));
                 lvItem.ImageIndex = 0;
                 lvItem.Tag = cxt.cxis[i];
             }
             if (cxt.cxis[i].RomFSSize > 0)
             {
-                lvItem = lvFileSystem.Items.Add("RomFS" + i + ".bin");
-                lvItem.SubItems.Add((cxt.cxis[i].RomFSSize * 0x200).ToString());
-                lvItem.SubItems.Add(toHexString(6, (ulong)(cxt.cxis[i].RomFSOffset * 0x200)));
+                lvItem = lvFileTree.Nodes.Add("RomFS" + i + ".bin");
+                lvFileTree.AddSubItem(lvItem, (cxt.cxis[i].RomFSSize * 0x200).ToString());
+                lvFileTree.AddSubItem(lvItem, toHexString(6, (ulong)(cxt.cxis[i].RomFSOffset * 0x200)));
                 lvItem.ImageIndex = 0;
                 lvItem.Tag = cxt.cxis[i];
             }
@@ -194,7 +195,7 @@ namespace _3DSExplorer
                 AddListItem(0, 4, cxt.cxiprs[i].PlainRegionStrings[j], cxt.cxiprs[i].PlainRegionStrings[j].Length, "lvgPlainRegions");
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileSystem.Items.Clear();
+            lvFileTree.Nodes.Clear();;
         }
         #endregion
 
@@ -327,10 +328,10 @@ namespace _3DSExplorer
                 AddListItem(0x048, 8, "Unknown 11 (third table offset)", save.Unknown11, "lvgSave");
                 AddListItem(0x050, 4, "Unknown 12 (num of u32)", save.Unknown12, "lvgSave");
                 AddListItem(0x054, 4, "Unknown 13 (size of media?)", save.Unknown13, "lvgSave");
-                AddListItem(0x058, 8, "Local File Base Offset (form SAVE)", save.LocalFileBaseOffset, "lvgSave");
+                AddListItem(0x058, 8, "Local File Base Offset (from SAVE)", save.LocalFileBaseOffset, "lvgSave");
                 AddListItem(0x060, 4, "Filestore Length (medias)", save.FileStoreLength, "lvgSave");
                 AddListItem(0x064, 4, "Unknown 16", save.Unknown16, "lvgSave");
-                AddListItem(0x068, 4, "Unknown 17 Offset (form SAVE)", save.Unknown17, "lvgSave");
+                AddListItem(0x068, 4, "Folder Table offset (from SAVE; DATA files)", save.FolderTableOffset, "lvgSave");
                 AddListItem(0x06C, 4, "FileSystem Table Offset (medias)", save.FSTBlockOffset, "lvgSave");
                 AddListItem(0x070, 4, "Unknown 18", save.Unknown18, "lvgSave");
                 AddListItem(0x074, 4, "Unknown 19", save.Unknown19, "lvgSave");
@@ -342,13 +343,13 @@ namespace _3DSExplorer
                 if (save.Magic != null & SaveTool.isSaveMagic(save.Magic))
                 {
                     int i = 0;
-                    foreach (FileSystemEntry fse in cxt.Files)
+                    foreach (FileSystemFileEntry fse in cxt.Files)
                     {
                         AddListItem(i, 8, charArrayToString(fse.Filename), fse.FileSize, "lvgFiles");
-                        AddListItem(i, 4, "NodeCount", fse.NodeCount, "lvgFiles");
-                        AddListItem(i, 4, "FileIndex", fse.Index, "lvgFiles");
+                        AddListItem(i, 4, "Parent Folder Index", fse.ParentFolderIndex, "lvgFiles");
+                        AddListItem(i, 4, "File Index", fse.Index, "lvgFiles");
                         AddListItem(i, 4, "Magic? (Unknown 1)", fse.Magic, "lvgFiles");
-                        AddListItem(i, 8, "FileBlockOffset (if size>0)", fse.BlockOffset, "lvgFiles");
+                        AddListItem(i, 8, "File Block offset (if size>0)", fse.BlockOffset, "lvgFiles");
                         AddListItem(i, 4, "Unknown 2", fse.Unknown2, "lvgFiles");
                         AddListItem(i++, 4, "Unknown 3", fse.Unknown3, "lvgFiles");
                     }
@@ -427,7 +428,7 @@ namespace _3DSExplorer
             AddListItem(off+227, 32, "Content Info Records Hash", head.ContentInfoRecordsHash, "lvgTmd");
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileSystem.Items.Clear();
+            lvFileTree.Nodes.Clear();;
         }
 
         private void showTMDCertificate(int i)
@@ -458,7 +459,7 @@ namespace _3DSExplorer
             AddListItem(off+556, 52, "Padding", cert.Padding, "lvgTmd");
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileSystem.Items.Clear();
+            lvFileTree.Nodes.Clear();;
         }
         #endregion
 
@@ -552,22 +553,37 @@ namespace _3DSExplorer
                         topNode.Nodes.Add("SAVE Partition");
                         if (scxt.isData)
                             topNode.Nodes.Add("DATA Partition");
-                        lvFileSystem.Items.Clear();
-                        if (scxt.Files.Length > 0) //if has files
+                        lvFileTree.Nodes.Clear();;
+                        TreeNode[] folders = new TreeNode[scxt.Folders.Length];
+                        //add root folder
+                        folders[0] = lvFileTree.Nodes.Add("ROOT");
+                        folders[0].ImageIndex = 1;
+                        folders[0].SelectedImageIndex = 1;
+                        //add folders
+                        if (scxt.Folders.Length > 1)
+                            for (int i = 1; i < scxt.Folders.Length; i++)
+                            {
+                                folders[i] = folders[scxt.Folders[i].ParentFolderIndex-1].Nodes.Add(charArrayToString(scxt.Folders[i].FolderName));
+                                folders[i].ImageIndex = 1;
+                                folders[i].SelectedImageIndex = 1;
+                            }
+                        //add files
+                        if (scxt.Files.Length > 0)
                         {
-                            ListViewItem lvItem;
+                            TreeNode lvItem;
                             for (int i = 0; i < scxt.Files.Length; i++)
                             {
-                                lvItem = lvFileSystem.Items.Add(charArrayToString(scxt.Files[i].Filename));
-                                lvItem.SubItems.Add(scxt.Files[i].FileSize.ToString());
-                                lvItem.SubItems.Add(toHexString(6, (ulong)(scxt.fileBase + 0x200 * scxt.Files[i].BlockOffset)));
+                                lvItem = folders[scxt.Files[i].ParentFolderIndex-1].Nodes.Add(charArrayToString(scxt.Files[i].Filename));
+                                lvFileTree.AddSubItem(lvItem, scxt.Files[i].FileSize.ToString());
+                                lvFileTree.AddSubItem(lvItem, toHexString(6, (ulong)(scxt.fileBase + 0x200 * scxt.Files[i].BlockOffset)));
                                 lvItem.ImageIndex = 0;
                                 lvItem.Tag = scxt.Files[i];
                             }
-                            treeView.ExpandAll();
-                            currentContext = scxt;
-                            treeView.SelectedNode = topNode;
                         }
+                        folders[0].ExpandAll();
+                        treeView.ExpandAll();
+                        currentContext = scxt;
+                        treeView.SelectedNode = topNode;
                     }
                     break;
                 case 2: //TMD
@@ -671,17 +687,17 @@ namespace _3DSExplorer
             return retArray;
         }
 
-        private void lvFileSystem_DoubleClick(object sender, EventArgs e)
+        private void lvFileTree_DoubleClick(object sender, EventArgs e)
         {
-            if (lvFileSystem.SelectedIndices.Count > 0)
+            TreeNode tn = lvFileTree.TreeView.SelectedNode;
+            if (tn != null)
             {
-                ListViewItem item = lvFileSystem.SelectedItems[0];
-                if (item.Tag != null)
+                if (tn.Tag != null)
                 {
                     saveFileDialog.Filter = "All Files (*.*)|*.*";
-                    if (item.Tag is FileSystemEntry)
+                    if (tn.Tag is FileSystemFileEntry)
                     {
-                        FileSystemEntry entry = (FileSystemEntry)item.Tag;
+                        FileSystemFileEntry entry = (FileSystemFileEntry)tn.Tag;
                         SFContext cxt = (SFContext)currentContext;
                         saveFileDialog.FileName = charArrayToString(entry.Filename);
                         if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -695,11 +711,11 @@ namespace _3DSExplorer
                             fs.Close();
                         }
                     }
-                    else if (item.Tag is CXI)
+                    else if (tn.Tag is CXI)
                     {
-                        CXI cxi = (CXI)item.Tag;
+                        CXI cxi = (CXI)tn.Tag;
                         RomContext cxt = (RomContext)currentContext;
-                        saveFileDialog.FileName = item.Text;
+                        saveFileDialog.FileName = lvFileTree.GetMainText(tn);
                         if (saveFileDialog.ShowDialog() == DialogResult.OK)
                         {
                             string strKey = InputBox.ShowDialog("Please Enter Key:\nPress OK with empty key to save encrypted");
@@ -713,7 +729,7 @@ namespace _3DSExplorer
                                 {
                                     string inpath = saveFileDialog.FileName;
                                     FileStream infs = File.OpenRead(inpath);
-                                    bool isExeFS = item.Text.StartsWith("Exe");
+                                    bool isExeFS = tn.Text.StartsWith("Exe");
 
                                     long offset = isExeFS ? cxi.ExeFSOffset : cxi.RomFSOffset;
                                     if (cxt.currentNcch == 0) offset += cxt.cci.FirstNCCHOffset;
@@ -875,13 +891,16 @@ namespace _3DSExplorer
         #region CXTMENU FileContext
         private void cxtFile_MouseEnter(object sender, EventArgs e)
         {
-            if (lvFileSystem.SelectedItems.Count == 0)
+            if (lvFileTree.TreeView.SelectedNode == null)
                 cxtFile.Close();
+            else
+                if (lvFileTree.TreeView.SelectedNode.Tag == null)
+                    cxtFile.Close();
         }
 
         private void cxtFileSaveAs_Click(object sender, EventArgs e)
         {
-            lvFileSystem_DoubleClick(null, null);
+            lvFileTree_DoubleClick(null, null);
         }
 
         private void cxtFileReplaceWith_Click(object sender, EventArgs e)
@@ -892,7 +911,7 @@ namespace _3DSExplorer
                 openFileDialog.Filter = "All Files|*.*";
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    FileSystemEntry originalFile = (FileSystemEntry)lvFileSystem.SelectedItems[0].Tag;
+                    FileSystemFileEntry originalFile = (FileSystemFileEntry)lvFileTree.TreeView.SelectedNode.Tag;
                     FileStream newFile = File.OpenRead(openFileDialog.FileName);
                     long newFileSize = newFile.Length;
                     newFile.Close();
