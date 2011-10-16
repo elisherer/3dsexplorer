@@ -42,6 +42,7 @@ namespace _3DSExplorer
     public class SFContext : Context
     {
         public bool Encrypted;
+        public bool FirstSave;
 
         //Wear-Level stuff
 
@@ -65,7 +66,8 @@ namespace _3DSExplorer
         public Partition[] Partitions;
 
         public SAVE Save;
-        public FileSystemEntry[] Files;
+        public FileSystemFolderEntry[] Folders;
+        public FileSystemFileEntry[] Files;
         public long fileBase;
     }
 
