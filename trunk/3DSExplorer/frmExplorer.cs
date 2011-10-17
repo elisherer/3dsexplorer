@@ -727,8 +727,8 @@ namespace _3DSExplorer
                                     MessageBox.Show("Error parsing key string, (must be a multiple of 2 and made of hex letters.");
                                 else
                                 {
-                                    string inpath = saveFileDialog.FileName;
-                                    FileStream infs = File.OpenRead(inpath);
+                                    //string inpath = saveFileDialog.FileName;
+                                    FileStream infs = File.OpenRead(filePath);
                                     bool isExeFS = tn.Text.StartsWith("Exe");
 
                                     long offset = isExeFS ? cxi.ExeFSOffset : cxi.RomFSOffset;
