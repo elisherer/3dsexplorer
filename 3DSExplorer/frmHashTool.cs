@@ -12,8 +12,20 @@ namespace _3DSExplorer
 {
     public partial class frmHashTool : Form
     {
+        public class ValueObject
+        {
+            public ValueObject(int value)
+            {
+                this.value = value;
+            }
+            public int value;
+        }
+
         [DllImport("msvcrt.dll")]
         static extern int memcmp(byte[] b1, byte[] b2, long count);
+
+        private byte[] searchKey;
+        private HashAlgorithm ha;
 
         private string filePath;
 
@@ -22,6 +34,10 @@ namespace _3DSExplorer
             InitializeComponent();
             cbAlgo.SelectedIndex = 0;
             cbOption.SelectedIndex = 0;
+            if (Clipboard.GetText().Length == 64)
+            {
+                txtSearch.Text = Clipboard.GetText();
+            }
         }
 
         private string byteArrayToString(byte[] array)
@@ -33,9 +49,8 @@ namespace _3DSExplorer
             return arraystring;
         }
 
-        private HashAlgorithm getHashAlgorithm()
+        private void setHashAlgorithm()
         {
-            HashAlgorithm ha = null;
                 switch (cbAlgo.SelectedIndex)
                 {
                     case 0:
@@ -87,21 +102,20 @@ namespace _3DSExplorer
                         //stays null for Modbus-CRC16
                         break;
                 }
-            return ha;
         }
 
-        private void btnOpenGo_Click(object sender, EventArgs e)
+        private void btnCompute_Click(object sender, EventArgs e)
         {
             try
             {
                 FileStream fs = File.OpenRead(filePath);
                 
-                int blockSize = Int32.Parse(txtSize.Text);
+                int blockSize = Int32.Parse(cbComputeBlockSize.Text);
                 int blocks = Int32.Parse(txtBlocks.Text);
 
                 byte[] block = new byte[blockSize];
                 byte[] hash;
-                HashAlgorithm ha = getHashAlgorithm();
+                setHashAlgorithm();
                 
                 progressBar.Maximum = (blocks > 0 ? blocks : (int)fs.Length / blockSize);
                 progressBar.Value = 0;
@@ -137,8 +151,9 @@ namespace _3DSExplorer
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                btnHash.Enabled = true;
+                btnCompute.Enabled = true;
                 btnBrute.Enabled = true;
+                btnSuperBrute.Enabled = true;
                 filePath = openFileDialog.FileName;
             }
         }
@@ -175,7 +190,7 @@ namespace _3DSExplorer
 
                     byte[] block = new byte[blockSize];
                     byte[] hash;
-                    HashAlgorithm ha = getHashAlgorithm();
+                    setHashAlgorithm();
 
                     progressBar.Maximum = blocks * blockSize;
                     progressBar.Value = 0;
@@ -215,50 +230,123 @@ namespace _3DSExplorer
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnSuperBrute_Click(object sender, EventArgs e)
         {
-            byte[] key = parseByteArray(txtSearch.Text);
-            if (key == null)
-                MessageBox.Show("Error with search string!");
-            else
+            if (MessageBox.Show("Are you sure you want to do a Super Brute-Force search for this key?", "Super Brute-Force", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                try
+                searchKey = parseByteArray(txtSearch.Text);
+                if (searchKey == null)
+                    MessageBox.Show("Error with search string!");
+                else if (!superBruteForce.IsBusy)
                 {
-                    byte[] fileBuffer = File.ReadAllBytes(filePath);
-                    byte[] hash;
-                    HashAlgorithm ha = getHashAlgorithm();
-
-                    //int offset = Int32.Parse(txtOffset.Text);
-
-                    progressBar.Maximum = fileBuffer.Length - 1;
-                    progressBar.Value = 0;
-                    StringBuilder sb = new StringBuilder();
-                    for (int offset = 0; offset < fileBuffer.Length - 1; offset++)
+                    setHashAlgorithm();
+                    if (searchKey.Length != ha.HashSize / 8)
                     {
-                        for (int i = 1; i <= fileBuffer.Length - offset; i++) // Each iteration the starting offset is different
-                        {
-                            if (ha != null)
-                                hash = ha.ComputeHash(fileBuffer, offset, i);
-                            else
-                                return;
-                            if (key[0] == hash[0]) // 1:256 probability
-                            if (memcmp(key, hash, key.Length) == 0) //are equal
-                            {
-                                txtList.Text = "@" + offset.ToString("X7") + " of " + i + " : " + byteArrayToString(hash);
-                                return;
-                            }
-                            //sb.Append("@" + offset.ToString("X7") + " of " + i + " : " + byteArrayToString(hash) + Environment.NewLine);
-                        }
-                        progressBar.PerformStep();
-                        Application.DoEvents();
+                        MessageBox.Show("Wrong key length.. suppose to be " + ha.HashSize / 8 + " bytes");
+                        return;
                     }
-                    txtList.Text = sb.ToString();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
+                    btnSuperBrute.Enabled = false;
+                    btnCancel.Visible = true;
+                    superBruteForce.RunWorkerAsync();
                 }
             }
+        }
+
+        private void superBruteForce_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+            try
+            {
+                byte[] fileBuffer = File.ReadAllBytes(filePath);
+                byte[] hash;
+
+                worker.ReportProgress(0, new ValueObject(fileBuffer.Length));
+                for (int blockSize = 64; blockSize <= fileBuffer.Length; blockSize += 4)
+                {
+                    worker.ReportProgress(1, new ValueObject(fileBuffer.Length - blockSize));
+                    for (int offset = 0; offset < fileBuffer.Length - blockSize; offset+= 4)
+                    {
+                        if (worker.CancellationPending)
+                        {
+                            e.Cancel = true;
+                            return;
+                        }
+
+                        if (ha != null)
+                            hash = ha.ComputeHash(fileBuffer, offset, blockSize);
+                        else
+                            hash = CRC16.GetCRC(fileBuffer, offset, blockSize);
+                        if (searchKey[0] == hash[0]) // 1:256 probability
+                            if (memcmp(searchKey, hash, searchKey.Length) == 0) //key found!!!
+                            {
+                                e.Result = "@" + offset.ToString("X7") + " of " + blockSize + " : " + byteArrayToString(hash);
+                                return;
+                            }
+                        if (!chkHighCPU.Checked && (offset % 64) == 0)
+                            System.Threading.Thread.Sleep(1); //let the cpu cool off
+                        worker.ReportProgress(11, new ValueObject(offset));
+                    }
+                    worker.ReportProgress(10, new ValueObject(blockSize));
+                }               
+                e.Result = "Search key not found.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            
+        }
+
+        private void superBruteForce_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            ValueObject val = e.UserState as ValueObject;
+            switch (e.ProgressPercentage)
+            {
+                case 0: //set max for progress
+                    progressBar.Minimum = 0;
+                    progressBar.Maximum = val.value;
+                    break;
+                case 1: //set max for sub-progress
+                    subProgressBar.Minimum = 0;
+                    subProgressBar.Maximum = val.value;
+                    break;
+                case 10: //report progress
+                    progressBar.Value = val.value;
+                    break;
+                case 11: //report sub-progress
+                    subProgressBar.Value = val.value;
+                    break;
+            }
+        }
+
+        private void superBruteForce_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+                txtList.Text = "Canceled!";
+            else if (!(e.Error == null))
+                txtList.Text = ("Error: " + e.Error.Message);
+            else
+                txtList.Text = "Done!" + Environment.NewLine + e.Result;
+            btnCancel.Visible = false;
+            btnSuperBrute.Enabled = true;
+            progressBar.Value = 0;
+            subProgressBar.Value = 0;
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            superBruteForce.CancelAsync();
+        }
+
+        private void picTool_Click(object sender, EventArgs e)
+        {
+            txtList.Text = "Super Brute-Force checks every block size starting from" + Environment.NewLine +
+                "64 bytes to the size of the file increamented by 4 every iteration." + Environment.NewLine + 
+                "That block is hashed at every offset starting from 0 to the last" + Environment.NewLine +
+                "possible offset in the file. The operation is very slow..." + Environment.NewLine +
+                "You could speed it up by checking the High CPU usage but be aware" + Environment.NewLine +
+                "that your CPU might heat up because of the intense processing." + Environment.NewLine + 
+                "Good luck!...";
         }
     }
 }

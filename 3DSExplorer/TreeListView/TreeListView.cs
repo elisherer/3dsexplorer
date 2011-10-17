@@ -93,7 +93,7 @@ namespace TreeListView
             if (!tn.Text.Contains(ColumnSeperator))
                 return tn.Text;
             else
-                return tn.Text.Substring(tn.Text.IndexOf(ColumnSeperator) - 1);
+                return tn.Text.Substring(0,tn.Text.IndexOf(ColumnSeperator));
         }
 
         private void listView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
