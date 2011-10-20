@@ -29,14 +29,23 @@ namespace _3DSExplorer
 
     public class Partition
     {
-        public long offsetInImage;
+        public ulong OffsetInImage;
 
         public DIFI Difi;
         public IVFC Ivfc;
         public DPFS Dpfs;
         public byte[] Hash; //0x20 - SHA256
 
+        public uint FirstFlag;
+        public uint FirstFlagDupe;
+        public uint SecondFlag;
+        public uint SecondFlagDupe;
+        /*
+        public byte[] SecondFlagTable;
+        public byte[] SecondFlagTableDupe;
+        */
         public byte[][] HashTable;
+         
     }
 
     public class SFContext : Context
@@ -51,7 +60,7 @@ namespace _3DSExplorer
         public byte[] MemoryMap;
         public SFHeaderEntry[] Blockmap;
         public SFLongSectorEntry[] Journal;
-        public int JournalSize;
+        public uint JournalSize;
         public SFHeader fileHeader;
         public byte[] image;
         
@@ -65,10 +74,14 @@ namespace _3DSExplorer
         public int currentPartition;
         public Partition[] Partitions;
 
+        //SAVE Stuff
         public SAVE Save;
         public FileSystemFolderEntry[] Folders;
         public FileSystemFileEntry[] Files;
         public long fileBase;
+        public uint[] FilesMap;
+        public uint[] FoldersMap;
+        public SFBlockMapEntry[] BlockMap;
     }
 
     public class TMDCertContext
