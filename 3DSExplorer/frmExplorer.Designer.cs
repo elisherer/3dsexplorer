@@ -42,6 +42,7 @@
             System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("NCSD", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("NCCH", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("Plain Regios", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("Unknown", System.Windows.Forms.HorizontalAlignment.Left);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.lstInfo = new System.Windows.Forms.ListView();
@@ -54,6 +55,10 @@
             this.splitContainerLeft = new System.Windows.Forms.SplitContainer();
             this.treeView = new System.Windows.Forms.TreeView();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
+            this.lvFileTree = new TreeListView.TreeListViewControl();
+            this.cName = new System.Windows.Forms.ColumnHeader();
+            this.cSize = new System.Windows.Forms.ColumnHeader();
+            this.cOffset = new System.Windows.Forms.ColumnHeader();
             this.cxtFile = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cxtFileSaveAs = new System.Windows.Forms.ToolStripMenuItem();
             this.cxtFileReplaceWith = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,10 +80,6 @@
             this.menuHelpVisit3DBrew = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.lvFileTree = new TreeListView.TreeListViewControl();
-            this.cName = new System.Windows.Forms.ColumnHeader();
-            this.cSize = new System.Windows.Forms.ColumnHeader();
-            this.cOffset = new System.Windows.Forms.ColumnHeader();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
@@ -131,6 +132,8 @@
             listViewGroup12.Name = "lvgNCCH";
             listViewGroup13.Header = "Plain Regios";
             listViewGroup13.Name = "lvgPlainRegions";
+            listViewGroup14.Header = "Unknown";
+            listViewGroup14.Name = "lvgUnknown";
             this.lstInfo.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
             listViewGroup1,
             listViewGroup2,
@@ -144,7 +147,8 @@
             listViewGroup10,
             listViewGroup11,
             listViewGroup12,
-            listViewGroup13});
+            listViewGroup13,
+            listViewGroup14});
             this.lstInfo.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lstInfo.HideSelection = false;
             this.lstInfo.Location = new System.Drawing.Point(0, 0);
@@ -183,6 +187,7 @@
             // splitContainer
             // 
             this.splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainer.Location = new System.Drawing.Point(0, 24);
             this.splitContainer.Name = "splitContainer";
             // 
@@ -233,6 +238,37 @@
             this.imageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList.ImageStream")));
             this.imageList.TransparentColor = System.Drawing.Color.Transparent;
             this.imageList.Images.SetKeyName(0, "bullet_black.png");
+            // 
+            // lvFileTree
+            // 
+            this.lvFileTree.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.cName,
+            this.cSize,
+            this.cOffset});
+            this.lvFileTree.ContextMenuStrip = this.cxtFile;
+            this.lvFileTree.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvFileTree.ImageList = this.imlFS;
+            this.lvFileTree.Location = new System.Drawing.Point(0, 0);
+            this.lvFileTree.Name = "lvFileTree";
+            this.lvFileTree.Size = new System.Drawing.Size(263, 279);
+            this.lvFileTree.TabIndex = 1;
+            this.lvFileTree.TreeDoubleClicked += new System.EventHandler(this.lvFileTree_DoubleClick);
+            // 
+            // cName
+            // 
+            this.cName.Text = "Name";
+            this.cName.Width = 130;
+            // 
+            // cSize
+            // 
+            this.cSize.Text = "Size";
+            this.cSize.Width = 50;
+            // 
+            // cOffset
+            // 
+            this.cOffset.Text = "Offset";
+            this.cOffset.Width = 65;
             // 
             // cxtFile
             // 
@@ -405,37 +441,6 @@
             this.menuHelpAbout.Size = new System.Drawing.Size(165, 22);
             this.menuHelpAbout.Text = "by elisherer";
             this.menuHelpAbout.Click += new System.EventHandler(this.menuHelpAbout_Click);
-            // 
-            // lvFileTree
-            // 
-            this.lvFileTree.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.cName,
-            this.cSize,
-            this.cOffset});
-            this.lvFileTree.ContextMenuStrip = this.cxtFile;
-            this.lvFileTree.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvFileTree.ImageList = this.imlFS;
-            this.lvFileTree.Location = new System.Drawing.Point(0, 0);
-            this.lvFileTree.Name = "lvFileTree";
-            this.lvFileTree.Size = new System.Drawing.Size(263, 279);
-            this.lvFileTree.TabIndex = 1;
-            this.lvFileTree.TreeDoubleClicked += new System.EventHandler(this.lvFileTree_DoubleClick);
-            // 
-            // cName
-            // 
-            this.cName.Text = "Name";
-            this.cName.Width = 130;
-            // 
-            // cSize
-            // 
-            this.cSize.Text = "Size";
-            this.cSize.Width = 50;
-            // 
-            // cOffset
-            // 
-            this.cOffset.Text = "Offset";
-            this.cOffset.Width = 65;
             // 
             // frmExplorer
             // 

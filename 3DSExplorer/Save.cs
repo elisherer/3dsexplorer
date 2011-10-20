@@ -9,8 +9,8 @@ namespace _3DSExplorer
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SFHeader
     {
-        public int Unknown1;
-        public int Unknown2;
+        public uint Unknown1;
+        public uint Unknown2;
     }
     
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -39,35 +39,42 @@ namespace _3DSExplorer
     {
         public SFSectorEntry Sector;
         public SFSectorEntry Dupe;
-        public int Magic; //constant through the journal
+        public uint Magic; //constant through the journal
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct SFBlockMapEntry
+    {
+        public uint StartBlock;
+        public uint EndBlock;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct FileSystemFolderEntry
     {
-        public int ParentFolderIndex;
+        public uint ParentFolderIndex;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x10)]
         public char[] FolderName;
-        public int Index;
-        public int Unknown1;
-        public int Flags; //??
-        public int Unknown2;
-        public int Unknown3;
+        public uint Index;
+        public uint Unknown1;
+        public uint LastFileIndex;
+        public uint Unknown2;
+        public uint Unknown3;
     }
 
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct FileSystemFileEntry
     {
-        public int ParentFolderIndex;
+        public uint ParentFolderIndex;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x10)]
         public char[] Filename;
-        public int Index;
-        public int Magic;
-        public int BlockOffset;
-        public long FileSize;
-        public int Unknown2; // flags and/or date?
-        public int Unknown3;
+        public uint Index;
+        public uint Magic;
+        public uint BlockOffset;
+        public ulong FileSize;
+        public uint Unknown2; // flags and/or date?
+        public uint Unknown3;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -75,19 +82,19 @@ namespace _3DSExplorer
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
-        public int Unknown0;
-        public long TableSize;
-        public long PrimaryTableOffset;
-        public long SecondaryTableOffset;
-        public long TableLength;
-        public long SAVEEntryOffset;
-        public long SAVEEntryLength;
-        public long DATAEntryOffset;
-        public long DATAEntryLength;
-        public long SAVEPartitionOffset;
-        public long SAVEPartitionLength;
-        public long DATAPartitionOffset;
-        public long DATAPartitionLength;
+        public uint Unknown0;
+        public ulong TableSize;
+        public ulong PrimaryTableOffset;
+        public ulong SecondaryTableOffset;
+        public ulong TableLength;
+        public ulong SAVEEntryOffset;
+        public ulong SAVEEntryLength;
+        public ulong DATAEntryOffset;
+        public ulong DATAEntryLength;
+        public ulong SAVEPartitionOffset;
+        public ulong SAVEPartitionLength;
+        public ulong DATAPartitionOffset;
+        public ulong DATAPartitionLength;
 
         public uint ActiveTable;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x20)]
@@ -98,8 +105,8 @@ namespace _3DSExplorer
         public uint Unknown1;
         public uint ZeroPad1; 
         public uint Unknown2; //Magic
-        public long DataFsLength; //Why??
-        public long Unknown3;
+        public ulong DataFsLength; //Why??
+        public ulong Unknown3;
         public uint Unknown4; 
         public uint Unknown5; 
         public uint Unknown6;
@@ -127,15 +134,15 @@ namespace _3DSExplorer
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
-        public int Unknown0;
-        public long IVFCOffset;
-        public long IVFCSize;
-        public long DPFSOffset;
-        public long DPFSSize;
-        public long HashOffset;
-        public long HashSize;
-        public int Flags;
-        public long FileBase;
+        public uint MagicPadding;
+        public ulong IVFCOffset;
+        public ulong IVFCSize;
+        public ulong DPFSOffset;
+        public ulong DPFSSize;
+        public ulong HashOffset;
+        public ulong HashSize;
+        public uint Flags;
+        public ulong FileBase;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -143,23 +150,23 @@ namespace _3DSExplorer
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
-        public int MagicPadding;
-        public long Unknown1;
+        public uint MagicPadding;
+        public ulong Unknown1;
 
-        public long FirstHashOffset;
-        public long FirstHashLength;
-        public long FirstHashBlock;
-        public long SecondHashOffset;
-        public long SecondHashLength;
-        public long SecondHashBlock;
+        public ulong FirstHashOffset;
+        public ulong FirstHashLength;
+        public ulong FirstHashBlock;
+        public ulong SecondHashOffset;
+        public ulong SecondHashLength;
+        public ulong SecondHashBlock;
 
-        public long HashTableOffset;
-        public long HashTableLength;
-        public long HashTableBlock;
-        public long FileSystemOffset;
-        public long FileSystemLength;
-        public long FileSystemBlock;
-        public long Unknown3; //0x78
+        public ulong HashTableOffset;
+        public ulong HashTableLength;
+        public ulong HashTableBlock;
+        public ulong FileSystemOffset;
+        public ulong FileSystemLength;
+        public ulong FileSystemBlock;
+        public ulong Unknown3; //0x78
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -167,17 +174,17 @@ namespace _3DSExplorer
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
-        public int MagicPadding;
+        public uint MagicPadding;
 
-        public long OffsetToFirstTable;
-        public long FirstTableLength;
-        public long FirstTableBlock;
-        public long OffsetToSecondTable;
-        public long SecondTableLength;
-        public long SecondTableBlock;
-        public long OffsetToData;
-        public long DataLength;
-        public long DataBlock;
+        public ulong FirstTableOffset;
+        public ulong FirstTableLength;
+        public ulong FirstTableBlock;
+        public ulong SecondTableOffset;
+        public ulong SecondTableLength;
+        public ulong SecondTableBlock;
+        public ulong OffsetToData;
+        public ulong DataLength;
+        public ulong DataBlock;
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SAVE
@@ -185,32 +192,32 @@ namespace _3DSExplorer
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
 
-        public int MagicPadding;
-        public long Unknown1;
-        public long PartitionSize;
-        public int Unknown2;
-        public long Unknown3;
-        public int Unknown4;
-        public long Unknown5; //length of header?
-        public int Unknown6;
-        public int Unknown7; 
-        public long Unknown8; //offset?
-        public int Unknown9; //length?
-        public int Unknown10; 
-        public long Unknown11; //offset to table
-        public int Unknown12;
-        public int Unknown13;
-        public long LocalFileBaseOffset;
-        public int FileStoreLength;
-        public int Unknown16;
-        public int FolderTableOffset;
-        public int FSTBlockOffset;
-        public int Unknown18;
-        public int Unknown19; 
-        public int FSTExactOffset;
-        public int Unknown20;
-        public int Unknown21;
-        public int Unknown22;
+        public uint MagicPadding;
+        public ulong Unknown1;
+        public ulong PartitionSize;
+        public uint PartitionMediaSize;
+        public ulong Unknown3;
+        public uint Unknown4;
+        public ulong FolderMapOffset;
+        public uint FolderMapSize;
+        public uint FolderMapMediaSize; 
+        public ulong FileMapOffset;
+        public uint FileMapSize;
+        public uint FileMapMediaSize;
+        public ulong BlockMapOffset;
+        public uint BlockMapSize;
+        public uint BlockMapMediaSize;
+        public ulong FileStoreOffset;
+        public uint FileStoreLength;
+        public uint FileStoreMedia;
+        public uint FolderTableOffset;
+        public uint FolderTableLength;
+        public uint FolderTableUnknown;
+        public uint FolderTableMedia; 
+        public uint FSTOffset;
+        public uint FSTLength;
+        public uint FSTUnknown;
+        public uint FSTMedia;
     }
 
     public class SaveTool
@@ -366,6 +373,19 @@ namespace _3DSExplorer
             return buffer;
         }
 
+        public static uint ReadUInt32(Stream fs)
+        {
+            byte[] buffer = new byte[4];
+            fs.Read(buffer, 0, 4);
+            return BitConverter.ToUInt32(buffer, 0);
+        }
+
+        public static ulong ReadUInt64(Stream fs)
+        {
+            byte[] buffer = new byte[8];
+            fs.Read(buffer, 0, 8);
+            return BitConverter.ToUInt64(buffer, 0);
+        }
 
         public static SFContext Open(string path, ref string errorMessage)
         {
@@ -420,7 +440,7 @@ namespace _3DSExplorer
                 int jSize = (int)(0x1000 - ms.Position) / Marshal.SizeOf(typeof(SFLongSectorEntry));
                 cxt.Journal = new SFLongSectorEntry[jSize];
                 cxt.JournalSize = 0;
-                int jc = 0;
+                uint jc = 0;
                 while (ms.Position < 0x1000) //assure stopping
                 {
                     cxt.Journal[jc] = MarshalTool.ReadStruct<SFLongSectorEntry>(ms);
@@ -457,9 +477,9 @@ namespace _3DSExplorer
                 {
                     //Which table to read
                     if ((cxt.Disa.ActiveTable & 1) == 1) //second table
-                        ims.Seek(cxt.Disa.PrimaryTableOffset, SeekOrigin.Begin);
+                        ims.Seek((long)cxt.Disa.PrimaryTableOffset, SeekOrigin.Begin);
                     else
-                        ims.Seek(cxt.Disa.SecondaryTableOffset, SeekOrigin.Begin);
+                        ims.Seek((long)cxt.Disa.SecondaryTableOffset, SeekOrigin.Begin);
 
                     cxt.Partitions = new Partition[cxt.Disa.TableSize];
                     for (int i = 0; i < cxt.Partitions.Length; i++)
@@ -479,44 +499,77 @@ namespace _3DSExplorer
                     for (int p = 0; p < cxt.Partitions.Length; p++)
                     {
                         if (p == 0)
-                            ims.Seek(cxt.Disa.SAVEPartitionOffset + cxt.Partitions[p].Dpfs.OffsetToData, SeekOrigin.Begin);
+                            ims.Seek((long)cxt.Disa.SAVEPartitionOffset, SeekOrigin.Begin);
                         else
-                            ims.Seek(cxt.Disa.DATAPartitionOffset + cxt.Partitions[p].Dpfs.OffsetToData, SeekOrigin.Begin);
+                            ims.Seek((long)cxt.Disa.DATAPartitionOffset, SeekOrigin.Begin);
 
-                        cxt.Partitions[p].offsetInImage = ims.Position;
+                        cxt.Partitions[p].OffsetInImage = (ulong)ims.Position;
+
+                        ims.Seek((long)cxt.Partitions[p].Dpfs.FirstTableOffset, SeekOrigin.Current);
+                        cxt.Partitions[p].FirstFlag = ReadUInt32(ims);
+                        cxt.Partitions[p].FirstFlagDupe = ReadUInt32(ims);
+                        cxt.Partitions[p].SecondFlag = ReadUInt32(ims);
+                        ims.Seek((long)cxt.Partitions[p].Dpfs.SecondTableLength - 4, SeekOrigin.Current);
+                        cxt.Partitions[p].SecondFlagDupe = ReadUInt32(ims);
+                        /*
+                        cxt.Partitions[p].FirstFlagTableDupe = new byte[cxt.Partitions[p].Dpfs.FirstTableLength / 4];
+                        for (int i = 0; i < cxt.Partitions[p].FirstFlagTableDupe.Length; i++)
+                            cxt.Partitions[p].FirstFlagTableDupe[i] = ReadUInt32(ims);
+                        cxt.Partitions[p].SecondFlagTable = new byte[cxt.Partitions[p].Dpfs.SecondTableLength / 4];
+                        for (int i = 0; i < cxt.Partitions[p].SecondFlagTable.Length; i++)
+                            cxt.Partitions[p].SecondFlagTable[i] = ReadUInt32(ims);
+                        cxt.Partitions[p].SecondFlagTableDupe = new byte[cxt.Partitions[p].Dpfs.SecondTableLength / 4];
+                        for (int i = 0; i < cxt.Partitions[p].SecondFlagTableDupe.Length; i++)
+                            cxt.Partitions[p].SecondFlagTableDupe[i] = ReadUInt32(ims); 
+                        */
+
+                        ims.Seek((long)(cxt.Partitions[p].OffsetInImage + cxt.Partitions[p].Dpfs.OffsetToData), SeekOrigin.Begin);
 
                         //Get hashes table
-                        ims.Seek(cxt.Partitions[p].Ivfc.HashTableOffset, SeekOrigin.Current);
+                        ims.Seek((long)cxt.Partitions[p].Ivfc.HashTableOffset, SeekOrigin.Current);
                         cxt.Partitions[p].HashTable = new byte[cxt.Partitions[p].Ivfc.HashTableLength / 0x20][];
                         for (int i = 0; i < cxt.Partitions[p].HashTable.Length; i++)
                             cxt.Partitions[p].HashTable[i] = ReadByteArray(ims, 0x20);
 
-                        if (p == 0)                        
+                        ims.Seek((long)(cxt.Partitions[p].OffsetInImage + cxt.Partitions[p].Dpfs.OffsetToData), SeekOrigin.Begin);
+
+                        //jump to dupe if needed (SAVE partition is written twice)
+                        if ((cxt.Partitions[p].SecondFlag & 0x20000000) == 0) //*** EXPERIMENTAL ***
+                            ims.Seek((long)cxt.Partitions[p].Dpfs.DataLength, SeekOrigin.Current);
+
+                        ims.Seek((long)cxt.Partitions[p].Ivfc.FileSystemOffset, SeekOrigin.Current);
+
+                        if (p == 0)
                         {
-                            cxt.FirstSave = (cxt.image[0x100B] & 0x20) == 0x20; //*** EXPERIMENTAL ***
-
-                            ims.Seek(cxt.Partitions[0].offsetInImage, SeekOrigin.Begin);
-
-                            //jump to backup if needed (SAVE partition is written twice)
-                            if (!cxt.FirstSave) //Apperantly in 2 Partition files the second SAVE is more updated ???
-                                ims.Seek(cxt.Partitions[0].Dpfs.DataLength, SeekOrigin.Current);
-
-                            ims.Seek(cxt.Partitions[0].Ivfc.FileSystemOffset, SeekOrigin.Current);
                             long saveOffset = ims.Position;
-
                             cxt.Save = MarshalTool.ReadStruct<SAVE>(ims);
                             //add SAVE information (if exists) (suppose to...)
                             if (SaveTool.isSaveMagic(cxt.Save.Magic)) //read 
                             {
+                                ims.Seek(saveOffset + (long)cxt.Save.FileMapOffset, SeekOrigin.Begin);
+                                cxt.FilesMap = new uint[cxt.Save.FileMapSize];
+                                for (int i = 0; i < cxt.FilesMap.Length; i++)
+                                    cxt.FilesMap[i] = ReadUInt32(ims);
+                                ims.Seek(saveOffset + (long)cxt.Save.FolderMapOffset, SeekOrigin.Begin);
+                                cxt.FoldersMap= new uint[cxt.Save.FolderMapSize];
+                                for (int i = 0; i < cxt.FoldersMap.Length; i++)
+                                    cxt.FoldersMap[i] = ReadUInt32(ims);
+                                ims.Seek(saveOffset + (long)cxt.Save.BlockMapOffset, SeekOrigin.Begin);
+                                SFBlockMapEntry first = MarshalTool.ReadStruct<SFBlockMapEntry>(ims);
+                                cxt.BlockMap = new SFBlockMapEntry[first.EndBlock + 2];
+                                cxt.BlockMap[0] = first;
+                                for (uint i = 1; i < cxt.BlockMap.Length; i++)
+                                    cxt.BlockMap[i] = MarshalTool.ReadStruct<SFBlockMapEntry>(ims);
+                                
                                 //-- Get folders -- (and set filebase 'while at it')
                                 if (!cxt.isData)
                                 {
-                                    cxt.fileBase = saveOffset + cxt.Save.LocalFileBaseOffset;
-                                    ims.Seek(cxt.fileBase, SeekOrigin.Begin);
+                                    cxt.fileBase = saveOffset + (long)cxt.Save.FileStoreOffset;
+                                    ims.Seek(cxt.fileBase + cxt.Save.FolderTableOffset * 0x200, SeekOrigin.Begin);
                                 }
                                 else
                                 {   //file base is remote
-                                    cxt.fileBase = cxt.Disa.DATAPartitionOffset + cxt.Partitions[1].Difi.FileBase;
+                                    cxt.fileBase = (long)(cxt.Disa.DATAPartitionOffset + cxt.Partitions[1].Difi.FileBase);
                                     ims.Seek(saveOffset + cxt.Save.FolderTableOffset, SeekOrigin.Begin);
                                 }
                                 FileSystemFolderEntry froot = MarshalTool.ReadStruct<FileSystemFolderEntry>(ims);
@@ -528,9 +581,9 @@ namespace _3DSExplorer
                                 //-- Get files --
                                 //go to FST
                                 if (!cxt.isData)
-                                    ims.Seek(cxt.fileBase + cxt.Save.FSTBlockOffset * 0x200, SeekOrigin.Begin);
+                                    ims.Seek(cxt.fileBase + cxt.Save.FSTOffset * 0x200, SeekOrigin.Begin);
                                 else //file base is remote
-                                    ims.Seek(saveOffset + cxt.Save.FSTExactOffset, SeekOrigin.Begin);
+                                    ims.Seek(saveOffset + cxt.Save.FSTOffset, SeekOrigin.Begin);
 
                                 FileSystemFileEntry root = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
                                 cxt.Files = new FileSystemFileEntry[root.ParentFolderIndex - 1];
@@ -539,8 +592,10 @@ namespace _3DSExplorer
                                         cxt.Files[i] = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
                             }
                             else
-                                cxt.Files = new FileSystemFileEntry[0]; //Not a legal SAVE filesystem
-
+                            {   //Not a legal SAVE filesystem
+                                cxt.Folders = new FileSystemFolderEntry[0];
+                                cxt.Files = new FileSystemFileEntry[0]; 
+                            }
                         } // end if (p == 0)
                     } //end foreach (partitions)
                 }
@@ -563,11 +618,11 @@ namespace _3DSExplorer
                 for (int j = 0; j < cxt.Partitions[i].HashTable.Length; j++)
                     if (!is00(cxt.Partitions[i].HashTable[j])) //hash isn't zero
                     {
-                        offset = (int)(cxt.Partitions[i].offsetInImage + cxt.Partitions[i].Ivfc.FileSystemOffset);
+                        offset = (int)(cxt.Partitions[i].OffsetInImage + cxt.Partitions[i].Dpfs.OffsetToData  + cxt.Partitions[i].Ivfc.FileSystemOffset);
                         offset += j * hashSize;
                         cxt.Partitions[i].HashTable[j] = ha.ComputeHash(cxt.image, offset, hashSize);
                         //write it into the image
-                        offset = (int)(cxt.Partitions[i].offsetInImage + cxt.Partitions[i].Ivfc.HashTableOffset);
+                        offset = (int)(cxt.Partitions[i].OffsetInImage + cxt.Partitions[i].Dpfs.OffsetToData + cxt.Partitions[i].Ivfc.HashTableOffset);
                         offset += j * Sizes.SHA256;
                         Buffer.BlockCopy(cxt.Partitions[i].HashTable[j], 0, cxt.image, offset, Sizes.SHA256);
                     }

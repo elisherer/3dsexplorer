@@ -38,37 +38,47 @@ namespace _3DSExplorer
 
         #region AddListItem
 
-        private void AddListItem(int offset, int size, string description, long value, string grp)
+        private void AddListItem(int offset, int size, string description, ulong value, string group)
         {
             ListViewItem lvi = new ListViewItem("0x" + offset.ToString("X3"));
             lvi.SubItems.Add(size.ToString());
             lvi.SubItems.Add(description);
             lvi.SubItems.Add(value.ToString());
-            lvi.SubItems.Add(toHexString(size * 2,(ulong)value));
-            lvi.Group = lstInfo.Groups[grp];
+            lvi.SubItems.Add(toHexString(size * 2,value));
+            lvi.Group = lstInfo.Groups[group];
             lstInfo.Items.Add(lvi);
         }
-        private void AddListItem(int offset, int size, string description, byte[] value, string grp)
+        private void AddListItem(int offset, int size, string description, byte[] value, string group)
         {
             ListViewItem lvi = new ListViewItem("0x" + offset.ToString("X3"));
             lvi.SubItems.Add(size.ToString());
             lvi.SubItems.Add(description);
             lvi.SubItems.Add("");
             lvi.SubItems.Add(byteArrayToString(value));
-            lvi.Group = lstInfo.Groups[grp];
+            lvi.Group = lstInfo.Groups[group];
             lstInfo.Items.Add(lvi);
         }
-        private void AddListItem(int offset, int size, string description, char[] value, string grp)
+        private void AddListItem(int offset, int size, string description, char[] value, string group)
         {
             ListViewItem lvi = new ListViewItem("0x" + offset.ToString("X3"));
             lvi.SubItems.Add(size.ToString());
             lvi.SubItems.Add(description);
             lvi.SubItems.Add(charArrayToString(value));
             lvi.SubItems.Add("");
-            lvi.Group = lstInfo.Groups[grp];
+            lvi.Group = lstInfo.Groups[group];
             lstInfo.Items.Add(lvi);
         }
 
+        private void AddListItem(string offset, string size, string description, string value, string hexvalue, string group)
+        {
+            ListViewItem lvi = new ListViewItem(offset);
+            lvi.SubItems.Add(size);
+            lvi.SubItems.Add(description);
+            lvi.SubItems.Add(value);
+            lvi.SubItems.Add(hexvalue);
+            lvi.Group = lstInfo.Groups[group];
+            lstInfo.Items.Add(lvi);
+        }
         #endregion
 
         #region ToString functions
@@ -192,7 +202,7 @@ namespace _3DSExplorer
             RomContext cxt = (RomContext)currentContext;
             lstInfo.Items.Clear();
             for (int j = 0 ;j < cxt.cxiprs[i].PlainRegionStrings.Length ; j++)
-                AddListItem(0, 4, cxt.cxiprs[i].PlainRegionStrings[j], cxt.cxiprs[i].PlainRegionStrings[j].Length, "lvgPlainRegions");
+                AddListItem(0, 4, cxt.cxiprs[i].PlainRegionStrings[j], (ulong)cxt.cxiprs[i].PlainRegionStrings[j].Length, "lvgPlainRegions");
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             lvFileTree.Nodes.Clear();;
@@ -208,7 +218,7 @@ namespace _3DSExplorer
             lstInfo.Items.Clear();
             AddListItem(0x000, 4, "Unknown 1", cxt.fileHeader.Unknown1, "lvgSaveFlash");
             AddListItem(0x004, 4, "Unknown 2", cxt.fileHeader.Unknown2, "lvgSaveFlash");
-            AddListItem(0, 4, "** Blockmap length", cxt.Blockmap.Length, "lvgSaveFlash");
+            AddListItem(0, 4, "** Blockmap length", (ulong)cxt.Blockmap.Length, "lvgSaveFlash");
             AddListItem(0, 4, "** Journal size", cxt.JournalSize, "lvgSaveFlash");
 
             AddListItem(0, 0x10, "** Image Hash", cxt.ImageHash,"lvgImage");
@@ -259,6 +269,26 @@ namespace _3DSExplorer
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
+        private void showTables()
+        {
+            SFContext cxt = (SFContext)currentContext;
+            lstInfo.Items.Clear();
+
+            if (SaveTool.isSaveMagic(cxt.Save.Magic))
+            {
+                for (int i = 0; i < cxt.FilesMap.Length; i++)
+                    AddListItem(i, 4, "UInt32", cxt.FilesMap[i], "lvgFiles");
+                for (int i = 0; i < cxt.FoldersMap.Length; i++)
+                    AddListItem(i, 4, "UInt32", cxt.FoldersMap[i], "lvgFolders");
+
+                AddListItem("", "", "Start", "Start:" + (cxt.BlockMap[0].StartBlock & 0xff) + ", End: " + (cxt.BlockMap[0].EndBlock & 0xff), "Start:" + cxt.BlockMap[0].StartBlock.ToString("X8") + ", End: " + cxt.BlockMap[0].EndBlock.ToString("X8"), "lvgUnknown");
+                for (int i = 1; i < cxt.BlockMap.Length - 1; i++)
+                    AddListItem("", (i - 1).ToString(), "Block " + i + (cxt.BlockMap[i].EndBlock == 0x80000000 && cxt.BlockMap[i].StartBlock == 0x80000000 ? " (Start of data)" : ""), "Start:" + (cxt.BlockMap[i].StartBlock & 0xff) + ", End: " + (cxt.BlockMap[i].EndBlock & 0xff), "Start:" + cxt.BlockMap[i].StartBlock.ToString("X8") + ", End: " + cxt.BlockMap[i].EndBlock.ToString("X8"), "lvgUnknown");
+                AddListItem("", "", "End", "", "Start:" + (cxt.BlockMap[cxt.BlockMap.Length - 1].StartBlock & 0xff) + ", End: " + (cxt.BlockMap[cxt.BlockMap.Length - 1].EndBlock & 0xff), "lvgUnknown");
+            }
+            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+        }
+
         private void showPartition()
         {
             SFContext cxt = (SFContext)currentContext;
@@ -269,7 +299,7 @@ namespace _3DSExplorer
             SAVE save = cxt.Save;
 
             AddListItem(0x000, 4, "Magic DIFI", difi.Magic, "lvgDifi");
-            AddListItem(0x004, 4, "Unknown 0", difi.Unknown0, "lvgDifi");
+            AddListItem(0x004, 4, "Magic Padding", difi.MagicPadding, "lvgDifi");
             AddListItem(0x008, 8, "IVFC Offset", difi.IVFCOffset, "lvgDifi");
             AddListItem(0x010, 8, "IVFC Size", difi.IVFCSize, "lvgDifi");
             AddListItem(0x018, 8, "DPFS Offset", difi.DPFSOffset, "lvgDifi");
@@ -280,7 +310,7 @@ namespace _3DSExplorer
             AddListItem(0x03C, 8, "File Base (for DATA partitions)", difi.FileBase, "lvgDifi");
 
             AddListItem(0x000, 4, "Magic IVFC", ivfc.Magic, "lvgIvfc");
-            AddListItem(0x004, 4, "Magic Padding (zeros)", ivfc.MagicPadding, "lvgIvfc");
+            AddListItem(0x004, 4, "Magic Padding", ivfc.MagicPadding, "lvgIvfc");
             AddListItem(0x008, 8, "Unknown 1", ivfc.Unknown1, "lvgIvfc");
             AddListItem(0x010, 8, "FirstHash Offset", ivfc.FirstHashOffset, "lvgIvfc");
             AddListItem(0x018, 8, "FirstHash Length", ivfc.FirstHashLength, "lvgIvfc");
@@ -294,19 +324,26 @@ namespace _3DSExplorer
             AddListItem(0x058, 8, "FileSystem Offset", ivfc.FileSystemOffset, "lvgIvfc");
             AddListItem(0x060, 8, "FileSystem Length", ivfc.FileSystemLength, "lvgIvfc");
             AddListItem(0x068, 8, "FileSystem Block" + " (=" + (1 << (int)ivfc.FileSystemBlock) + ")", ivfc.FileSystemBlock, "lvgIvfc");
-            AddListItem(0x070, 8, "Unknown 3", ivfc.Unknown3, "lvgIvfc");
+            AddListItem(0x070, 8, "Unknown 3 (?=0x78)", ivfc.Unknown3, "lvgIvfc");
 
             AddListItem(0x000, 4, "Magic DPFS", dpfs.Magic, "lvgDpfs");
-            AddListItem(0x004, 4, "Magic Padding (zeros)", dpfs.MagicPadding, "lvgDpfs");
-            AddListItem(0x008, 8, "Offset to First Table", dpfs.OffsetToFirstTable, "lvgDpfs");
+            AddListItem(0x004, 4, "Magic Padding", dpfs.MagicPadding, "lvgDpfs");
+            AddListItem(0x008, 8, "First Table Offset", dpfs.FirstTableOffset, "lvgDpfs");
             AddListItem(0x010, 8, "First Table Length", dpfs.FirstTableLength, "lvgDpfs");
             AddListItem(0x018, 8, "First Table Block", dpfs.FirstTableBlock, "lvgDpfs");
-            AddListItem(0x020, 8, "Offset to Second Table", dpfs.OffsetToSecondTable, "lvgDpfs");
+            AddListItem(0x020, 8, "Second Table Offset", dpfs.SecondTableOffset, "lvgDpfs");
             AddListItem(0x028, 8, "Second Table Length", dpfs.SecondTableLength, "lvgDpfs");
             AddListItem(0x030, 8, "Second Table Block", dpfs.SecondTableBlock, "lvgDpfs");
             AddListItem(0x038, 8, "Offset to Data", dpfs.OffsetToData, "lvgDpfs");
             AddListItem(0x040, 8, "Data Length", dpfs.DataLength, "lvgDpfs");
             AddListItem(0x048, 8, "Data Block", dpfs.DataBlock, "lvgDpfs");
+
+#if DEBUG
+            AddListItem(0x000, 4, "* First Flag", cxt.Partitions[cxt.currentPartition].FirstFlag, "lvgDpfs");
+            AddListItem(0x000, 4, "* First Flag Dupe", cxt.Partitions[cxt.currentPartition].FirstFlagDupe, "lvgDpfs");
+            AddListItem(0x000, 4, "* Second Flag", cxt.Partitions[cxt.currentPartition].SecondFlag, "lvgDpfs");
+            AddListItem(0x000, 4, "* Second Flag Dupe", cxt.Partitions[cxt.currentPartition].SecondFlagDupe, "lvgDpfs");
+#endif
             
             AddListItem(0x000, 0x20, "Hash", cxt.Partitions[cxt.currentPartition].Hash, "lvgHash");
             
@@ -314,45 +351,50 @@ namespace _3DSExplorer
             {
                 AddListItem(0x000, 4, "SAVE Magic", save.Magic, "lvgSave");
                 AddListItem(0x004, 4, "Magic Padding", save.MagicPadding, "lvgSave");
-                AddListItem(0x008, 8, "Unknown 1", save.Unknown1, "lvgSave");
-                AddListItem(0x010, 8, "Size of data partition [medias]", save.PartitionSize, "lvgSave");
-                AddListItem(0x018, 4, "Unknown 2", save.Unknown2, "lvgSave");
-                AddListItem(0x01C, 8, "Unknown 3", save.Unknown3, "lvgSave");
-                AddListItem(0x024, 4, "Unknown 4", save.Unknown4, "lvgSave");
-                AddListItem(0x028, 8, "Unknown 5 (first table offset)", save.Unknown5, "lvgSave");
-                AddListItem(0x030, 4, "Unknown 6 (num of u32)", save.Unknown6, "lvgSave");
-                AddListItem(0x034, 4, "Unknown 7 (size of media?)", save.Unknown7, "lvgSave");
-                AddListItem(0x038, 8, "Unknown 8 (second table offset)", save.Unknown8, "lvgSave");
-                AddListItem(0x040, 4, "Unknown 9 (num of u32)", save.Unknown9, "lvgSave");
-                AddListItem(0x044, 4, "Unknown 10 (size of media?)", save.Unknown10, "lvgSave");
-                AddListItem(0x048, 8, "Unknown 11 (third table offset)", save.Unknown11, "lvgSave");
-                AddListItem(0x050, 4, "Unknown 12 (num of u32)", save.Unknown12, "lvgSave");
-                AddListItem(0x054, 4, "Unknown 13 (size of media?)", save.Unknown13, "lvgSave");
-                AddListItem(0x058, 8, "Local File Base Offset (from SAVE)", save.LocalFileBaseOffset, "lvgSave");
+                AddListItem(0x008, 8, "Unknown 1 (?=0x020)", save.Unknown1, "lvgSave");
+                AddListItem(0x010, 8, "Size of data Partition [medias]", save.PartitionSize, "lvgSave");
+                AddListItem(0x018, 4, "Partition Media Size", save.PartitionMediaSize, "lvgSave");
+                AddListItem(0x01C, 8, "Unknown 3 (?=0x000)", save.Unknown3, "lvgSave");
+                AddListItem(0x024, 4, "Unknown 4 (?=0x200)", save.Unknown4, "lvgSave");
+                AddListItem(0x028, 8, "File Map Offset", save.FileMapOffset, "lvgSave");
+                AddListItem(0x030, 4, "File Map Size", save.FileMapSize, "lvgSave");
+                AddListItem(0x034, 4, "File Map MediaSize", save.FileMapMediaSize, "lvgSave");
+                AddListItem(0x038, 8, "Folder Map Offset", save.FolderMapOffset, "lvgSave");
+                AddListItem(0x040, 4, "Folder Map Size", save.FolderMapSize, "lvgSave");
+                AddListItem(0x044, 4, "Folder Map Media Size", save.FolderMapMediaSize, "lvgSave");
+                AddListItem(0x048, 8, "Block Map Offset", save.BlockMapOffset, "lvgSave");
+                AddListItem(0x050, 4, "Block Map Size", save.BlockMapSize, "lvgSave");
+                AddListItem(0x054, 4, "Block Map Media Size", save.BlockMapMediaSize, "lvgSave");
+                AddListItem(0x058, 8, "Filestore Offset (from SAVE)", save.FileStoreOffset, "lvgSave");
                 AddListItem(0x060, 4, "Filestore Length (medias)", save.FileStoreLength, "lvgSave");
-                AddListItem(0x064, 4, "Unknown 16", save.Unknown16, "lvgSave");
-                AddListItem(0x068, 4, "Folder Table offset (from SAVE; DATA files)", save.FolderTableOffset, "lvgSave");
-                AddListItem(0x06C, 4, "FileSystem Table Offset (medias)", save.FSTBlockOffset, "lvgSave");
-                AddListItem(0x070, 4, "Unknown 18", save.Unknown18, "lvgSave");
-                AddListItem(0x074, 4, "Unknown 19", save.Unknown19, "lvgSave");
-                AddListItem(0x078, 4, "FileSystem Table Exact Offset", save.FSTExactOffset, "lvgSave");
-                AddListItem(0x07C, 4, "Unknown 20", save.Unknown20, "lvgSave");
-                AddListItem(0x080, 4, "Unknown 21", save.Unknown21, "lvgSave");
-                AddListItem(0x084, 4, "Unknown 22", save.Unknown22, "lvgSave");
+                AddListItem(0x064, 4, "Filestore Media", save.FileStoreMedia, "lvgSave");
+                AddListItem(0x068, 4, "Folders Table offset (medias/exact)", save.FolderTableOffset, "lvgSave");
+                AddListItem(0x06C, 4, "Folders Table Length (medias)", save.FolderTableLength, "lvgSave");
+                AddListItem(0x070, 4, "Folders Table Unknown", save.FolderTableUnknown, "lvgSave");
+                AddListItem(0x074, 4, "Folders Table Media Size", save.FolderTableMedia, "lvgSave");
+                AddListItem(0x078, 4, "Files Table Offset (medias/exact)", save.FSTOffset, "lvgSave");
+                AddListItem(0x07C, 4, "Files Table Length", save.FSTLength, "lvgSave");
+                AddListItem(0x080, 4, "Files Table Unknown", save.FSTUnknown, "lvgSave");
+                AddListItem(0x084, 4, "Files Table Media Size", save.FSTMedia, "lvgSave");
 
-                if (save.Magic != null & SaveTool.isSaveMagic(save.Magic))
+                if (SaveTool.isSaveMagic(save.Magic))
                 {
-                    int i = 0;
+                    int i = 1;
+                    foreach (FileSystemFolderEntry fse in cxt.Folders)
+                        AddListItem(i++.ToString(),
+                                    fse.Index.ToString(),
+                                    charArrayToString(fse.FolderName),
+                                    fse.ParentFolderIndex.ToString(),
+                                    toHexString(8, fse.LastFileIndex),
+                                    "lvgFolders");
+                    i = 1;
                     foreach (FileSystemFileEntry fse in cxt.Files)
-                    {
-                        AddListItem(i, 8, charArrayToString(fse.Filename), fse.FileSize, "lvgFiles");
-                        AddListItem(i, 4, "Parent Folder Index", fse.ParentFolderIndex, "lvgFiles");
-                        AddListItem(i, 4, "File Index", fse.Index, "lvgFiles");
-                        AddListItem(i, 4, "Magic? (Unknown 1)", fse.Magic, "lvgFiles");
-                        AddListItem(i, 8, "File Block offset (if size>0)", fse.BlockOffset, "lvgFiles");
-                        AddListItem(i, 4, "Unknown 2", fse.Unknown2, "lvgFiles");
-                        AddListItem(i++, 4, "Unknown 3", fse.Unknown3, "lvgFiles");
-                    }
+                        AddListItem(i++.ToString(),
+                                    fse.BlockOffset.ToString(),
+                                    "[" + fse.Index + "] " + charArrayToString(fse.Filename) + ", (" + fse.FileSize + "b)" ,
+                                    fse.ParentFolderIndex.ToString(),
+                                    toHexString(8, fse.Unknown2) + " " + toHexString(8, fse.Magic),
+                                    "lvgFiles");
                 }
             }
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
@@ -397,7 +439,7 @@ namespace _3DSExplorer
             TMDContext cxt = (TMDContext)currentContext;
             lstInfo.Items.Clear();
             TMDHeader head = cxt.head;
-            AddListItem(0, 4, "Signature Type", (int)cxt.SignatureType, "lvgTmd");
+            AddListItem(0, 4, "Signature Type", (ulong)cxt.SignatureType, "lvgTmd");
             int off = 4;
             if (cxt.SignatureType == TMDSignatureType.RSA_2048_SHA256 || cxt.SignatureType == TMDSignatureType.RSA_2048_SHA1)
             {
@@ -437,7 +479,7 @@ namespace _3DSExplorer
             lstInfo.Items.Clear();
             TMDCertContext ccxt = (TMDCertContext)cxt.certs[i];
             TMDCertificate cert = ccxt.cert;
-            AddListItem(0, 4, "Signature Type", (int)ccxt.SignatureType, "lvgTmd");
+            AddListItem(0, 4, "Signature Type", (ulong)ccxt.SignatureType, "lvgTmd");
             int off = 4;
             if (ccxt.SignatureType == TMDSignatureType.RSA_2048_SHA256 || ccxt.SignatureType == TMDSignatureType.RSA_2048_SHA1)
             {
@@ -550,7 +592,7 @@ namespace _3DSExplorer
                         //Build Tree
                         treeView.Nodes.Clear();
                         topNode = treeView.Nodes.Add("Save Flash " + (scxt.Encrypted ? "(Encrypted)" : ""));
-                        topNode.Nodes.Add("SAVE Partition");
+                        topNode.Nodes.Add("SAVE Partition").Nodes.Add("Maps");
                         if (scxt.isData)
                             topNode.Nodes.Add("DATA Partition");
                         lvFileTree.Nodes.Clear();;
@@ -633,14 +675,17 @@ namespace _3DSExplorer
             else if (currentContext is SFContext)
             {
                 SFContext cxt = (SFContext)currentContext;
-                switch (e.Node.Text[1])
+                switch (e.Node.Text[2])
                 {
-                    case 'a': //Save
+                    case 'v': //Save
                         showImage();
                         break;
-                    case 'A': //SAVE/DATA Partition
+                    case 'V': //SAVE/DATA Partition
                         cxt.currentPartition = e.Node.Text[2]=='V' ? 0 : 1;
                         showPartition();
+                        break;
+                    case 'p': //Maps
+                        showTables();
                         break;
                 }
             }
@@ -913,7 +958,7 @@ namespace _3DSExplorer
                 {
                     FileSystemFileEntry originalFile = (FileSystemFileEntry)lvFileTree.TreeView.SelectedNode.Tag;
                     FileStream newFile = File.OpenRead(openFileDialog.FileName);
-                    long newFileSize = newFile.Length;
+                    ulong newFileSize = (ulong)newFile.Length;
                     newFile.Close();
                     if (originalFile.FileSize != newFileSize)
                     {

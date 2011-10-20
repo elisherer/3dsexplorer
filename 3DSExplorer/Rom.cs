@@ -12,56 +12,56 @@ namespace _3DSExplorer
         public byte[] NCSDHeaderSignature;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public char[] MagicID;
-        public int CCISize;
-        public long TitleID; //maybe number of ncch?
+        public uint CCISize;
+        public ulong TitleID; //maybe number of ncch?
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
         public byte[] Reserved0;
 
-        public int FirstNCCHOffset;
-        public int FirstNCCHSize;
+        public uint FirstNCCHOffset;
+        public uint FirstNCCHSize;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
         public byte[] Reserved1;
 
-        public int SecondNCCHOffset;
-        public int SecondNCCHSize;
+        public uint SecondNCCHOffset;
+        public uint SecondNCCHSize;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public byte[] Reserved2;
 
-        public int ThirdNCCHOffset;
-        public int ThirdNCCHSize;
+        public uint ThirdNCCHOffset;
+        public uint ThirdNCCHSize;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 40)]
         public byte[] Reserved3;
 
-        public long NCCHFlags;
+        public ulong NCCHFlags;
         //NCCH Flags: 
         // byte[5]-byte[7] indicate content type ( system update, application, ... )
         // byte[6] size of media units ( 512*2^byte[6] ) and encryption
 
-        public long FirstNCCHPartitionID;
+        public ulong FirstNCCHPartitionID;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
         public byte[] Reserved4;
 
-        public long SecondNCCHPartitionID;
+        public ulong SecondNCCHPartitionID;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public byte[] Reserved5;
 
-        public long ThirdNCCHPartitionID;
+        public ulong ThirdNCCHPartitionID;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 48)]
         public byte[] Reserved6;
 
-        public int PaddingFF;
+        public uint PaddingFF;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 252)]
         public byte[] Reserved7;
         
-        public int UsedRomSize; //in bytes
+        public uint UsedRomSize; //in bytes
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 28)]
         public byte[] Reserved8;
@@ -89,8 +89,8 @@ namespace _3DSExplorer
         public byte[] NCCHHeaderSignature;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public char[] MagicID;
-        public int CXISize;
-        public long PartitionID; //maybe number of ncch?
+        public uint CXISize;
+        public ulong PartitionID; //maybe number of ncch?
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
         public char[] MakerCode;
         public ushort Version;
@@ -98,7 +98,7 @@ namespace _3DSExplorer
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] Reserved0;
 
-        public long ProgramID;
+        public ulong ProgramID;
         public char TempFlag;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 47)]
@@ -114,7 +114,7 @@ namespace _3DSExplorer
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] Reserved2;
 
-        public long Flags;
+        public ulong Flags;
         public uint PlainRegionOffset;
         public uint PlainRegionSize;
 
@@ -166,7 +166,7 @@ namespace _3DSExplorer
         public char[] Name;
         public CXIExtendedHeaderSystemInfoFlags Flags;
         public CXIExtendedHeaderCodeSegmentInfo Text;
-        public int StackSize;
+        public uint StackSize;
         public CXIExtendedHeaderCodeSegmentInfo Ro;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] Reserved;
@@ -191,8 +191,8 @@ namespace _3DSExplorer
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] Address;
-        public int NumMaxPages;
-        public int CodeSize;
+        public uint NumMaxPages;
+        public uint CodeSize;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -205,7 +205,7 @@ namespace _3DSExplorer
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct CXIExtendedHeaderSystemInfo
     {
-        public int SaveDataSize;
+        public uint SaveDataSize;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] Reserved;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
@@ -240,7 +240,7 @@ namespace _3DSExplorer
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
         public byte[] ProgramID;
-        public long Flags;
+        public ulong Flags;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x10)]
         public ResourceLimit[] ResourceLimitDescriptor;
         public CXIExtendedHeaderStorageInfo StorageInfo;
