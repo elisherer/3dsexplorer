@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AES128CTR.cs" />
+    <Compile Include="CIA.cs" />
     <Compile Include="Rom.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="CRC16.cs" />
