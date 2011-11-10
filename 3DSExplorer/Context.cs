@@ -102,4 +102,15 @@ namespace _3DSExplorer
 
         public ArrayList certs; //of TMDCertContext
     }
+
+    public class CIAContext : Context
+    {
+        public CIAHeader header;
+        public long CertificateChainOffset;
+        public long TicketOffset;
+        public long TMDOffset;
+        public long BannerOffset;
+        public long AppOffset;
+        public TMDContext tmdContext;
+    }
 }

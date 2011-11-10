@@ -20,8 +20,8 @@ namespace _3DSExplorer
             byte[] big = first, small = second;
             if (first.Length < second.Length)
             {
-                big = first;
-                small = second;
+                big = second;
+                small = first;
             }
             for (int i = 0; i < dst.Length; i++)
                 dst[i] = (byte)(big[i] ^ small[i % small.Length]);

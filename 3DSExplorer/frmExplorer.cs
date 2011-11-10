@@ -505,6 +505,32 @@ namespace _3DSExplorer
         }
         #endregion
 
+        #region CIAContext
+
+        private void showCIA()
+        {
+            CIAContext cxt = (CIAContext)currentContext;
+            lstInfo.Items.Clear();
+            CIAHeader cia = cxt.header;
+            AddListItem(0, 8, "Certificate Chain Offset", cia.CertificateChainOffset, "lvgCia");
+            AddListItem(8, 4, "Certificate Chain Size", cia.CertificateChainSize, "lvgCia");
+            AddListItem(12, 4, "Ticket Size", cia.TicketSize, "lvgCia");
+            AddListItem(16, 4, "TMD Size", cia.TMDSize, "lvgCia");
+            AddListItem(20, 4, "Banner Size", cia.BannerSize, "lvgCia");
+            AddListItem(24, 8, "App Size", cia.AppSize, "lvgCia");
+
+            AddListItem(0, 8, "Certificate Chain Offset", (ulong)cxt.CertificateChainOffset, "lvgCiaOffsets");
+            AddListItem(0, 8, "Ticket Offset", (ulong)cxt.TicketOffset, "lvgCiaOffsets");
+            AddListItem(0, 8, "TMD Offset", (ulong)cxt.TMDOffset, "lvgCiaOffsets");
+            AddListItem(0, 8, "Banner Offset", (ulong)cxt.BannerOffset, "lvgCiaOffsets");
+            AddListItem(0, 8, "App Offset", (ulong)cxt.AppOffset, "lvgCiaOffsets");
+
+            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileTree.Nodes.Clear(); ;
+        }
+
+        #endregion
+
         private void openFile(string path)
         {
             filePath = path;
@@ -519,21 +545,26 @@ namespace _3DSExplorer
                 type = 0;
             else if (filePath.EndsWith("sav") || filePath.EndsWith("bin"))
                 type = 1;
-            else if (filePath.EndsWith("tmd") || filePath.EndsWith("tmd"))
+            else if (filePath.EndsWith("tmd"))
                 type = 2;
+            else if (filePath.EndsWith("cia"))
+                type = 3;
             else //Autodetect by content
             {
+                
                 //TMD Check
                 fs.Seek(0, SeekOrigin.Begin);
                 fs.Read(magic, 0, 4);
-                if (magic[0] < 5 & magic[1] == 0 & magic[2] == 1 & magic[3] == 0)
+                if (magic[0] < 5 && magic[1] == 0 && magic[2] == 1 && magic[3] == 0)
                     type = 1;
+                else if (magic[0] == 0x20 && magic[1] == 0x20 && magic[2] == 0 && magic[3] == 0)
+                    type = 3;
                 else if (fs.Length >= 0x104) // > 256+4
                 {
                     //CCI CHECK
                     fs.Seek(0x100, SeekOrigin.Current);
                     fs.Read(magic, 0, 4);
-                    if (magic[0] == 'N' && magic[1] == 'C' & magic[2] == 'S' & magic[3] == 'D')
+                    if (magic[0] == 'N' && magic[1] == 'C' && magic[2] == 'S' && magic[3] == 'D')
                         type = 0;
                     else if (fs.Length >= 0x10000) // > 64kb
                     {
@@ -647,6 +678,16 @@ namespace _3DSExplorer
                         treeView.SelectedNode = topNode;
                     }
                     break;
+                case 3: //CIA
+                    CIAContext ccxt = CIATool.Open(filePath);
+                    LoadText(filePath);
+                    //Build Tree
+                    treeView.Nodes.Clear();
+                    topNode = treeView.Nodes.Add("CIA");
+                    treeView.ExpandAll();
+                    currentContext = ccxt;
+                    treeView.SelectedNode = topNode;
+                    break;
                 default: MessageBox.Show("This file is unsupported!"); break;
             }
             menuFileSave.Enabled = (type == 1);
@@ -708,6 +749,14 @@ namespace _3DSExplorer
                 else if (e.Node.Text.StartsWith("Content C"))
                 {
                     showTMDContentChunks();
+                }
+            }
+            else if (currentContext is CIAContext)
+            {
+                CIAContext cxt = (CIAContext)currentContext;
+                if (e.Node.Text.StartsWith("CIA"))
+                {
+                    showCIA();
                 }
             }
         }
@@ -844,7 +893,7 @@ namespace _3DSExplorer
 
         private void menuFileOpen_Click(object sender, EventArgs e)
         {
-            openFileDialog.Filter = "All Supported (3ds,cci,bin,sav,tmd)|*.3ds;*.cci;*.bin;*.sav;*.tmd|3DS Dump Files (*.3ds,*.cci)|*.3ds;*.cci|Save Binary Files (*.bin,*.sav)|*.bin;*.sav|Title Metadata (*.tmd)|*.tmd|All Files|*.*";
+            openFileDialog.Filter = "All Supported (3ds,cci,bin,sav,tmd,cia)|*.3ds;*.cci;*.bin;*.sav;*.tmd;*.cia|3DS Dump Files (*.3ds,*.cci)|*.3ds;*.cci|Save Binary Files (*.bin,*.sav)|*.bin;*.sav|Title Metadata (*.tmd)|*.tmd|CTR Importable Archives (*.cia)|*.cia|All Files|*.*";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
                 openFile(openFileDialog.FileName);
         }
