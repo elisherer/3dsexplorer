@@ -26,7 +26,7 @@ namespace _3DSExplorer
         public frmExplorer()
         {
             InitializeComponent();
-            LoadText(null);
+            Text = "3DS Explorer v." + Application.ProductVersion;
         }
 
         public frmExplorer(string path)
@@ -404,9 +404,8 @@ namespace _3DSExplorer
 
         #region TMDContext
 
-        private void showTMDContentChunks()
+        private void showTMDContentChunks(TMDContext cxt)
         {
-            TMDContext cxt = (TMDContext)currentContext;
             lstInfo.Items.Clear();
             TMDContentChunkRecord cr;
             for (int i = 0; i < cxt.chunks.Count; i++)
@@ -421,9 +420,8 @@ namespace _3DSExplorer
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
-        private void showTMDContentRecords()
+        private void showTMDContentRecords(TMDContext cxt)
         {
-            TMDContext cxt = (TMDContext)currentContext;
             lstInfo.Items.Clear();
             for (int i = 0; i < 64; i++)
             {
@@ -434,9 +432,8 @@ namespace _3DSExplorer
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
-        private void showTMD()
+        private void showTMD(TMDContext cxt)
         {
-            TMDContext cxt = (TMDContext)currentContext;
             lstInfo.Items.Clear();
             TMDHeader head = cxt.head;
             AddListItem(0, 4, "Signature Type", (ulong)cxt.SignatureType, "lvgTmd");
@@ -473,32 +470,40 @@ namespace _3DSExplorer
             lvFileTree.Nodes.Clear();;
         }
 
-        private void showTMDCertificate(int i)
+        private void showCertificates(TMDContext cxt)
         {
-            TMDContext cxt = (TMDContext)currentContext;
+            lstInfo.Items.Clear();
+            AddListItem(0, 4, "Certificate Count", (ulong)cxt.certs.Count, "lvgCertificate");
+            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileTree.Nodes.Clear(); ;
+        }
+
+
+        private void showCertificate(TMDContext cxt, int i)
+        {
             lstInfo.Items.Clear();
             TMDCertContext ccxt = (TMDCertContext)cxt.certs[i];
             TMDCertificate cert = ccxt.cert;
-            AddListItem(0, 4, "Signature Type", (ulong)ccxt.SignatureType, "lvgTmd");
+            AddListItem(0, 4, "Signature Type", (ulong)ccxt.SignatureType, "lvgCertificate");
             int off = 4;
             if (ccxt.SignatureType == TMDSignatureType.RSA_2048_SHA256 || ccxt.SignatureType == TMDSignatureType.RSA_2048_SHA1)
             {
-                AddListItem(off, 0x100, "RSA-2048 signature of the TMD", ccxt.tmdSHA, "lvgTmd");
+                AddListItem(off, 0x100, "RSA-2048 signature of the TMD", ccxt.tmdSHA, "lvgCertificate");
                 off += 0x100;
             }
             else
             {
-                AddListItem(off, 0x200, "RSA-4096 signature of the TMD", ccxt.tmdSHA, "lvgTmd");
+                AddListItem(off, 0x200, "RSA-4096 signature of the TMD", ccxt.tmdSHA, "lvgCertificate");
                 off += 0x200;
             }
-            AddListItem(off, 60, "Reserved0", cert.Reserved0, "lvgTmd");
-            AddListItem(off+60, 64, "Issuer", cert.Issuer, "lvgTmd");
-            AddListItem(off+124, 4, "Tag", cert.Tag, "lvgTmd");
-            AddListItem(off+128, 64, "Name", cert.Name, "lvgTmd");
-            AddListItem(off+292, 0x104, "Key", cert.Key, "lvgTmd");
-            AddListItem(off+552, 2, "Unknown0", cert.Unknown1, "lvgTmd");
-            AddListItem(off+554, 2, "Unknown1", cert.Unknown2, "lvgTmd");
-            AddListItem(off+556, 52, "Padding", cert.Padding, "lvgTmd");
+            AddListItem(off, 60, "Reserved0", cert.Reserved0, "lvgCertificate");
+            AddListItem(off + 60, 64, "Issuer", cert.Issuer, "lvgCertificate");
+            AddListItem(off + 124, 4, "Tag", cert.Tag, "lvgCertificate");
+            AddListItem(off + 128, 64, "Name", cert.Name, "lvgCertificate");
+            AddListItem(off + 292, 0x104, "Key", cert.Key, "lvgCertificate");
+            AddListItem(off + 552, 2, "Unknown0", cert.Unknown1, "lvgCertificate");
+            AddListItem(off + 554, 2, "Unknown1", cert.Unknown2, "lvgCertificate");
+            AddListItem(off + 556, 52, "Padding", cert.Padding, "lvgCertificate");
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             lvFileTree.Nodes.Clear();;
@@ -512,12 +517,12 @@ namespace _3DSExplorer
             CIAContext cxt = (CIAContext)currentContext;
             lstInfo.Items.Clear();
             CIAHeader cia = cxt.header;
-            AddListItem(0, 8, "Certificate Chain Offset", cia.CertificateChainOffset, "lvgCia");
-            AddListItem(8, 4, "Certificate Chain Size", cia.CertificateChainSize, "lvgCia");
-            AddListItem(12, 4, "Ticket Size", cia.TicketSize, "lvgCia");
-            AddListItem(16, 4, "TMD Size", cia.TMDSize, "lvgCia");
-            AddListItem(20, 4, "Banner Size", cia.BannerSize, "lvgCia");
-            AddListItem(24, 8, "App Size", cia.AppSize, "lvgCia");
+            AddListItem(0, 8, "Padding Length", cia.PaddingLength, "lvgCia");
+            AddListItem(8, 4, "Certificate Chain Length", cia.CertificateChainLength, "lvgCia");
+            AddListItem(12, 4, "Ticket Length", cia.TicketLength, "lvgCia");
+            AddListItem(16, 4, "TMD Length", cia.TMDLength, "lvgCia");
+            AddListItem(20, 4, "Banner Length", cia.BannerLength, "lvgCia");
+            AddListItem(24, 8, "App Length", cia.AppLength, "lvgCia");
 
             AddListItem(0, 8, "Certificate Chain Offset", (ulong)cxt.CertificateChainOffset, "lvgCiaOffsets");
             AddListItem(0, 8, "Ticket Offset", (ulong)cxt.TicketOffset, "lvgCiaOffsets");
@@ -609,10 +614,10 @@ namespace _3DSExplorer
                                 topNode.Nodes[topNode.Nodes.Count - 1].Nodes.Add("PlainRegion");
                         }
                     treeView.ExpandAll();
-                    currentContext = rcxt;    
-                    treeView.SelectedNode = topNode;
+                    currentContext = rcxt;
+                    treeView.SelectedNode = treeView.TopNode;
                     break;
-                case 1:
+                case 1: //Save
                     string errMsg = null;
                     SFContext scxt = SaveTool.Open(filePath, ref errMsg);
                     if (scxt == null)
@@ -656,7 +661,7 @@ namespace _3DSExplorer
                         folders[0].ExpandAll();
                         treeView.ExpandAll();
                         currentContext = scxt;
-                        treeView.SelectedNode = topNode;
+                        treeView.SelectedNode = treeView.TopNode;
                     }
                     break;
                 case 2: //TMD
@@ -675,7 +680,7 @@ namespace _3DSExplorer
                             topNode.Nodes.Add("TMD Certificate " + i);
                         treeView.ExpandAll();
                         currentContext = tcxt;
-                        treeView.SelectedNode = topNode;
+                        treeView.SelectedNode = treeView.TopNode;
                     }
                     break;
                 case 3: //CIA
@@ -684,9 +689,26 @@ namespace _3DSExplorer
                     //Build Tree
                     treeView.Nodes.Clear();
                     topNode = treeView.Nodes.Add("CIA");
+                    if (ccxt.Ticket != null)
+                    {
+                        if (ccxt.Ticket.certs.Count > 0)
+                        {
+                            topNode = treeView.TopNode.Nodes.Add("Certificates");
+                            for (int i = 0; i < ccxt.Ticket.certs.Count; i++)
+                                topNode.Nodes.Add("Certificate " + i);
+                        }
+                        topNode = treeView.TopNode.Nodes.Add("Ticket");
+                    }
+                    if (ccxt.tmdContext != null)
+                    {
+                        topNode = treeView.TopNode.Nodes.Add("TMD");
+                        topNode.Nodes.Add("Content Info Records");
+                        topNode.Nodes.Add("Content Chunk Records");
+                    }
+                    
                     treeView.ExpandAll();
                     currentContext = ccxt;
-                    treeView.SelectedNode = topNode;
+                    treeView.SelectedNode = treeView.TopNode;
                     break;
                 default: MessageBox.Show("This file is unsupported!"); break;
             }
@@ -736,19 +758,19 @@ namespace _3DSExplorer
                 if (e.Node.Text.StartsWith("TMD C"))
                 {
                     int i = e.Node.Text[16] - '0';
-                    showTMDCertificate(i);
+                    showCertificate(cxt,i);
                 }
                 else if (e.Node.Text.StartsWith("TMD"))
                 {
-                    showTMD();
+                    showTMD(cxt);
                 }
                 else if (e.Node.Text.StartsWith("Content I"))
                 {
-                    showTMDContentRecords();
+                    showTMDContentRecords(cxt);
                 }
                 else if (e.Node.Text.StartsWith("Content C"))
                 {
-                    showTMDContentChunks();
+                    showTMDContentChunks(cxt);
                 }
             }
             else if (currentContext is CIAContext)
@@ -757,6 +779,31 @@ namespace _3DSExplorer
                 if (e.Node.Text.StartsWith("CIA"))
                 {
                     showCIA();
+                }
+                else if (e.Node.Text.StartsWith("Certificate "))
+                {
+                    int i = e.Node.Text[12] - '0';
+                    showCertificate(cxt.Ticket, i);
+                }
+                else if (e.Node.Text.StartsWith("Certificates"))
+                {
+                    showCertificates(cxt.Ticket);
+                }
+                else if (e.Node.Text.StartsWith("TMD"))
+                {
+                    showTMD(cxt.tmdContext);
+                }
+                else if (e.Node.Text.StartsWith("Content I"))
+                {
+                    showTMDContentRecords(cxt.tmdContext);
+                }
+                else if (e.Node.Text.StartsWith("Content C"))
+                {
+                    showTMDContentChunks(cxt.tmdContext);
+                }
+                else if (e.Node.Text.StartsWith("Ticket"))
+                {
+                    showTMD(cxt.Ticket);
                 }
             }
         }
@@ -855,7 +902,7 @@ namespace _3DSExplorer
 
         private void LoadText(string path)
         {
-            Text = "3DS Explorer v." + Application.ProductVersion + " " +  (path != null ? " (" + path.Substring(path.LastIndexOf('\\') + 1) + ")" : "");
+            lblCaptionTree.Text = path.Substring(path.LastIndexOf('\\') + 1);
         }
 
         private void lstInfo_DoubleClick(object sender, EventArgs e)
