@@ -105,7 +105,6 @@ namespace _3DSExplorer
             FileStream fs = File.OpenRead(path);
             cxt = OpenFromStream(fs, 0, fs.Length);
             if (cxt != null)
-                //start reading certificates
                 OpenCertificatesFromStream(fs, fs.Position, fs.Length, cxt);
             fs.Close();
             return cxt;
@@ -149,7 +148,7 @@ namespace _3DSExplorer
             byte[] intBytes = new byte[4];
             fs.Seek(offset, SeekOrigin.Begin);
             cxt.certs = new ArrayList();
-            while (fs.Position < offset + length)
+            while ((fs.Position < offset + length) && (fs.Position < fs.Length))
             {
                 TMDCertContext tcert = new TMDCertContext();
                 fs.Read(intBytes, 0, 4);
