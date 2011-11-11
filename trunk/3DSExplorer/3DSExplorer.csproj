@@ -160,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />
+    <None Include="Resources\menuBack.png" />
     <None Include="Resources\page_white_copy.png" />
     <None Include="Resources\page_white.png" />
     <None Include="Resources\help.png" />

@@ -116,6 +116,13 @@ namespace _3DSExplorer.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap menuBack {
+            get {
+                object obj = ResourceManager.GetObject("menuBack", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap page_white {
             get {
                 object obj = ResourceManager.GetObject("page_white", resourceCulture);

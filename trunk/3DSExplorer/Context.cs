@@ -111,6 +111,7 @@ namespace _3DSExplorer
         public long TMDOffset;
         public long BannerOffset;
         public long AppOffset;
+        public TMDContext Ticket; // Holds the certificates as well
         public TMDContext tmdContext;
     }
 }
