@@ -31,8 +31,6 @@ G:\3DS\3DSExplorer\3DSExplorer\bin\Debug\3DSExplorer.exe
 G:\3DS\3DSExplorer\3DSExplorer\bin\Debug\3DSExplorer.pdb
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.exe
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.pdb
-D:\dev\3DSExplorer\3DSExplorer\bin\Debug\3DSExplorer.exe
-D:\dev\3DSExplorer\3DSExplorer\bin\Debug\3DSExplorer.pdb
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\ResolveAssemblyReference.cache
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmExplorer.resources
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmHashTool.resources
@@ -66,3 +64,7 @@ D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.pdb
 \\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\TreeListView.TreeListViewControl.resources
 \\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\bin\3DSExplorer.exe
 \\ELI-PC\dev\3DS\3DSExplorer\3DSExplorer\bin\3DSExplorer.pdb
+D:\dev\3DSExplorer\3DSExplorer\obj\Debug\TreeListView.MultiColumnTreeView.resources
+D:\dev\3DSExplorer\3DSExplorer\obj\Debug\TreeListView.TreeListViewControl.resources
+D:\dev\3DSExplorer\3DSExplorer\bin\3DSExplorer.exe
+D:\dev\3DSExplorer\3DSExplorer\bin\3DSExplorer.pdb
