@@ -97,7 +97,7 @@ namespace _3DSExplorer
         public TMDHeader head;
         public TMDSignatureType SignatureType;
         public TMDContentInfoRecord[] ContentInfoRecords;
-        public ArrayList chunks; // of TMDContentChunkRecord
+        public TMDContentChunkRecord[] chunks;
         public byte[] tmdSHA;
 
         public ArrayList certs; //of TMDCertContext
@@ -109,9 +109,11 @@ namespace _3DSExplorer
         public long CertificateChainOffset;
         public long TicketOffset;
         public long TMDOffset;
-        public long BannerOffset;
+        public long SMDOffset;
         public long AppOffset;
         public TMDContext Ticket; // Holds the certificates as well
         public TMDContext tmdContext;
+        public ArrayList SMDHeaderEntries;
+        public CIASMetaData smd;
     }
 }

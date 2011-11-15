@@ -136,9 +136,9 @@ namespace _3DSExplorer
                 cxt.ContentInfoRecords = new TMDContentInfoRecord[64];
                 for (int i = 0; i < cxt.ContentInfoRecords.Length; i++)
                     cxt.ContentInfoRecords[i] = MarshalTool.ReadStructBE<TMDContentInfoRecord>(fs);
-                cxt.chunks = new ArrayList();
+                cxt.chunks = new TMDContentChunkRecord[cxt.head.ContentCount];// new ArrayList();
                 for (int i = 0; i < cxt.head.ContentCount; i++)
-                    cxt.chunks.Add(MarshalTool.ReadStructBE<TMDContentChunkRecord>(fs));
+                    cxt.chunks[i] = MarshalTool.ReadStructBE<TMDContentChunkRecord>(fs);
             }
             return (supported ? cxt : null);
         }

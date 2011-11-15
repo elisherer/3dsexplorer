@@ -408,7 +408,7 @@ namespace _3DSExplorer
         {
             lstInfo.Items.Clear();
             TMDContentChunkRecord cr;
-            for (int i = 0; i < cxt.chunks.Count; i++)
+            for (int i = 0; i < cxt.chunks.Length; i++)
             {
                 cr = (TMDContentChunkRecord)cxt.chunks[i];
                 AddListItem(i, 4, "Content ID", cr.ContentID, "lvgTmd");
@@ -521,14 +521,59 @@ namespace _3DSExplorer
             AddListItem(8, 4, "Certificate Chain Length", cia.CertificateChainLength, "lvgCia");
             AddListItem(12, 4, "Ticket Length", cia.TicketLength, "lvgCia");
             AddListItem(16, 4, "TMD Length", cia.TMDLength, "lvgCia");
-            AddListItem(20, 4, "Banner Length", cia.BannerLength, "lvgCia");
+            AddListItem(20, 4, "SMD Length", cia.SMDLength, "lvgCia");
             AddListItem(24, 8, "App Length", cia.AppLength, "lvgCia");
 
             AddListItem(0, 8, "Certificate Chain Offset", (ulong)cxt.CertificateChainOffset, "lvgCiaOffsets");
             AddListItem(0, 8, "Ticket Offset", (ulong)cxt.TicketOffset, "lvgCiaOffsets");
             AddListItem(0, 8, "TMD Offset", (ulong)cxt.TMDOffset, "lvgCiaOffsets");
-            AddListItem(0, 8, "Banner Offset", (ulong)cxt.BannerOffset, "lvgCiaOffsets");
             AddListItem(0, 8, "App Offset", (ulong)cxt.AppOffset, "lvgCiaOffsets");
+            AddListItem(0, 8, "SMD Offset", (ulong)cxt.SMDOffset, "lvgCiaOffsets");
+
+            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileTree.Nodes.Clear(); ;
+        }
+
+        private void showSMD()
+        {
+            CIAContext cxt = (CIAContext)currentContext;
+            lstInfo.Items.Clear();
+            
+            AddListItem(0, 4, "SMD Header Magic", cxt.smd.Magic, "lvgCia");
+            AddListItem(4, 4, "Padding 0", cxt.smd.Padding0, "lvgCia");
+
+            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileTree.Nodes.Clear(); ;
+        }
+
+        private void showSMDHeaderEntries()
+        {
+            CIAContext cxt = (CIAContext)currentContext;
+            lstInfo.Items.Clear();
+
+            for (int i = 0; i < cxt.SMDHeaderEntries.Count; i++)
+            {
+                CIASMDHeaderEntry entry = cxt.SMDHeaderEntries[i] as CIASMDHeaderEntry;
+                AddListItem(i, 2, "Type " + entry.Type, entry.Index, "lvgCia");
+                AddListItem(i, 4 , "Magic", entry.Magic, "lvgCia");
+            }
+
+            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileTree.Nodes.Clear(); ;
+        }
+
+        private void showSMDEntries()
+        {
+            CIAContext cxt = (CIAContext)currentContext;
+            lstInfo.Items.Clear();
+            string pubString, firString, secString;
+            for (int i = 0; i < cxt.smd.SMDEntries.Length; i++)
+            {
+                pubString = Encoding.Unicode.GetString(cxt.smd.SMDEntries[i].Publisher);
+                firString = Encoding.Unicode.GetString(cxt.smd.SMDEntries[i].FirstTitle);
+                secString = Encoding.Unicode.GetString(cxt.smd.SMDEntries[i].SecondTitle);
+                AddListItem(i.ToString(), "0x200", pubString, firString, secString, "lvgCia");
+            }
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             lvFileTree.Nodes.Clear(); ;
@@ -705,7 +750,12 @@ namespace _3DSExplorer
                         topNode.Nodes.Add("Content Info Records");
                         topNode.Nodes.Add("Content Chunk Records");
                     }
-                    
+                    if (ccxt.header.SMDLength > 0)
+                    {
+                        topNode = treeView.TopNode.Nodes.Add("SMD");
+                        topNode.Nodes.Add("Header Entries");
+                        topNode.Nodes.Add("Entries");
+                    }
                     treeView.ExpandAll();
                     currentContext = ccxt;
                     treeView.SelectedNode = treeView.TopNode;
@@ -804,6 +854,18 @@ namespace _3DSExplorer
                 else if (e.Node.Text.StartsWith("Ticket"))
                 {
                     showTMD(cxt.Ticket);
+                }
+                else if (e.Node.Text.StartsWith("SMD"))
+                {
+                    showSMD();
+                }
+                else if (e.Node.Text.StartsWith("Head"))
+                {
+                    showSMDHeaderEntries();
+                }
+                else if (e.Node.Text.StartsWith("Entr"))
+                {
+                    showSMDEntries();
                 }
             }
         }
