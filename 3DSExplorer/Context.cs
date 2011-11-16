@@ -58,10 +58,10 @@ namespace _3DSExplorer
         public byte[] Key;
 
         public byte[] MemoryMap;
-        public SFHeaderEntry[] Blockmap;
-        public SFLongSectorEntry[] Journal;
+        public SRAMHeaderEntry[] Blockmap;
+        public SRAMLongSectorEntry[] Journal;
         public uint JournalSize;
-        public SFHeader fileHeader;
+        public SRAMHeader fileHeader;
         public byte[] image;
         
         //Image stuff
@@ -81,26 +81,17 @@ namespace _3DSExplorer
         public long fileBase;
         public uint[] FilesMap;
         public uint[] FoldersMap;
-        public SFBlockMapEntry[] BlockMap;
-    }
-
-    public class TMDCertContext
-    {
-        
-        public TMDCertificate cert;
-        public TMDSignatureType SignatureType;
-        public byte[] tmdSHA;
+        public SRAMBlockMapEntry[] BlockMap;
     }
 
     public class TMDContext : Context
     {
         public TMDHeader head;
-        public TMDSignatureType SignatureType;
+        public SignatureType SignatureType;
         public TMDContentInfoRecord[] ContentInfoRecords;
         public TMDContentChunkRecord[] chunks;
-        public byte[] tmdSHA;
-
-        public ArrayList certs; //of TMDCertContext
+        public byte[] Hash;
+        public ArrayList Certificates; //of CertContext
     }
 
     public class CIAContext : Context
@@ -111,8 +102,10 @@ namespace _3DSExplorer
         public long TMDOffset;
         public long AppOffset;
         public long BannerOffset;
-        public TMDContext Ticket; // Holds the certificates as well
-        public TMDContext tmdContext;
+        public ArrayList Certificates; //of CertContext
+        public Ticket Ticket;
+        public TMDContext TMD;
+        
         public ArrayList BannerHeaderEntries;
         public CIABanner Banner;
         public Bitmap SmallIcon, LargeIcon;

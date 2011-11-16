@@ -63,8 +63,8 @@ namespace _3DSExplorer
             ListViewItem lvi = new ListViewItem("0x" + offset.ToString("X3"));
             lvi.SubItems.Add(size.ToString());
             lvi.SubItems.Add(description);
-            lvi.SubItems.Add(charArrayToString(value));
             lvi.SubItems.Add("");
+            lvi.SubItems.Add(charArrayToString(value));
             lvi.Group = lstInfo.Groups[group];
             lstInfo.Items.Add(lvi);
         }
@@ -274,7 +274,7 @@ namespace _3DSExplorer
             SFContext cxt = (SFContext)currentContext;
             lstInfo.Items.Clear();
 
-            if (SaveTool.isSaveMagic(cxt.Save.Magic))
+            if (SRAMTool.isSaveMagic(cxt.Save.Magic))
             {
                 for (int i = 0; i < cxt.FilesMap.Length; i++)
                     AddListItem(i, 4, "UInt32", cxt.FilesMap[i], "lvgFiles");
@@ -377,7 +377,7 @@ namespace _3DSExplorer
                 AddListItem(0x080, 4, "Files Table Unknown", save.FSTUnknown, "lvgSave");
                 AddListItem(0x084, 4, "Files Table Media Size", save.FSTMedia, "lvgSave");
 
-                if (SaveTool.isSaveMagic(save.Magic))
+                if (SRAMTool.isSaveMagic(save.Magic))
                 {
                     int i = 1;
                     foreach (FileSystemFolderEntry fse in cxt.Folders)
@@ -438,14 +438,14 @@ namespace _3DSExplorer
             TMDHeader head = cxt.head;
             AddListItem(0, 4, "Signature Type", (ulong)cxt.SignatureType, "lvgTmd");
             int off = 4;
-            if (cxt.SignatureType == TMDSignatureType.RSA_2048_SHA256 || cxt.SignatureType == TMDSignatureType.RSA_2048_SHA1)
+            if (cxt.SignatureType == SignatureType.RSA_2048_SHA256 || cxt.SignatureType == SignatureType.RSA_2048_SHA1)
             {
-                AddListItem(off, 0x100, "RSA-2048 signature of the TMD", cxt.tmdSHA, "lvgTmd");
+                AddListItem(off, 0x100, "RSA-2048 signature of the TMD", cxt.Hash, "lvgTmd");
                 off += 0x100;
             }
             else
             {
-                AddListItem(off, 0x200, "RSA-4096 signature of the TMD", cxt.tmdSHA, "lvgTmd");
+                AddListItem(off, 0x200, "RSA-4096 signature of the TMD", cxt.Hash, "lvgTmd");
                 off += 0x200;
             }
             AddListItem(off,    60, "Reserved0", head.Reserved0, "lvgTmd");
@@ -465,45 +465,6 @@ namespace _3DSExplorer
             AddListItem(off+223, 2, "Boot Content", head.BootContent, "lvgTmd");
             AddListItem(off+225, 2, "Padding", head.Padding0, "lvgTmd");
             AddListItem(off+227, 32, "Content Info Records Hash", head.ContentInfoRecordsHash, "lvgTmd");
-
-            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileTree.Nodes.Clear();;
-        }
-
-        private void showCertificates(TMDContext cxt)
-        {
-            lstInfo.Items.Clear();
-            AddListItem(0, 4, "Certificate Count", (ulong)cxt.certs.Count, "lvgCertificate");
-            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileTree.Nodes.Clear(); ;
-        }
-
-
-        private void showCertificate(TMDContext cxt, int i)
-        {
-            lstInfo.Items.Clear();
-            TMDCertContext ccxt = (TMDCertContext)cxt.certs[i];
-            TMDCertificate cert = ccxt.cert;
-            AddListItem(0, 4, "Signature Type", (ulong)ccxt.SignatureType, "lvgCertificate");
-            int off = 4;
-            if (ccxt.SignatureType == TMDSignatureType.RSA_2048_SHA256 || ccxt.SignatureType == TMDSignatureType.RSA_2048_SHA1)
-            {
-                AddListItem(off, 0x100, "RSA-2048 signature of the TMD", ccxt.tmdSHA, "lvgCertificate");
-                off += 0x100;
-            }
-            else
-            {
-                AddListItem(off, 0x200, "RSA-4096 signature of the TMD", ccxt.tmdSHA, "lvgCertificate");
-                off += 0x200;
-            }
-            AddListItem(off, 60, "Reserved0", cert.Reserved0, "lvgCertificate");
-            AddListItem(off + 60, 64, "Issuer", cert.Issuer, "lvgCertificate");
-            AddListItem(off + 124, 4, "Tag", cert.Tag, "lvgCertificate");
-            AddListItem(off + 128, 64, "Name", cert.Name, "lvgCertificate");
-            AddListItem(off + 292, 0x104, "Key", cert.Key, "lvgCertificate");
-            AddListItem(off + 552, 2, "Unknown0", cert.Unknown1, "lvgCertificate");
-            AddListItem(off + 554, 2, "Unknown1", cert.Unknown2, "lvgCertificate");
-            AddListItem(off + 556, 52, "Padding", cert.Padding, "lvgCertificate");
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             lvFileTree.Nodes.Clear();;
@@ -541,7 +502,7 @@ namespace _3DSExplorer
 
             for (int i = 0; i < cxt.BannerHeaderEntries.Count; i++)
             {
-                CIABannerHeaderEntry entry = cxt.BannerHeaderEntries[i] as CIABannerHeaderEntry;
+                CIABannerHeaderEntry entry = (CIABannerHeaderEntry)cxt.BannerHeaderEntries[i];
                 AddListItem(i, 2, "Type " + entry.Type, entry.Index, "lvgCia");
                 AddListItem(i, 4, "Magic", entry.Magic, "lvgCia");
             }
@@ -572,6 +533,77 @@ namespace _3DSExplorer
             lvFileTree.Nodes.Clear(); ;
         }
 
+        #endregion
+
+        #region Shared Context
+
+        private void showTicket(Ticket tik)
+        {
+            lstInfo.Items.Clear();
+            AddListItem(0x000, 0x004, "Signature Type", (ulong)tik.SignatureType, "lvgTicket");
+            AddListItem(0x004, 0x100, "RSA-2048 signature of the Ticket", tik.Signature, "lvgTicket");
+            AddListItem(0x104, 0x03C, "Padding 0", tik.Padding0, "lvgTicket");
+            AddListItem(0x140, 0x040, "Issuer", tik.Issuer, "lvgTicket");
+            AddListItem(0x180, 0x03C, "ECDSA", tik.ECDSA, "lvgTicket");
+            AddListItem(0x1BC, 0x003, "Padding 1", tik.Padding1, "lvgTicket");
+            AddListItem(0x1BF, 0x010, "Encrypted Title Key", tik.EncryptedTitleKey, "lvgTicket");
+            AddListItem(0x1CF, 0x001, "Unknown 0", tik.Unknown0, "lvgTicket");
+            AddListItem(0x1D0, 0x008, "Ticket ID", tik.TicketID, "lvgTicket");
+            AddListItem(0x1D8, 0x004, "Console ID", tik.ConsoleID, "lvgTicket");
+            AddListItem(0x1DC, 0x008, "Title ID", tik.TitleID, "lvgTicket");
+            AddListItem(0x1E4, 0x002, "System Access", tik.SystemAccess, "lvgTicket");
+            AddListItem(0x1E6, 0x002, "Ticket Version", tik.TicketVersion, "lvgTicket");
+            AddListItem(0x1E8, 0x004, "Permitted Titles Mask", tik.PermittedTitlesMask, "lvgTicket");
+            AddListItem(0x1EC, 0x004, "Permit Mask", tik.PermitMask, "lvgTicket");
+            AddListItem(0x1F0, 0x001, "Title Export allowed using PRNG key", tik.TitleExport, "lvgTicket");
+            AddListItem(0x1F1, 0x001, "Common Key index (1=Korean,0=Normal)", tik.CommonKeyIndex, "lvgTicket");
+            AddListItem(0x1F2, 0x030, "Unknown1", tik.Unknown1, "lvgTicket");
+            AddListItem(0x222, 0x040, "Content access permissions (bit for each content)", tik.ContentPermissions, "lvgTicket");
+            AddListItem(0x262, 0x002, "Padding 2", tik.Padding2, "lvgTicket");
+            for (int i=0;i<tik.TimeLimitEntries.Length;i++)
+                AddListItem(0x264 + i * 8, 0x004, "Time Limit Enabled=" + tik.TimeLimitEntries[i].EnableTimeLimit + " For", tik.TimeLimitEntries[i].TimeLimitSeconds, "lvgTicket");
+            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileTree.Nodes.Clear(); ;
+        }
+
+        private void showCertificates(ArrayList certs)
+        {
+            lstInfo.Items.Clear();
+            AddListItem(0, 4, "Certificate Count", (ulong)certs.Count, "lvgCertificate");
+            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileTree.Nodes.Clear(); ;
+        }
+
+
+        private void showCertificate(ArrayList certs, int i)
+        {
+            lstInfo.Items.Clear();
+            CertificateEntry entry = (CertificateEntry)certs[i];
+            Certificate cert = entry.cert;
+            AddListItem(0, 4, "Signature Type", (ulong)entry.SignatureType, "lvgCertificate");
+            int off = 4;
+            if (entry.SignatureType == SignatureType.RSA_2048_SHA256 || entry.SignatureType == SignatureType.RSA_2048_SHA1)
+            {
+                AddListItem(off, 0x100, "RSA-2048 signature of the content", entry.Hash, "lvgCertificate");
+                off += 0x100;
+            }
+            else
+            {
+                AddListItem(off, 0x200, "RSA-4096 signature of the content", entry.Hash, "lvgCertificate");
+                off += 0x200;
+            }
+            AddListItem(off, 60, "Reserved0", cert.Reserved0, "lvgCertificate");
+            AddListItem(off + 60, 64, "Issuer", cert.Issuer, "lvgCertificate");
+            AddListItem(off + 124, 4, "Tag", cert.Tag, "lvgCertificate");
+            AddListItem(off + 128, 64, "Name", cert.Name, "lvgCertificate");
+            AddListItem(off + 292, 0x104, "Key", cert.Key, "lvgCertificate");
+            AddListItem(off + 552, 2, "Unknown0", cert.Unknown1, "lvgCertificate");
+            AddListItem(off + 554, 2, "Unknown1", cert.Unknown2, "lvgCertificate");
+            AddListItem(off + 556, 52, "Padding", cert.Padding, "lvgCertificate");
+
+            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            lvFileTree.Nodes.Clear(); ;
+        }
         #endregion
 
         private void openFile(string path)
@@ -626,7 +658,7 @@ namespace _3DSExplorer
             {
                 //check if encrypted
                 fs.Seek(0x1000, SeekOrigin.Begin); //Start of information
-                while ((fs.Length - fs.Position > 0x200) & !SaveTool.isSaveMagic(magic))
+                while ((fs.Length - fs.Position > 0x200) & !SRAMTool.isSaveMagic(magic))
                 {
                     fs.Read(magic, 0, 4);
                     fs.Seek(0x200 - 4, SeekOrigin.Current);
@@ -657,7 +689,7 @@ namespace _3DSExplorer
                     break;
                 case 1: //Save
                     string errMsg = null;
-                    SFContext scxt = SaveTool.Open(filePath, ref errMsg);
+                    SFContext scxt = SRAMTool.Open(filePath, ref errMsg);
                     if (scxt == null)
                         MessageBox.Show("Error: " + errMsg);
                     else
@@ -714,8 +746,12 @@ namespace _3DSExplorer
                         topNode = treeView.Nodes.Add("TMD");
                         topNode.Nodes.Add("Content Info Records");
                         topNode.Nodes.Add("Content Chunk Records");
-                        for (int i = 0; i < tcxt.certs.Count; i++)
-                            topNode.Nodes.Add("TMD Certificate " + i);
+                        if (tcxt.Certificates.Count > 0)
+                        {
+                            topNode = treeView.TopNode.Nodes.Add("Certificates");
+                            for (int i = 0; i < tcxt.Certificates.Count; i++)
+                                topNode.Nodes.Add("Certificate " + i);
+                        }
                         treeView.ExpandAll();
                         currentContext = tcxt;
                         treeView.SelectedNode = treeView.TopNode;
@@ -727,17 +763,15 @@ namespace _3DSExplorer
                     //Build Tree
                     treeView.Nodes.Clear();
                     topNode = treeView.Nodes.Add("CIA");
-                    if (ccxt.Ticket != null)
+                    if (ccxt.Certificates.Count > 0)
                     {
-                        if (ccxt.Ticket.certs.Count > 0)
-                        {
-                            topNode = treeView.TopNode.Nodes.Add("Certificates");
-                            for (int i = 0; i < ccxt.Ticket.certs.Count; i++)
-                                topNode.Nodes.Add("Certificate " + i);
-                        }
-                        topNode = treeView.TopNode.Nodes.Add("Ticket");
+                        topNode = treeView.TopNode.Nodes.Add("Certificates");
+                        for (int i = 0; i < ccxt.Certificates.Count; i++)
+                            topNode.Nodes.Add("Certificate " + i);
                     }
-                    if (ccxt.tmdContext != null)
+                    if ((uint)ccxt.Ticket.SignatureType != 0)
+                        topNode = treeView.TopNode.Nodes.Add("Ticket");
+                    if (ccxt.TMD != null)
                     {
                         topNode = treeView.TopNode.Nodes.Add("TMD");
                         topNode.Nodes.Add("Content Info Records");
@@ -797,10 +831,14 @@ namespace _3DSExplorer
             else if (currentContext is TMDContext)
             {
                 TMDContext cxt = (TMDContext)currentContext;
-                if (e.Node.Text.StartsWith("TMD C"))
+                if (e.Node.Text.StartsWith("Certificate "))
                 {
-                    int i = e.Node.Text[16] - '0';
-                    showCertificate(cxt,i);
+                    int i = e.Node.Text[12] - '0';
+                    showCertificate(cxt.Certificates, i);
+                }
+                else if (e.Node.Text.StartsWith("Certificates"))
+                {
+                    showCertificates(cxt.Certificates);
                 }
                 else if (e.Node.Text.StartsWith("TMD"))
                 {
@@ -825,27 +863,27 @@ namespace _3DSExplorer
                 else if (e.Node.Text.StartsWith("Certificate "))
                 {
                     int i = e.Node.Text[12] - '0';
-                    showCertificate(cxt.Ticket, i);
+                    showCertificate(cxt.Certificates, i);
                 }
                 else if (e.Node.Text.StartsWith("Certificates"))
                 {
-                    showCertificates(cxt.Ticket);
+                    showCertificates(cxt.Certificates);
                 }
                 else if (e.Node.Text.StartsWith("TMD"))
                 {
-                    showTMD(cxt.tmdContext);
+                    showTMD(cxt.TMD);
                 }
                 else if (e.Node.Text.StartsWith("Content I"))
                 {
-                    showTMDContentRecords(cxt.tmdContext);
+                    showTMDContentRecords(cxt.TMD);
                 }
                 else if (e.Node.Text.StartsWith("Content C"))
                 {
-                    showTMDContentChunks(cxt.tmdContext);
+                    showTMDContentChunks(cxt.TMD);
                 }
                 else if (e.Node.Text.StartsWith("Ticket"))
                 {
-                    showTMD(cxt.Ticket);
+                    showTicket(cxt.Ticket);
                 }
                 else if (e.Node.Text.StartsWith("Banner"))
                 {
@@ -1008,7 +1046,7 @@ namespace _3DSExplorer
         {
             saveFileDialog.Filter = "Save Sav Files (*.sav)|*.sav;*.bin|All Files|*.*";
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                File.WriteAllBytes(saveFileDialog.FileName, SaveTool.createSAV((SFContext)currentContext));
+                File.WriteAllBytes(saveFileDialog.FileName, SRAMTool.createSAV((SFContext)currentContext));
         }
 
         private void menuFileSaveImageFile_Click(object sender, EventArgs e)

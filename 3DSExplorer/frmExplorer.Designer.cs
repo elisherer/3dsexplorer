@@ -47,6 +47,7 @@
             System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("CIA Offsets", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("Certificate", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("Icons (Double-click to show)", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("Ticket", System.Windows.Forms.HorizontalAlignment.Left);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.lstInfo = new System.Windows.Forms.ListView();
@@ -142,6 +143,8 @@
             listViewGroup17.Name = "lvgCertificate";
             listViewGroup18.Header = "Icons (Double-click to show)";
             listViewGroup18.Name = "lvgIcons";
+            listViewGroup19.Header = "Ticket";
+            listViewGroup19.Name = "lvgTicket";
             this.lstInfo.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
             listViewGroup1,
             listViewGroup2,
@@ -160,7 +163,8 @@
             listViewGroup15,
             listViewGroup16,
             listViewGroup17,
-            listViewGroup18});
+            listViewGroup18,
+            listViewGroup19});
             this.lstInfo.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lstInfo.HideSelection = false;
             this.lstInfo.Location = new System.Drawing.Point(0, 0);
@@ -193,7 +197,7 @@
             // 
             // chHexValue
             // 
-            this.chHexValue.Text = "Hex Value";
+            this.chHexValue.Text = "Hex / String Value";
             this.chHexValue.Width = 278;
             // 
             // splitContainer

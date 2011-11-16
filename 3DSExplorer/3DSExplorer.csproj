@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AES128CTR.cs" />
+    <Compile Include="Certificate.cs" />
     <Compile Include="CIA.cs" />
     <Compile Include="ImageBox.cs">
       <SubType>Form</SubType>
@@ -153,7 +154,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Save.cs" />
+    <Compile Include="SRAM.cs" />
+    <Compile Include="Ticket.cs" />
     <Compile Include="TMD.cs" />
     <Compile Include="TreeListView\IColumnsProvider.cs" />
     <Compile Include="TreeListView\MultiColumnTreeView.cs">
