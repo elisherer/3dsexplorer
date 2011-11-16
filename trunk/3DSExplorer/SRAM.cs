@@ -7,14 +7,14 @@ using System.Security.Cryptography;
 namespace _3DSExplorer
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct SFHeader
+    public struct SRAMHeader
     {
         public uint Unknown1;
         public uint Unknown2;
     }
     
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct SFHeaderEntry
+    public struct SRAMHeaderEntry
     {
         public byte PhysicalSector; // when bit7 is set, block has checksums, otherwise checksums are all zero
         public byte AllocationCount;
@@ -23,7 +23,7 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct SFSectorEntry
+    public struct SRAMSectorEntry
     {
         public byte VirtualSector;             // Mapped to sector
         public byte PreviousVirtualSector;     // Physical sector previously mapped to
@@ -35,15 +35,15 @@ namespace _3DSExplorer
         public byte[] CheckSums;
 }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct SFLongSectorEntry
+    public struct SRAMLongSectorEntry
     {
-        public SFSectorEntry Sector;
-        public SFSectorEntry Dupe;
+        public SRAMSectorEntry Sector;
+        public SRAMSectorEntry Dupe;
         public uint Magic; //constant through the journal
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct SFBlockMapEntry
+    public struct SRAMBlockMapEntry
     {
         public uint StartBlock;
         public uint EndBlock;
@@ -220,7 +220,7 @@ namespace _3DSExplorer
         public uint FSTMedia;
     }
 
-    public class SaveTool
+    public class SRAMTool
     {
         [DllImport("msvcrt.dll")]
         static extern int memcmp(byte[] b1, byte[] b2, long count);
@@ -356,7 +356,7 @@ namespace _3DSExplorer
             FileStream fs = File.OpenRead(path);
             byte[] magic = new byte[4];
             fs.Seek(0x1000, SeekOrigin.Begin); //Start of information
-            while ((fs.Length - fs.Position > 0x200) & !SaveTool.isSaveMagic(magic))
+            while ((fs.Length - fs.Position > 0x200) & !SRAMTool.isSaveMagic(magic))
             {
                 fs.Read(magic, 0, 4);
                 fs.Seek(0x200 - 4, SeekOrigin.Current);
@@ -413,15 +413,15 @@ namespace _3DSExplorer
                     cxt.Key = key;
                 }
             }
-            cxt.fileHeader = MarshalTool.ReadStruct<SFHeader>(ms);
+            cxt.fileHeader = MarshalTool.ReadStruct<SRAMHeader>(ms);
 
             //get the blockmap headers
             int bmSize = (int)(ms.Length >> 12) - 1;
-            cxt.Blockmap = new SFHeaderEntry[bmSize];
+            cxt.Blockmap = new SRAMHeaderEntry[bmSize];
             cxt.MemoryMap = new byte[bmSize];
             for (int i = 0; i < cxt.Blockmap.Length; i++)
             {
-                cxt.Blockmap[i] = MarshalTool.ReadStruct<SFHeaderEntry>(ms);
+                cxt.Blockmap[i] = MarshalTool.ReadStruct<SRAMHeaderEntry>(ms);
                 cxt.MemoryMap[i] = cxt.Blockmap[i].PhysicalSector;
             }
             //Check crc16
@@ -437,14 +437,14 @@ namespace _3DSExplorer
             else
             {
                 //get journal updates
-                int jSize = (int)(0x1000 - ms.Position) / Marshal.SizeOf(typeof(SFLongSectorEntry));
-                cxt.Journal = new SFLongSectorEntry[jSize];
+                int jSize = (int)(0x1000 - ms.Position) / Marshal.SizeOf(typeof(SRAMLongSectorEntry));
+                cxt.Journal = new SRAMLongSectorEntry[jSize];
                 cxt.JournalSize = 0;
                 uint jc = 0;
                 while (ms.Position < 0x1000) //assure stopping
                 {
-                    cxt.Journal[jc] = MarshalTool.ReadStruct<SFLongSectorEntry>(ms);
-                    if (!SaveTool.isFF(cxt.Journal[jc].Sector.CheckSums)) //check if we got a valid checksum
+                    cxt.Journal[jc] = MarshalTool.ReadStruct<SRAMLongSectorEntry>(ms);
+                    if (!SRAMTool.isFF(cxt.Journal[jc].Sector.CheckSums)) //check if we got a valid checksum
                     {
                         cxt.MemoryMap[cxt.Journal[jc].Sector.VirtualSector] = cxt.Journal[jc].Sector.PhysicalSector;
                         jc++;
@@ -466,7 +466,7 @@ namespace _3DSExplorer
                 ims.Seek(0x100, SeekOrigin.Begin);
                 cxt.Disa = MarshalTool.ReadStruct<DISA>(ims);
                 cxt.isData = cxt.Disa.TableSize > 1;
-                if (!SaveTool.isDisaMagic(cxt.Disa.Magic))
+                if (!SRAMTool.isDisaMagic(cxt.Disa.Magic))
                 {
                     errorMessage = "Corrupt Save File!";
                     ms.Close();
@@ -544,7 +544,7 @@ namespace _3DSExplorer
                             long saveOffset = ims.Position;
                             cxt.Save = MarshalTool.ReadStruct<SAVE>(ims);
                             //add SAVE information (if exists) (suppose to...)
-                            if (SaveTool.isSaveMagic(cxt.Save.Magic)) //read 
+                            if (SRAMTool.isSaveMagic(cxt.Save.Magic)) //read 
                             {
                                 ims.Seek(saveOffset + (long)cxt.Save.FileMapOffset, SeekOrigin.Begin);
                                 cxt.FilesMap = new uint[cxt.Save.FileMapSize];
@@ -555,11 +555,11 @@ namespace _3DSExplorer
                                 for (int i = 0; i < cxt.FoldersMap.Length; i++)
                                     cxt.FoldersMap[i] = ReadUInt32(ims);
                                 ims.Seek(saveOffset + (long)cxt.Save.BlockMapOffset, SeekOrigin.Begin);
-                                SFBlockMapEntry first = MarshalTool.ReadStruct<SFBlockMapEntry>(ims);
-                                cxt.BlockMap = new SFBlockMapEntry[first.EndBlock + 2];
+                                SRAMBlockMapEntry first = MarshalTool.ReadStruct<SRAMBlockMapEntry>(ims);
+                                cxt.BlockMap = new SRAMBlockMapEntry[first.EndBlock + 2];
                                 cxt.BlockMap[0] = first;
                                 for (uint i = 1; i < cxt.BlockMap.Length; i++)
-                                    cxt.BlockMap[i] = MarshalTool.ReadStruct<SFBlockMapEntry>(ims);
+                                    cxt.BlockMap[i] = MarshalTool.ReadStruct<SRAMBlockMapEntry>(ims);
                                 
                                 //-- Get folders -- (and set filebase 'while at it')
                                 if (!cxt.isData)
@@ -651,18 +651,18 @@ namespace _3DSExplorer
 
             MemoryStream ms = new MemoryStream();
 
-            int blockmapEntrySize = Marshal.SizeOf(typeof(SFHeaderEntry));
-            int sfHeaderSize = Marshal.SizeOf(typeof(SFHeader));
+            int blockmapEntrySize = Marshal.SizeOf(typeof(SRAMHeaderEntry));
+            int sfHeaderSize = Marshal.SizeOf(typeof(SRAMHeader));
             byte[] crcBlock = new byte[blockmapEntrySize * cxt.Blockmap.Length + sfHeaderSize];
             
             //Prepare the file header
-            byte[] temp = MarshalTool.StructureToByteArray<SFHeader>(cxt.fileHeader);
+            byte[] temp = MarshalTool.StructureToByteArray<SRAMHeader>(cxt.fileHeader);
             Buffer.BlockCopy(temp, 0, crcBlock, 0, temp.Length);
 
             //Update & Prepare the blockmap (straight)
             for (byte i = 0; i < cxt.MemoryMap.Length ; i++)
                 cxt.MemoryMap[i] = i;
-            cxt.Journal = new SFLongSectorEntry[0];
+            cxt.Journal = new SRAMLongSectorEntry[0];
             cxt.JournalSize = 0;
             
             for (byte i = 0; i < cxt.Blockmap.Length; i++)
@@ -671,7 +671,7 @@ namespace _3DSExplorer
                 cxt.Blockmap[i].PhysicalSector = (byte)(i + 0x81); //checksum flag + 1 (offset from file header)
                 for (int j = 0; j < cxt.Blockmap[i].CheckSums.Length; j++)
                     cxt.Blockmap[i].CheckSums[j] = CRC16.CS(CRC16.GetCRC(cxt.image, 0x1000 * i + 0x200 * j, 0x200));
-                temp = MarshalTool.StructureToByteArray<SFHeaderEntry>(cxt.Blockmap[i]);
+                temp = MarshalTool.StructureToByteArray<SRAMHeaderEntry>(cxt.Blockmap[i]);
                 Buffer.BlockCopy(temp,0,crcBlock, sfHeaderSize + i * blockmapEntrySize,blockmapEntrySize);
             }
             //Write the header and the blockmap

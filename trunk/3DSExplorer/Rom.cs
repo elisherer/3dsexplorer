@@ -74,7 +74,7 @@ namespace _3DSExplorer
     public struct String8
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
-        char[] text;
+        public char[] text;
     }
 
     public class CXIPlaingRegion

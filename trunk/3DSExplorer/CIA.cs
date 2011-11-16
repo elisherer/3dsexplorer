@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 namespace _3DSExplorer
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class CIAHeader
+    public struct CIAHeader
     {
         public ulong PaddingLength;
         public uint CertificateChainLength;
@@ -29,7 +29,7 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class CIABanner
+    public struct CIABanner
     {
         //SMDH - Header
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
@@ -41,7 +41,7 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class CIABannerHeaderEntry
+    public struct CIABannerHeaderEntry
     {
         public byte Type;
         public byte Index;
@@ -75,9 +75,10 @@ namespace _3DSExplorer
             if (cxt.BannerOffset % 64 != 0)
                 cxt.BannerOffset += (64 - cxt.BannerOffset % 64);
 
-            cxt.Ticket = TMDTool.OpenFromStream(fs, cxt.TicketOffset, cxt.header.TicketLength);
-            TMDTool.OpenCertificatesFromStream(fs, cxt.CertificateChainOffset, cxt.header.CertificateChainLength, cxt.Ticket);
-            cxt.tmdContext = TMDTool.OpenFromStream(fs, cxt.TMDOffset, cxt.header.TMDLength);
+            cxt.Ticket = TicketTool.OpenFromStream(fs, cxt.TicketOffset);
+            cxt.Certificates = new ArrayList();
+            CertTool.OpenCertificatesFromStream(fs, cxt.CertificateChainOffset, cxt.header.CertificateChainLength, cxt.Certificates);
+            cxt.TMD = TMDTool.OpenFromStream(fs, cxt.TMDOffset, cxt.header.TMDLength);
 
             if (cxt.header.BannerLength > 0)
             {

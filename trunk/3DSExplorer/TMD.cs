@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace _3DSExplorer
 {
-    public enum TMDSignatureType
+    public enum SignatureType
     {
         RSA_2048_SHA256 = 0x04000100,
         RSA_4096_SHA256 = 0x03000100,
@@ -15,7 +15,7 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class TMDHeader
+    public struct TMDHeader
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 60)]
         public byte[] Reserved0;
@@ -44,7 +44,7 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class TMDContentInfoRecord
+    public struct TMDContentInfoRecord
     {
         public ushort ContentIndexOffset;
         public ushort ContentCommandCount; //K
@@ -53,7 +53,7 @@ namespace _3DSExplorer
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class TMDContentChunkRecord
+    public struct TMDContentChunkRecord
     {
         public uint ContentID;
         public ushort ContentIndex;
@@ -61,24 +61,6 @@ namespace _3DSExplorer
         public ulong ContentSize;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
         public byte[] ContentHash; //SHA-256
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class TMDCertificate
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 60)]
-        public byte[] Reserved0;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public char[] Issuer;
-        public uint Tag;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
-        public char[] Name; 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x104)]
-        public byte[] Key;
-        public ushort Unknown1;
-        public ushort Unknown2;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 52)]
-        public byte[] Padding;
     }
 
     public class TMDTool
@@ -105,7 +87,10 @@ namespace _3DSExplorer
             FileStream fs = File.OpenRead(path);
             cxt = OpenFromStream(fs, 0, fs.Length);
             if (cxt != null)
-                OpenCertificatesFromStream(fs, fs.Position, fs.Length, cxt);
+            {
+                cxt.Certificates = new ArrayList();
+                CertTool.OpenCertificatesFromStream(fs, fs.Position, fs.Length, cxt.Certificates);
+            }
             fs.Close();
             return cxt;
         }
@@ -120,17 +105,17 @@ namespace _3DSExplorer
 
             byte[] intBytes = new byte[4];
             fs.Read(intBytes, 0, 4);
-            cxt.SignatureType = (TMDSignatureType)BitConverter.ToInt32(intBytes, 0);
+            cxt.SignatureType = (SignatureType)BitConverter.ToInt32(intBytes, 0);
             // Read the TMD RSA Type 
-            if (cxt.SignatureType == TMDSignatureType.RSA_2048_SHA256)
-                cxt.tmdSHA = new byte[256];
-            else if (cxt.SignatureType == TMDSignatureType.RSA_4096_SHA256)
-                cxt.tmdSHA = new byte[512];
+            if (cxt.SignatureType == SignatureType.RSA_2048_SHA256)
+                cxt.Hash = new byte[256];
+            else if (cxt.SignatureType == SignatureType.RSA_4096_SHA256)
+                cxt.Hash = new byte[512];
             else
                 supported = false;
             if (supported)
             {
-                fs.Read(cxt.tmdSHA, 0, cxt.tmdSHA.Length);
+                fs.Read(cxt.Hash, 0, cxt.Hash.Length);
                 //Continue reading header
                 cxt.head = MarshalTool.ReadStructBE<TMDHeader>(fs); //read header
                 cxt.ContentInfoRecords = new TMDContentInfoRecord[64];
@@ -141,29 +126,6 @@ namespace _3DSExplorer
                     cxt.chunks[i] = MarshalTool.ReadStructBE<TMDContentChunkRecord>(fs);
             }
             return (supported ? cxt : null);
-        }
-
-        public static void OpenCertificatesFromStream(FileStream fs, long offset, long length, TMDContext cxt)
-        {
-            byte[] intBytes = new byte[4];
-            fs.Seek(offset, SeekOrigin.Begin);
-            cxt.certs = new ArrayList();
-            while ((fs.Position < offset + length) && (fs.Position < fs.Length))
-            {
-                TMDCertContext tcert = new TMDCertContext();
-                fs.Read(intBytes, 0, 4);
-                tcert.SignatureType = (TMDSignatureType)BitConverter.ToInt32(intBytes, 0);
-                // RSA Type
-                if (tcert.SignatureType == TMDSignatureType.RSA_2048_SHA256 || tcert.SignatureType == TMDSignatureType.RSA_2048_SHA1)
-                    tcert.tmdSHA = new byte[256];
-                else if (tcert.SignatureType == TMDSignatureType.RSA_4096_SHA256 || tcert.SignatureType == TMDSignatureType.RSA_4096_SHA1)
-                    tcert.tmdSHA = new byte[512];
-                else
-                    break; //no more certificates
-                fs.Read(tcert.tmdSHA, 0, tcert.tmdSHA.Length);
-                tcert.cert = MarshalTool.ReadStructBE<TMDCertificate>(fs);
-                cxt.certs.Add(tcert);
-            }
         }
     }
 }
