@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{91B5ECFA-3A39-43D2-B8D3-60080AAC52BE}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -67,6 +67,13 @@
   <ItemGroup>
     <Compile Include="AES128CTR.cs" />
     <Compile Include="CIA.cs" />
+    <Compile Include="ImageBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImageBox.Designer.cs">
+      <DependentUpon>ImageBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RawDecoder.cs" />
     <Compile Include="Rom.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="CRC16.cs" />
@@ -109,6 +116,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmHashTool.resx">
       <DependentUpon>frmHashTool.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImageBox.resx">
+      <DependentUpon>ImageBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="InputBox.resx">

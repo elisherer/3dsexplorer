@@ -521,59 +521,52 @@ namespace _3DSExplorer
             AddListItem(8, 4, "Certificate Chain Length", cia.CertificateChainLength, "lvgCia");
             AddListItem(12, 4, "Ticket Length", cia.TicketLength, "lvgCia");
             AddListItem(16, 4, "TMD Length", cia.TMDLength, "lvgCia");
-            AddListItem(20, 4, "SMD Length", cia.SMDLength, "lvgCia");
+            AddListItem(20, 4, "Banner Length", cia.BannerLength, "lvgCia");
             AddListItem(24, 8, "App Length", cia.AppLength, "lvgCia");
 
             AddListItem(0, 8, "Certificate Chain Offset", (ulong)cxt.CertificateChainOffset, "lvgCiaOffsets");
             AddListItem(0, 8, "Ticket Offset", (ulong)cxt.TicketOffset, "lvgCiaOffsets");
             AddListItem(0, 8, "TMD Offset", (ulong)cxt.TMDOffset, "lvgCiaOffsets");
             AddListItem(0, 8, "App Offset", (ulong)cxt.AppOffset, "lvgCiaOffsets");
-            AddListItem(0, 8, "SMD Offset", (ulong)cxt.SMDOffset, "lvgCiaOffsets");
+            AddListItem(0, 8, "Banner Offset", (ulong)cxt.BannerOffset, "lvgCiaOffsets");
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             lvFileTree.Nodes.Clear(); ;
         }
 
-        private void showSMD()
-        {
-            CIAContext cxt = (CIAContext)currentContext;
-            lstInfo.Items.Clear();
-            
-            AddListItem(0, 4, "SMD Header Magic", cxt.smd.Magic, "lvgCia");
-            AddListItem(4, 4, "Padding 0", cxt.smd.Padding0, "lvgCia");
-
-            lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            lvFileTree.Nodes.Clear(); ;
-        }
-
-        private void showSMDHeaderEntries()
+        private void showBanner()
         {
             CIAContext cxt = (CIAContext)currentContext;
             lstInfo.Items.Clear();
 
-            for (int i = 0; i < cxt.SMDHeaderEntries.Count; i++)
+            for (int i = 0; i < cxt.BannerHeaderEntries.Count; i++)
             {
-                CIASMDHeaderEntry entry = cxt.SMDHeaderEntries[i] as CIASMDHeaderEntry;
+                CIABannerHeaderEntry entry = cxt.BannerHeaderEntries[i] as CIABannerHeaderEntry;
                 AddListItem(i, 2, "Type " + entry.Type, entry.Index, "lvgCia");
-                AddListItem(i, 4 , "Magic", entry.Magic, "lvgCia");
+                AddListItem(i, 4, "Magic", entry.Magic, "lvgCia");
             }
-
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             lvFileTree.Nodes.Clear(); ;
         }
 
-        private void showSMDEntries()
+        private void showBannerMetaData()
         {
             CIAContext cxt = (CIAContext)currentContext;
             lstInfo.Items.Clear();
             string pubString, firString, secString;
-            for (int i = 0; i < cxt.smd.SMDEntries.Length; i++)
+            AddListItem(0, 4, "Banner Meta-Data Magic (SMDH)", cxt.Banner.Magic, "lvgCia");
+            AddListItem(4, 4, "Padding 0", cxt.Banner.Padding0, "lvgCia");
+
+            for (int i = 0; i < cxt.Banner.MDEntries.Length; i++)
             {
-                pubString = Encoding.Unicode.GetString(cxt.smd.SMDEntries[i].Publisher);
-                firString = Encoding.Unicode.GetString(cxt.smd.SMDEntries[i].FirstTitle);
-                secString = Encoding.Unicode.GetString(cxt.smd.SMDEntries[i].SecondTitle);
+                pubString = Encoding.Unicode.GetString(cxt.Banner.MDEntries[i].Publisher);
+                firString = Encoding.Unicode.GetString(cxt.Banner.MDEntries[i].FirstTitle);
+                secString = Encoding.Unicode.GetString(cxt.Banner.MDEntries[i].SecondTitle);
                 AddListItem(i.ToString(), "0x200", pubString, firString, secString, "lvgCia");
             }
+
+            AddListItem(0, 0, "Small Icon", 24, "lvgIcons");
+            AddListItem(0, 0, "Large Icon", 48, "lvgIcons");
 
             lstInfo.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             lvFileTree.Nodes.Clear(); ;
@@ -750,11 +743,10 @@ namespace _3DSExplorer
                         topNode.Nodes.Add("Content Info Records");
                         topNode.Nodes.Add("Content Chunk Records");
                     }
-                    if (ccxt.header.SMDLength > 0)
+                    if (ccxt.header.BannerLength > 0)
                     {
-                        topNode = treeView.TopNode.Nodes.Add("SMD");
-                        topNode.Nodes.Add("Header Entries");
-                        topNode.Nodes.Add("Entries");
+                        topNode = treeView.TopNode.Nodes.Add("Banner");
+                        topNode.Nodes.Add("Meta-Data");
                     }
                     treeView.ExpandAll();
                     currentContext = ccxt;
@@ -855,17 +847,13 @@ namespace _3DSExplorer
                 {
                     showTMD(cxt.Ticket);
                 }
-                else if (e.Node.Text.StartsWith("SMD"))
+                else if (e.Node.Text.StartsWith("Banner"))
                 {
-                    showSMD();
+                    showBanner();
                 }
-                else if (e.Node.Text.StartsWith("Head"))
+                else if (e.Node.Text.StartsWith("Meta-Data"))
                 {
-                    showSMDHeaderEntries();
-                }
-                else if (e.Node.Text.StartsWith("Entr"))
-                {
-                    showSMDEntries();
+                    showBannerMetaData();
                 }
             }
         }
@@ -971,14 +959,23 @@ namespace _3DSExplorer
         {
             if (lstInfo.SelectedIndices.Count > 0)
             {
-                string toClip = "";
-                if (lstInfo.SelectedItems[0].SubItems[3].Text == "")
-                    toClip = lstInfo.SelectedItems[0].SubItems[4].Text;
+                if (lstInfo.SelectedItems[0].Group == lstInfo.Groups["lvgIcons"])
+                {
+                    if (lstInfo.SelectedItems[0].SubItems[2].Text.StartsWith("Small"))
+                        ImageBox.ShowDialog((currentContext as CIAContext).SmallIcon);
+                    else if (lstInfo.SelectedItems[0].SubItems[2].Text.StartsWith("Large"))
+                        ImageBox.ShowDialog((currentContext as CIAContext).LargeIcon);
+                }
                 else
-                    toClip = lstInfo.SelectedItems[0].SubItems[3].Text;
-                Clipboard.SetText(toClip);
-                MessageBox.Show("Value copied to clipboard!");
-
+                {
+                    string toClip = "";
+                    if (lstInfo.SelectedItems[0].SubItems[3].Text == "")
+                        toClip = lstInfo.SelectedItems[0].SubItems[4].Text;
+                    else
+                        toClip = lstInfo.SelectedItems[0].SubItems[3].Text;
+                    Clipboard.SetText(toClip);
+                    MessageBox.Show("Value copied to clipboard!");
+                }
             }
         }
 

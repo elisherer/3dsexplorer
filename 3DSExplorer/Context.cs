@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections; 
 using System.Collections.Generic;
-using System.Linq;
+using System.Drawing;
 using System.Text;
 
 namespace _3DSExplorer
@@ -109,11 +109,12 @@ namespace _3DSExplorer
         public long CertificateChainOffset;
         public long TicketOffset;
         public long TMDOffset;
-        public long SMDOffset;
         public long AppOffset;
+        public long BannerOffset;
         public TMDContext Ticket; // Holds the certificates as well
         public TMDContext tmdContext;
-        public ArrayList SMDHeaderEntries;
-        public CIASMetaData smd;
+        public ArrayList BannerHeaderEntries;
+        public CIABanner Banner;
+        public Bitmap SmallIcon, LargeIcon;
     }
 }
