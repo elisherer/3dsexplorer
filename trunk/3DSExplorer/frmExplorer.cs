@@ -562,7 +562,7 @@ namespace _3DSExplorer
                 pubString = Encoding.Unicode.GetString(cxt.Banner.MDEntries[i].Publisher);
                 firString = Encoding.Unicode.GetString(cxt.Banner.MDEntries[i].FirstTitle);
                 secString = Encoding.Unicode.GetString(cxt.Banner.MDEntries[i].SecondTitle);
-                AddListItem(i.ToString(), "0x200", pubString, firString, secString, "lvgCia");
+                AddListItem(i.ToString(), "0x200", firString, secString, pubString, "lvgCia");
             }
 
             AddListItem(0, 0, "Small Icon", 24, "lvgIcons");
