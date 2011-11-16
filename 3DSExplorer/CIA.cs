@@ -21,11 +21,11 @@ namespace _3DSExplorer
     public struct CIAMetaDataEntry
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x80)]
-        public byte[] Publisher;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x100)]
         public byte[] FirstTitle;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x80)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x100)]
         public byte[] SecondTitle;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x80)]
+        public byte[] Publisher;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
