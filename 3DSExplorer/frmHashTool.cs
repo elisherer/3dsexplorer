@@ -155,6 +155,7 @@ namespace _3DSExplorer
                 btnBrute.Enabled = true;
                 btnSuperBrute.Enabled = true;
                 filePath = openFileDialog.FileName;
+                lblFilename.Text = filePath;
             }
         }
 

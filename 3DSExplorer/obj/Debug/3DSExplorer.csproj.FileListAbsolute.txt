@@ -69,3 +69,4 @@ D:\dev\3DSExplorer\3DSExplorer\obj\Debug\TreeListView.TreeListViewControl.resour
 D:\dev\3DSExplorer\3DSExplorer\bin\3DSExplorer.exe
 D:\dev\3DSExplorer\3DSExplorer\bin\3DSExplorer.pdb
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.ImageBox.resources
+d:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.ImageBox.resources
