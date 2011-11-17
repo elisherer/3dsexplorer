@@ -54,9 +54,10 @@
             this.cbComputeBlockSize = new System.Windows.Forms.ComboBox();
             this.lblHashesSize = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.picTool = new System.Windows.Forms.PictureBox();
             this.chkHighCPU = new System.Windows.Forms.CheckBox();
             this.lblSuper = new System.Windows.Forms.Label();
-            this.picTool = new System.Windows.Forms.PictureBox();
+            this.lblFilename = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picTool)).BeginInit();
@@ -81,7 +82,7 @@
             // 
             this.btnCompute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCompute.Enabled = false;
-            this.btnCompute.Location = new System.Drawing.Point(463, 4);
+            this.btnCompute.Location = new System.Drawing.Point(465, 4);
             this.btnCompute.Name = "btnCompute";
             this.btnCompute.Size = new System.Drawing.Size(130, 24);
             this.btnCompute.TabIndex = 1;
@@ -188,7 +189,7 @@
             this.txtSearch.Font = new System.Drawing.Font("Courier New", 7.5F);
             this.txtSearch.Location = new System.Drawing.Point(79, 8);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(337, 19);
+            this.txtSearch.Size = new System.Drawing.Size(339, 19);
             this.txtSearch.TabIndex = 12;
             // 
             // btnBrute
@@ -246,7 +247,7 @@
             // 
             this.btnSuperBrute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSuperBrute.Enabled = false;
-            this.btnSuperBrute.Location = new System.Drawing.Point(463, 32);
+            this.btnSuperBrute.Location = new System.Drawing.Point(465, 32);
             this.btnSuperBrute.Name = "btnSuperBrute";
             this.btnSuperBrute.Size = new System.Drawing.Size(130, 24);
             this.btnSuperBrute.TabIndex = 18;
@@ -275,7 +276,7 @@
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.Location = new System.Drawing.Point(362, 32);
+            this.btnCancel.Location = new System.Drawing.Point(364, 32);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(95, 24);
             this.btnCancel.TabIndex = 20;
@@ -288,7 +289,7 @@
             // 
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.Controls.Add(this.cbComputeBlockSize);
             this.panel1.Controls.Add(this.lblBlocks);
             this.panel1.Controls.Add(this.lblHashesSize);
@@ -330,7 +331,7 @@
             // 
             this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.BackColor = System.Drawing.Color.White;
             this.panel2.Controls.Add(this.picTool);
             this.panel2.Controls.Add(this.chkHighCPU);
             this.panel2.Controls.Add(this.lblSize);
@@ -346,27 +347,6 @@
             this.panel2.Size = new System.Drawing.Size(598, 64);
             this.panel2.TabIndex = 22;
             // 
-            // chkHighCPU
-            // 
-            this.chkHighCPU.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkHighCPU.AutoSize = true;
-            this.chkHighCPU.Location = new System.Drawing.Point(434, 9);
-            this.chkHighCPU.Name = "chkHighCPU";
-            this.chkHighCPU.Size = new System.Drawing.Size(159, 17);
-            this.chkHighCPU.TabIndex = 23;
-            this.chkHighCPU.Text = "High CPU usage (no sleeps)";
-            this.chkHighCPU.UseVisualStyleBackColor = true;
-            // 
-            // lblSuper
-            // 
-            this.lblSuper.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblSuper.AutoSize = true;
-            this.lblSuper.Location = new System.Drawing.Point(370, 38);
-            this.lblSuper.Name = "lblSuper";
-            this.lblSuper.Size = new System.Drawing.Size(87, 13);
-            this.lblSuper.TabIndex = 24;
-            this.lblSuper.Text = "Every block size:";
-            // 
             // picTool
             // 
             this.picTool.Image = global::_3DSExplorer.Properties.Resources.help;
@@ -378,11 +358,41 @@
             this.picTool.TabStop = false;
             this.picTool.Click += new System.EventHandler(this.picTool_Click);
             // 
+            // chkHighCPU
+            // 
+            this.chkHighCPU.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkHighCPU.AutoSize = true;
+            this.chkHighCPU.Location = new System.Drawing.Point(436, 9);
+            this.chkHighCPU.Name = "chkHighCPU";
+            this.chkHighCPU.Size = new System.Drawing.Size(159, 17);
+            this.chkHighCPU.TabIndex = 23;
+            this.chkHighCPU.Text = "High CPU usage (no sleeps)";
+            this.chkHighCPU.UseVisualStyleBackColor = true;
+            // 
+            // lblSuper
+            // 
+            this.lblSuper.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblSuper.AutoSize = true;
+            this.lblSuper.Location = new System.Drawing.Point(372, 38);
+            this.lblSuper.Name = "lblSuper";
+            this.lblSuper.Size = new System.Drawing.Size(87, 13);
+            this.lblSuper.TabIndex = 24;
+            this.lblSuper.Text = "Every block size:";
+            // 
+            // lblFilename
+            // 
+            this.lblFilename.AutoSize = true;
+            this.lblFilename.Location = new System.Drawing.Point(102, 17);
+            this.lblFilename.Name = "lblFilename";
+            this.lblFilename.Size = new System.Drawing.Size(0, 13);
+            this.lblFilename.TabIndex = 23;
+            // 
             // frmHashTool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(624, 442);
+            this.Controls.Add(this.lblFilename);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.subProgressBar);
@@ -438,5 +448,6 @@
         private System.Windows.Forms.CheckBox chkHighCPU;
         private System.Windows.Forms.Label lblSuper;
         private System.Windows.Forms.PictureBox picTool;
+        private System.Windows.Forms.Label lblFilename;
     }
 }
