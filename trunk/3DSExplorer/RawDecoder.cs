@@ -12,13 +12,16 @@ namespace _3DSExplorer
 {
     static class RawDecoder
     {
+        private const double CNV_5BIT_TO_8BIT = 0xFF / 0x1F;
+        private const double CNV_6BIT_TO_8BIT = 0xFF / 0x3F;
+
         private static Color colorFrom2Bytes(byte[] bytes) //Using GBR655
         {
             int green = (bytes[0] & 0xFC) >> 2;
             int blue = ((bytes[0] & 0x03) << 3);
             blue += ((bytes[1] & 0xE0) >> 5);
             int red = bytes[1] & 0x1F;
-            return Color.FromArgb(red * 8, green * 4, blue * 8);
+            return Color.FromArgb((int)(red * CNV_5BIT_TO_8BIT), (int)(green * CNV_6BIT_TO_8BIT), (int)(blue * CNV_5BIT_TO_8BIT));
         }
 
         private static void fillBitmap(int iconSize, int tileSize, int ax, int ay, Bitmap bmp, FileStream fs)
