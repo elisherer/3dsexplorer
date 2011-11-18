@@ -98,7 +98,8 @@ namespace _3DSExplorer
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] Reserved0;
 
-        public ulong ProgramID;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+        public byte[] ProgramID;
         public char TempFlag;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 47)]

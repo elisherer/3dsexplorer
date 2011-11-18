@@ -973,8 +973,13 @@ namespace _3DSExplorer
                                     infs.Close();
                                     if (key.Length > 0)
                                     {
-                                        AES128CTR aes = new AES128CTR(key);
-                                        aes.Decrypt(buffer);
+                                        byte[] iv = new byte[0x10];
+                                        for (int i = 0; i < 8; i++)
+                                            iv[i] = 0;
+                                        Buffer.BlockCopy(cxt.cxis[0].ProgramID, 0, iv, 8, 8);
+
+                                        AES128CTR aes = new AES128CTR(key,iv);
+                                        aes.TransformBlock(buffer);
                                     }
                                     string outpath = saveFileDialog.FileName;
                                     FileStream outfs = File.OpenWrite(outpath);
