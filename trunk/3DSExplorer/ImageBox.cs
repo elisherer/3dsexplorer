@@ -27,5 +27,19 @@ namespace _3DSExplorer
             imBox.setImage(image);
             return imBox.ShowDialog();
         }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog sfd = new SaveFileDialog()) {
+                sfd.Filter = "PNG Image (*.png)|*.png|All Files (*.*)|*.*";
+                if (sfd.ShowDialog() == DialogResult.OK)
+                    pictureBox.Image.Save(sfd.FileName, System.Drawing.Imaging.ImageFormat.Png);
+            }
+        }
+
+        private void btnCopy_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetImage(pictureBox.Image);
+        }
     }
 }

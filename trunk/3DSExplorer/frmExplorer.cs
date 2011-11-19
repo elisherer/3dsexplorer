@@ -33,7 +33,6 @@ namespace _3DSExplorer
         {
             InitializeComponent();
             openFile(path);
-
         }
 
         #region AddListItem
@@ -672,20 +671,23 @@ namespace _3DSExplorer
             {
                 case 0: //Rom
                     RomContext rcxt = RomTool.Open(filePath);
-                    LoadText(filePath);
-                    //Build Tree
-                    treeView.Nodes.Clear();
-                    topNode = treeView.Nodes.Add("Rom");
-                    for (int i=0; i < rcxt.cxis.Length ; i++) //ADD CXIs
-                        if (rcxt.cxis[i].CXISize > 0)
-                        {
-                            topNode.Nodes.Add("NCCH " + i + " (" + (new String(rcxt.cxis[i].ProductCode)).Substring(0, 10) + ")");
-                            if (rcxt.cxis[i].PlainRegionSize > 0) //Add PlainRegions
-                                topNode.Nodes[topNode.Nodes.Count - 1].Nodes.Add("PlainRegion");
-                        }
-                    treeView.ExpandAll();
-                    currentContext = rcxt;
-                    treeView.SelectedNode = treeView.TopNode;
+                    if (rcxt != null)
+                    {
+                        LoadText(filePath);
+                        //Build Tree
+                        treeView.Nodes.Clear();
+                        topNode = treeView.Nodes.Add("Rom");
+                        for (int i = 0; i < rcxt.cxis.Length; i++) //ADD CXIs
+                            if (rcxt.cxis[i].CXISize > 0)
+                            {
+                                topNode.Nodes.Add("NCCH " + i + " (" + (new String(rcxt.cxis[i].ProductCode)).Substring(0, 10) + ")");
+                                if (rcxt.cxis[i].PlainRegionSize > 0) //Add PlainRegions
+                                    topNode.Nodes[topNode.Nodes.Count - 1].Nodes.Add("PlainRegion");
+                            }
+                        treeView.ExpandAll();
+                        currentContext = rcxt;
+                        treeView.SelectedNode = treeView.TopNode;
+                    }
                     break;
                 case 1: //Save
                     string errMsg = null;
@@ -788,9 +790,12 @@ namespace _3DSExplorer
                     break;
                 default: MessageBox.Show("This file is unsupported!"); break;
             }
-            menuFileSave.Enabled = (type == 1);
-            menuFileSaveImageFile.Enabled = (type == 1);
-            menuFileSaveKeyFile.Enabled = (type == 1) && encrypted;
+            if (currentContext != null)
+            {
+                menuFileSave.Enabled = (type == 1);
+                menuFileSaveImageFile.Enabled = (type == 1);
+                menuFileSaveKeyFile.Enabled = (type == 1) && encrypted;
+            }
         }
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)

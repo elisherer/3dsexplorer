@@ -292,6 +292,30 @@ namespace _3DSExplorer
             }
         }
 
+        public static byte[] FindKey2(byte[] input)
+        {
+            MemoryStream ms = new MemoryStream(input);
+            byte[] disa = new byte[4];
+            ms.Seek(0x100,SeekOrigin.Begin);
+            ms.Read(disa, 0, disa.Length);
+            ms.Seek(0x200, SeekOrigin.Current);
+            byte[] check = new byte[4];
+            while (ms.Position < ms.Length)
+            {
+                ms.Read(check, 0, check.Length);
+                XorByteArray(check, disa, 0);
+                if (check[0] == 'D' && check[1] == 'I' && check[2] == 'S' && check[3] == 'A')
+                {
+                    ms.Seek(-0x104, SeekOrigin.Current);
+                    byte[] key = new byte[0x200];
+                    ms.Read(key, 0, key.Length);
+                    return key;
+                }
+                ms.Seek(0x200, SeekOrigin.Current);
+            }
+            return null; //key not found
+        }
+
         public static byte[] FindKey(byte[] input)
         {
             MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
@@ -397,22 +421,6 @@ namespace _3DSExplorer
             byte[] fileBuffer = File.ReadAllBytes(path);
             MemoryStream ms = new MemoryStream(fileBuffer);
 
-            if (cxt.Encrypted)
-            {
-                byte[] key = FindKey(fileBuffer);
-                if (key == null)
-                {
-                    ms.Close();
-                    errorMessage = "Can't find key in binary file.";
-                    return null;
-                }
-                else
-                {
-                    XorByteArray(fileBuffer, key, 0x1000);
-                    //XorExperimental(fileBuffer, key, 0x1000);
-                    cxt.Key = key;
-                }
-            }
             cxt.fileHeader = MarshalTool.ReadStruct<SRAMHeader>(ms);
 
             //get the blockmap headers
@@ -459,8 +467,38 @@ namespace _3DSExplorer
                 for (int i = 0; i < cxt.MemoryMap.Length; i++)
                     Buffer.BlockCopy(fileBuffer, (cxt.MemoryMap[i] & 0x7F) * 0x1000, cxt.image, i * 0x1000, 0x1000);
 
-                MemoryStream ims = new MemoryStream(cxt.image);
+                if (cxt.Encrypted)
+                {
+                    byte[] key = FindKey(cxt.image);
+                    if (key == null)
+                    {
+                        ms.Close();
+                        errorMessage = "Can't find key in binary file.";
+                        return null;
+                    }
+                    else
+                    {
+                        XorByteArray(cxt.image, key, 0);
+                        //XorExperimental(fileBuffer, key, 0x1000);
+                        cxt.Key = key;
+                    }
+                }
 
+                /*
+                if ((cxt.image[0x100] != 'D') || (cxt.image[0x101] != 'I') || (cxt.image[0x102] != 'S') || (cxt.image[0x103] != 'A'))
+                {   //Might be second encryption
+                    byte[] key = FindKey(fileBuffer);
+                    if (key != null)
+                    {
+                        XorByteArray(cxt.image, key, 0);
+                        cxt.Key = key;
+                    }
+                    File.WriteAllBytes("image.bin", cxt.image);
+                }*/
+
+                File.WriteAllBytes("image.bin", cxt.image);
+
+                MemoryStream ims = new MemoryStream(cxt.image);
                 cxt.ImageHash = ReadByteArray(ims, Sizes.MD5);
                 //Go to start of image
                 ims.Seek(0x100, SeekOrigin.Begin);
@@ -473,132 +511,129 @@ namespace _3DSExplorer
                     ims.Close();
                     return null;
                 }
+                //Which table to read
+                if ((cxt.Disa.ActiveTable & 1) == 1) //second table
+                    ims.Seek((long)cxt.Disa.PrimaryTableOffset, SeekOrigin.Begin);
                 else
+                    ims.Seek((long)cxt.Disa.SecondaryTableOffset, SeekOrigin.Begin);
+
+                cxt.Partitions = new Partition[cxt.Disa.TableSize];
+                for (int i = 0; i < cxt.Partitions.Length; i++)
                 {
-                    //Which table to read
-                    if ((cxt.Disa.ActiveTable & 1) == 1) //second table
-                        ims.Seek((long)cxt.Disa.PrimaryTableOffset, SeekOrigin.Begin);
+                    long startOfDifi = ims.Position;
+                    cxt.Partitions[i] = new Partition();
+                    cxt.Partitions[i].Difi = MarshalTool.ReadStruct<DIFI>(ims);
+                    //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.IVFCOffset, SeekOrigin.Begin);
+                    cxt.Partitions[i].Ivfc = MarshalTool.ReadStruct<IVFC>(ims);
+                    //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.DPFSOffset, SeekOrigin.Begin);
+                    cxt.Partitions[i].Dpfs = MarshalTool.ReadStruct<DPFS>(ims);
+                    //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.HashOffset, SeekOrigin.Begin);
+                    cxt.Partitions[i].Hash = ReadByteArray(ims, Sizes.SHA256);
+                    ims.Seek(4, SeekOrigin.Current); // skip garbage
+                }
+
+                for (int p = 0; p < cxt.Partitions.Length; p++)
+                {
+                    if (p == 0)
+                        ims.Seek((long)cxt.Disa.SAVEPartitionOffset, SeekOrigin.Begin);
                     else
-                        ims.Seek((long)cxt.Disa.SecondaryTableOffset, SeekOrigin.Begin);
+                        ims.Seek((long)cxt.Disa.DATAPartitionOffset, SeekOrigin.Begin);
 
-                    cxt.Partitions = new Partition[cxt.Disa.TableSize];
-                    for (int i = 0; i < cxt.Partitions.Length; i++)
+                    cxt.Partitions[p].OffsetInImage = (ulong)ims.Position;
+
+                    ims.Seek((long)cxt.Partitions[p].Dpfs.FirstTableOffset, SeekOrigin.Current);
+                    cxt.Partitions[p].FirstFlag = ReadUInt32(ims);
+                    cxt.Partitions[p].FirstFlagDupe = ReadUInt32(ims);
+                    cxt.Partitions[p].SecondFlag = ReadUInt32(ims);
+                    ims.Seek((long)cxt.Partitions[p].Dpfs.SecondTableLength - 4, SeekOrigin.Current);
+                    cxt.Partitions[p].SecondFlagDupe = ReadUInt32(ims);
+                    /*
+                    cxt.Partitions[p].FirstFlagTableDupe = new byte[cxt.Partitions[p].Dpfs.FirstTableLength / 4];
+                    for (int i = 0; i < cxt.Partitions[p].FirstFlagTableDupe.Length; i++)
+                        cxt.Partitions[p].FirstFlagTableDupe[i] = ReadUInt32(ims);
+                    cxt.Partitions[p].SecondFlagTable = new byte[cxt.Partitions[p].Dpfs.SecondTableLength / 4];
+                    for (int i = 0; i < cxt.Partitions[p].SecondFlagTable.Length; i++)
+                        cxt.Partitions[p].SecondFlagTable[i] = ReadUInt32(ims);
+                    cxt.Partitions[p].SecondFlagTableDupe = new byte[cxt.Partitions[p].Dpfs.SecondTableLength / 4];
+                    for (int i = 0; i < cxt.Partitions[p].SecondFlagTableDupe.Length; i++)
+                        cxt.Partitions[p].SecondFlagTableDupe[i] = ReadUInt32(ims); 
+                    */
+
+                    ims.Seek((long)(cxt.Partitions[p].OffsetInImage + cxt.Partitions[p].Dpfs.OffsetToData), SeekOrigin.Begin);
+
+                    //Get hashes table
+                    ims.Seek((long)cxt.Partitions[p].Ivfc.HashTableOffset, SeekOrigin.Current);
+                    cxt.Partitions[p].HashTable = new byte[cxt.Partitions[p].Ivfc.HashTableLength / 0x20][];
+                    for (int i = 0; i < cxt.Partitions[p].HashTable.Length; i++)
+                        cxt.Partitions[p].HashTable[i] = ReadByteArray(ims, 0x20);
+
+                    ims.Seek((long)(cxt.Partitions[p].OffsetInImage + cxt.Partitions[p].Dpfs.OffsetToData), SeekOrigin.Begin);
+
+                    //jump to dupe if needed (SAVE partition is written twice)
+                    if ((cxt.Partitions[p].SecondFlag & 0x20000000) == 0) //*** EXPERIMENTAL ***
+                        ims.Seek((long)cxt.Partitions[p].Dpfs.DataLength, SeekOrigin.Current);
+
+                    ims.Seek((long)cxt.Partitions[p].Ivfc.FileSystemOffset, SeekOrigin.Current);
+
+                    if (p == 0)
                     {
-                        long startOfDifi = ims.Position;
-                        cxt.Partitions[i] = new Partition();
-                        cxt.Partitions[i].Difi = MarshalTool.ReadStruct<DIFI>(ims);
-                        //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.IVFCOffset, SeekOrigin.Begin);
-                        cxt.Partitions[i].Ivfc = MarshalTool.ReadStruct<IVFC>(ims);
-                        //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.DPFSOffset, SeekOrigin.Begin);
-                        cxt.Partitions[i].Dpfs = MarshalTool.ReadStruct<DPFS>(ims);
-                        //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.HashOffset, SeekOrigin.Begin);
-                        cxt.Partitions[i].Hash = ReadByteArray(ims, Sizes.SHA256);
-                        ims.Seek(4, SeekOrigin.Current); // skip garbage
-                    }
-
-                    for (int p = 0; p < cxt.Partitions.Length; p++)
-                    {
-                        if (p == 0)
-                            ims.Seek((long)cxt.Disa.SAVEPartitionOffset, SeekOrigin.Begin);
-                        else
-                            ims.Seek((long)cxt.Disa.DATAPartitionOffset, SeekOrigin.Begin);
-
-                        cxt.Partitions[p].OffsetInImage = (ulong)ims.Position;
-
-                        ims.Seek((long)cxt.Partitions[p].Dpfs.FirstTableOffset, SeekOrigin.Current);
-                        cxt.Partitions[p].FirstFlag = ReadUInt32(ims);
-                        cxt.Partitions[p].FirstFlagDupe = ReadUInt32(ims);
-                        cxt.Partitions[p].SecondFlag = ReadUInt32(ims);
-                        ims.Seek((long)cxt.Partitions[p].Dpfs.SecondTableLength - 4, SeekOrigin.Current);
-                        cxt.Partitions[p].SecondFlagDupe = ReadUInt32(ims);
-                        /*
-                        cxt.Partitions[p].FirstFlagTableDupe = new byte[cxt.Partitions[p].Dpfs.FirstTableLength / 4];
-                        for (int i = 0; i < cxt.Partitions[p].FirstFlagTableDupe.Length; i++)
-                            cxt.Partitions[p].FirstFlagTableDupe[i] = ReadUInt32(ims);
-                        cxt.Partitions[p].SecondFlagTable = new byte[cxt.Partitions[p].Dpfs.SecondTableLength / 4];
-                        for (int i = 0; i < cxt.Partitions[p].SecondFlagTable.Length; i++)
-                            cxt.Partitions[p].SecondFlagTable[i] = ReadUInt32(ims);
-                        cxt.Partitions[p].SecondFlagTableDupe = new byte[cxt.Partitions[p].Dpfs.SecondTableLength / 4];
-                        for (int i = 0; i < cxt.Partitions[p].SecondFlagTableDupe.Length; i++)
-                            cxt.Partitions[p].SecondFlagTableDupe[i] = ReadUInt32(ims); 
-                        */
-
-                        ims.Seek((long)(cxt.Partitions[p].OffsetInImage + cxt.Partitions[p].Dpfs.OffsetToData), SeekOrigin.Begin);
-
-                        //Get hashes table
-                        ims.Seek((long)cxt.Partitions[p].Ivfc.HashTableOffset, SeekOrigin.Current);
-                        cxt.Partitions[p].HashTable = new byte[cxt.Partitions[p].Ivfc.HashTableLength / 0x20][];
-                        for (int i = 0; i < cxt.Partitions[p].HashTable.Length; i++)
-                            cxt.Partitions[p].HashTable[i] = ReadByteArray(ims, 0x20);
-
-                        ims.Seek((long)(cxt.Partitions[p].OffsetInImage + cxt.Partitions[p].Dpfs.OffsetToData), SeekOrigin.Begin);
-
-                        //jump to dupe if needed (SAVE partition is written twice)
-                        if ((cxt.Partitions[p].SecondFlag & 0x20000000) == 0) //*** EXPERIMENTAL ***
-                            ims.Seek((long)cxt.Partitions[p].Dpfs.DataLength, SeekOrigin.Current);
-
-                        ims.Seek((long)cxt.Partitions[p].Ivfc.FileSystemOffset, SeekOrigin.Current);
-
-                        if (p == 0)
+                        long saveOffset = ims.Position;
+                        cxt.Save = MarshalTool.ReadStruct<SAVE>(ims);
+                        //add SAVE information (if exists) (suppose to...)
+                        if (SRAMTool.isSaveMagic(cxt.Save.Magic)) //read 
                         {
-                            long saveOffset = ims.Position;
-                            cxt.Save = MarshalTool.ReadStruct<SAVE>(ims);
-                            //add SAVE information (if exists) (suppose to...)
-                            if (SRAMTool.isSaveMagic(cxt.Save.Magic)) //read 
+                            ims.Seek(saveOffset + (long)cxt.Save.FileMapOffset, SeekOrigin.Begin);
+                            cxt.FilesMap = new uint[cxt.Save.FileMapSize];
+                            for (int i = 0; i < cxt.FilesMap.Length; i++)
+                                cxt.FilesMap[i] = ReadUInt32(ims);
+                            ims.Seek(saveOffset + (long)cxt.Save.FolderMapOffset, SeekOrigin.Begin);
+                            cxt.FoldersMap= new uint[cxt.Save.FolderMapSize];
+                            for (int i = 0; i < cxt.FoldersMap.Length; i++)
+                                cxt.FoldersMap[i] = ReadUInt32(ims);
+                            ims.Seek(saveOffset + (long)cxt.Save.BlockMapOffset, SeekOrigin.Begin);
+                            SRAMBlockMapEntry first = MarshalTool.ReadStruct<SRAMBlockMapEntry>(ims);
+                            cxt.BlockMap = new SRAMBlockMapEntry[first.EndBlock + 2];
+                            cxt.BlockMap[0] = first;
+                            for (uint i = 1; i < cxt.BlockMap.Length; i++)
+                                cxt.BlockMap[i] = MarshalTool.ReadStruct<SRAMBlockMapEntry>(ims);
+                            
+                            //-- Get folders -- (and set filebase 'while at it')
+                            if (!cxt.isData)
                             {
-                                ims.Seek(saveOffset + (long)cxt.Save.FileMapOffset, SeekOrigin.Begin);
-                                cxt.FilesMap = new uint[cxt.Save.FileMapSize];
-                                for (int i = 0; i < cxt.FilesMap.Length; i++)
-                                    cxt.FilesMap[i] = ReadUInt32(ims);
-                                ims.Seek(saveOffset + (long)cxt.Save.FolderMapOffset, SeekOrigin.Begin);
-                                cxt.FoldersMap= new uint[cxt.Save.FolderMapSize];
-                                for (int i = 0; i < cxt.FoldersMap.Length; i++)
-                                    cxt.FoldersMap[i] = ReadUInt32(ims);
-                                ims.Seek(saveOffset + (long)cxt.Save.BlockMapOffset, SeekOrigin.Begin);
-                                SRAMBlockMapEntry first = MarshalTool.ReadStruct<SRAMBlockMapEntry>(ims);
-                                cxt.BlockMap = new SRAMBlockMapEntry[first.EndBlock + 2];
-                                cxt.BlockMap[0] = first;
-                                for (uint i = 1; i < cxt.BlockMap.Length; i++)
-                                    cxt.BlockMap[i] = MarshalTool.ReadStruct<SRAMBlockMapEntry>(ims);
-                                
-                                //-- Get folders -- (and set filebase 'while at it')
-                                if (!cxt.isData)
-                                {
-                                    cxt.fileBase = saveOffset + (long)cxt.Save.FileStoreOffset;
-                                    ims.Seek(cxt.fileBase + cxt.Save.FolderTableOffset * 0x200, SeekOrigin.Begin);
-                                }
-                                else
-                                {   //file base is remote
-                                    cxt.fileBase = (long)(cxt.Disa.DATAPartitionOffset + cxt.Partitions[1].Difi.FileBase);
-                                    ims.Seek(saveOffset + cxt.Save.FolderTableOffset, SeekOrigin.Begin);
-                                }
-                                FileSystemFolderEntry froot = MarshalTool.ReadStruct<FileSystemFolderEntry>(ims);
-                                cxt.Folders = new FileSystemFolderEntry[froot.ParentFolderIndex - 1];
-                                if (froot.ParentFolderIndex > 1) //if has folders
-                                    for (int i = 0; i < cxt.Folders.Length; i++)
-                                        cxt.Folders[i] = MarshalTool.ReadStruct<FileSystemFolderEntry>(ims);
-
-                                //-- Get files --
-                                //go to FST
-                                if (!cxt.isData)
-                                    ims.Seek(cxt.fileBase + cxt.Save.FSTOffset * 0x200, SeekOrigin.Begin);
-                                else //file base is remote
-                                    ims.Seek(saveOffset + cxt.Save.FSTOffset, SeekOrigin.Begin);
-
-                                FileSystemFileEntry root = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
-                                cxt.Files = new FileSystemFileEntry[root.ParentFolderIndex - 1];
-                                if ((root.ParentFolderIndex > 1) && (root.Magic == 0)) //if has files
-                                    for (int i = 0; i < cxt.Files.Length; i++)
-                                        cxt.Files[i] = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
+                                cxt.fileBase = saveOffset + (long)cxt.Save.FileStoreOffset;
+                                ims.Seek(cxt.fileBase + cxt.Save.FolderTableOffset * 0x200, SeekOrigin.Begin);
                             }
                             else
-                            {   //Not a legal SAVE filesystem
-                                cxt.Folders = new FileSystemFolderEntry[0];
-                                cxt.Files = new FileSystemFileEntry[0]; 
+                            {   //file base is remote
+                                cxt.fileBase = (long)(cxt.Disa.DATAPartitionOffset + cxt.Partitions[1].Difi.FileBase);
+                                ims.Seek(saveOffset + cxt.Save.FolderTableOffset, SeekOrigin.Begin);
                             }
-                        } // end if (p == 0)
-                    } //end foreach (partitions)
-                }
+                            FileSystemFolderEntry froot = MarshalTool.ReadStruct<FileSystemFolderEntry>(ims);
+                            cxt.Folders = new FileSystemFolderEntry[froot.ParentFolderIndex - 1];
+                            if (froot.ParentFolderIndex > 1) //if has folders
+                                for (int i = 0; i < cxt.Folders.Length; i++)
+                                    cxt.Folders[i] = MarshalTool.ReadStruct<FileSystemFolderEntry>(ims);
+
+                            //-- Get files --
+                            //go to FST
+                            if (!cxt.isData)
+                                ims.Seek(cxt.fileBase + cxt.Save.FSTOffset * 0x200, SeekOrigin.Begin);
+                            else //file base is remote
+                                ims.Seek(saveOffset + cxt.Save.FSTOffset, SeekOrigin.Begin);
+
+                            FileSystemFileEntry root = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
+                            cxt.Files = new FileSystemFileEntry[root.ParentFolderIndex - 1];
+                            if ((root.ParentFolderIndex > 1) && (root.Magic == 0)) //if has files
+                                for (int i = 0; i < cxt.Files.Length; i++)
+                                    cxt.Files[i] = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
+                        }
+                        else
+                        {   //Not a legal SAVE filesystem
+                            cxt.Folders = new FileSystemFolderEntry[0];
+                            cxt.Files = new FileSystemFileEntry[0]; 
+                        }
+                    } // end if (p == 0)
+                } //end foreach (partitions)
                 ims.Close();
             } //end if crc is ok
             ms.Close();
