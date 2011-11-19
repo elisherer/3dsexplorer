@@ -15,7 +15,7 @@ namespace _3DSExplorer
         private const double CNV_5BIT_TO_8BIT = 0xFF / 0x1F;
         private const double CNV_6BIT_TO_8BIT = 0xFF / 0x3F;
 
-        private static Color colorFrom2Bytes(byte[] bytes) //Using GBR655
+        public static Color colorFrom2Bytes(byte[] bytes) //Using GBR655
         {
             int green = (bytes[0] & 0xFC) >> 2;
             int blue = ((bytes[0] & 0x03) << 3);

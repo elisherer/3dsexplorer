@@ -29,6 +29,7 @@ namespace _3DSExplorer
                 case "SC": return "Splinter Cell 3D";
                 case "SD": return "Steel Diver";
                 case "SS": return "Super Street Fighter IV - 3D Edition";
+                case "RE": return "Super Mario 3D Land";
                 case "SM": return "Super Monkey Ball 3D";
                 case "QE": return "The Legend of Zelda: Ocarina of Time 3D";
                 case "S3": return "The Sims 3";
