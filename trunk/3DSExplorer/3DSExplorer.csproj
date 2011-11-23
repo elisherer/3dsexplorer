@@ -66,17 +66,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AES128CTR.cs" />
-    <Compile Include="Certificate.cs" />
-    <Compile Include="CIA.cs" />
-    <Compile Include="ImageBox.cs">
+    <Compile Include="frmImageBox.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ImageBox.Designer.cs">
-      <DependentUpon>ImageBox.cs</DependentUpon>
+    <Compile Include="frmImageBox.Designer.cs">
+      <DependentUpon>frmImageBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="RawDecoder.cs" />
-    <Compile Include="Rom.cs" />
-    <Compile Include="Context.cs" />
+    <Compile Include="Modules\mdlCertificate.cs" />
+    <Compile Include="Modules\mdlCIA.cs" />
+    <Compile Include="Modules\mdlRom.cs" />
+    <Compile Include="Modules\mdlSRAM.cs" />
+    <Compile Include="Modules\mdlTicket.cs" />
+    <Compile Include="Modules\mdlTMD.cs" />
     <Compile Include="CRC16.cs" />
     <Compile Include="frmXORTool.cs">
       <SubType>Form</SubType>
@@ -97,11 +98,11 @@
     <Compile Include="frmHashTool.Designer.cs">
       <DependentUpon>frmHashTool.cs</DependentUpon>
     </Compile>
-    <Compile Include="InputBox.cs">
+    <Compile Include="frmInputBox.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="InputBox.Designer.cs">
-      <DependentUpon>InputBox.cs</DependentUpon>
+    <Compile Include="frmInputBox.Designer.cs">
+      <DependentUpon>frmInputBox.cs</DependentUpon>
     </Compile>
     <Compile Include="MakerResolver.cs" />
     <Compile Include="MarshalTool.cs" />
@@ -119,12 +120,12 @@
       <DependentUpon>frmHashTool.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="ImageBox.resx">
-      <DependentUpon>ImageBox.cs</DependentUpon>
+    <EmbeddedResource Include="frmImageBox.resx">
+      <DependentUpon>frmImageBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="InputBox.resx">
-      <DependentUpon>InputBox.cs</DependentUpon>
+    <EmbeddedResource Include="frmInputBox.resx">
+      <DependentUpon>frmInputBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -154,9 +155,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="SRAM.cs" />
-    <Compile Include="Ticket.cs" />
-    <Compile Include="TMD.cs" />
     <Compile Include="TreeListView\IColumnsProvider.cs" />
     <Compile Include="TreeListView\MultiColumnTreeView.cs">
       <SubType>Component</SubType>
@@ -170,6 +168,7 @@
     <Compile Include="TreeListView\TreeListView.Designer.cs">
       <DependentUpon>TreeListView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />

@@ -6,6 +6,72 @@ using System.Security.Cryptography;
 
 namespace _3DSExplorer
 {
+
+    public class SRAMContext : Context
+    {
+        public bool Encrypted;
+        public bool FirstSave;
+
+        //Wear-Level stuff
+
+        public byte[] Key;
+
+        public byte[] MemoryMap;
+        public SRAMHeaderEntry[] Blockmap;
+        public SRAMLongSectorEntry[] Journal;
+        public uint JournalSize;
+        public SRAMHeader fileHeader;
+        public byte[] image;
+
+        //Image stuff
+
+        public bool isData;
+
+        public byte[] ImageHash; //0x10 - ??
+        public DISA Disa;
+
+        public int currentPartition;
+        public Partition[] Partitions;
+
+        //SAVE Stuff
+        public SAVE Save;
+        public FileSystemFolderEntry[] Folders;
+        public FileSystemFileEntry[] Files;
+        public long fileBase;
+        public uint[] FilesMap;
+        public uint[] FoldersMap;
+        public SRAMBlockMapEntry[] BlockMap;
+    }
+
+    public class Partition
+    {
+        public ulong OffsetInImage;
+
+        public DIFI Difi;
+        public IVFC Ivfc;
+        public DPFS Dpfs;
+        public byte[] Hash; //0x20 - SHA256
+
+        public uint FirstFlag;
+        public uint FirstFlagDupe;
+        public uint SecondFlag;
+        public uint SecondFlagDupe;
+        /*
+        public byte[] SecondFlagTable;
+        public byte[] SecondFlagTableDupe;
+        */
+        public byte[][] HashTable;
+    }
+
+    public static class Sizes
+    {
+        public const int SHA256 = 0x20;
+        public const int SHA512 = 0x40;
+        public const int SHA1 = 0x10;
+        public const int MD5 = 0x10;
+        public const int CRC16 = 0x02;
+    }
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SRAMHeader
     {
@@ -316,6 +382,36 @@ namespace _3DSExplorer
             return null; //key not found
         }
 
+        public static byte[] MakeKey(byte[] input)
+        {
+            byte[] keyArray = new byte[0x200];
+            
+            //copy from 0x0010
+            for (int i = 0x10; i < 0x100; i++)
+                keyArray[i] = (byte)(input[i] ^ 0);
+            //copy from 0x0100
+            byte[] x00100 = new byte[] { 0x44, 0x49, 0x53, 0x41, 00, 00, 04, 00 };
+            for (int i = 0; i < 8; i++)
+                keyArray[0x100+i] = (byte)(input[0x100+i] ^ x00100[i]);
+            //copy from 0x1000
+            byte[] x01000 = new byte[] { 0, 0, 0, 8 };
+            for (int i = 0; i < 4; i++)
+                keyArray[i] = (byte)(input[0x1000 + i] ^ x01000[i]);
+            //find where SAVE is
+            int saveOffset = 0x2400;
+            if ((input[saveOffset] ^ keyArray[0]) != 'S' ||
+                (input[saveOffset + 1] ^ keyArray[1]) != 'A' ||
+                (input[saveOffset + 2] ^ keyArray[2]) != 'S' ||
+                (input[saveOffset + 3] ^ keyArray[3]) != 'S')
+                saveOffset += 0xC00;
+            //copy from SAVE
+            byte[] xSave = new byte[] { 00, 00, 04, 00, 0x20, 00, 00, 00, 00, 00, 00, 00};
+            for (int i = 0x04; i < 0x10; i++)
+                keyArray[i] = (byte)(input[saveOffset + i] ^ xSave[i - 0x04]);
+            
+            return keyArray;
+        }
+
         public static byte[] FindKey(byte[] input)
         {
             MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
@@ -327,7 +423,7 @@ namespace _3DSExplorer
             byte[] hash;
             byte[] ff_hash = new byte[] { 0xde, 0x03, 0xfe, 0x65, 0xa6, 0x76, 0x5c, 0xaa, 0x8c, 0x91, 0x34, 0x3a, 0xcc, 0x62, 0xcf, 0xfc };
 
-            hash_list = new HashEntry[4 * ((input.Length / 0x200) + 1)];
+            hash_list = new HashEntry[(input.Length / 0x200) + 1];
 
             for (int i = 0; i < (input.Length / 0x200); i++)
             {
@@ -368,8 +464,16 @@ namespace _3DSExplorer
             if (rec_count == 0)
                 return null;
 
+            //final DISA check
+            int foundOffset = hash_list[rec_idx].BlockIndex * 0x200;
+            if (((input[0x100] ^ input[foundOffset + 0x100]) != 'D') ||
+                ((input[0x101] ^ input[foundOffset + 0x101]) != 'I') ||
+                ((input[0x102] ^ input[foundOffset + 0x102]) != 'S') ||
+                ((input[0x103] ^ input[foundOffset + 0x103]) != 'A'))
+                return null; //That's not it
+
             outbuf = new byte[0x200];
-            Buffer.BlockCopy(input, hash_list[rec_idx].BlockIndex * 0x200, outbuf, 0, 0x200);
+            Buffer.BlockCopy(input, foundOffset, outbuf, 0, 0x200);
 
             return outbuf;
         }
@@ -411,9 +515,9 @@ namespace _3DSExplorer
             return BitConverter.ToUInt64(buffer, 0);
         }
 
-        public static SFContext Open(string path, ref string errorMessage)
+        public static SRAMContext Open(string path, ref string errorMessage)
         {
-            SFContext cxt = new SFContext();
+            SRAMContext cxt = new SRAMContext();
 
             cxt.Encrypted = isEncrypted(path);
 
@@ -473,7 +577,15 @@ namespace _3DSExplorer
                     if (key == null)
                     {
                         ms.Close();
-                        errorMessage = "Can't find key in binary file.";
+                        key = MakeKey(cxt.image);
+                        File.WriteAllBytes(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + "_img.bin", cxt.image);
+                        XorByteArray(cxt.image, key, 0);
+                        File.WriteAllBytes(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + "_dec.bin", cxt.image);
+                        File.WriteAllBytes(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + "_key.bin", key);
+                        errorMessage = "Can't find key in binary file." + Environment.NewLine + 
+                                        "Tried to create a key and saved the binaries to " + Environment.NewLine + 
+                                        Environment.NewLine +
+                                        "_img, _dec & _key";
                         return null;
                     }
                     else
@@ -495,8 +607,6 @@ namespace _3DSExplorer
                     }
                     File.WriteAllBytes("image.bin", cxt.image);
                 }*/
-
-                File.WriteAllBytes("image.bin", cxt.image);
 
                 MemoryStream ims = new MemoryStream(cxt.image);
                 cxt.ImageHash = ReadByteArray(ims, Sizes.MD5);
@@ -641,7 +751,7 @@ namespace _3DSExplorer
             return cxt;
         }
 
-        public static byte[] createSAV(SFContext cxt)
+        public static byte[] createSAV(SRAMContext cxt)
         {
             //Recompute the partitions' hash tables
             HashAlgorithm ha = SHA256.Create();
@@ -727,6 +837,196 @@ namespace _3DSExplorer
             XorByteArray(buffer, cxt.Key, 0x1000);
             
             return buffer;
+        }
+
+        public enum SRAMView
+        {
+            Image,
+            Partition,
+            Tables
+        };
+
+        public static void View(frmExplorer f, SRAMContext cxt, SRAMView view)
+        {
+            f.ClearInformation();
+            switch (view)
+            {
+                case SRAMView.Image:
+                    DISA disa = cxt.Disa;
+                    f.SetGroupHeaders("SRAM", "Image");
+                    f.AddListItem(0x000, 4, "Unknown 1", cxt.fileHeader.Unknown1, 0);
+                    f.AddListItem(0x004, 4, "Unknown 2", cxt.fileHeader.Unknown2, 0);
+                    f.AddListItem(0, 4, "** Blockmap length", (ulong)cxt.Blockmap.Length, 0);
+                    f.AddListItem(0, 4, "** Journal size", cxt.JournalSize, 0);
+                    f.AddListItem(0, 0x10, "** Image Hash", cxt.ImageHash, 1);
+                    f.AddListItem(0x000, 4, "DISA Magic", disa.Magic, 1);
+                    f.AddListItem(0x004, 4, "Unknown", disa.Unknown0, 1);
+                    f.AddListItem(0x008, 8, "Table Size", disa.TableSize, 1);
+                    f.AddListItem(0x010, 8, "Primary Table offset", disa.PrimaryTableOffset, 1);
+                    f.AddListItem(0x018, 8, "Secondary Table offset", disa.SecondaryTableOffset, 1);
+                    f.AddListItem(0x020, 8, "Table Length", disa.TableLength, 1);
+                    f.AddListItem(0x028, 8, "SAVE Entry Table offset", disa.SAVEEntryOffset, 1);
+                    f.AddListItem(0x030, 8, "SAVE Entry Table length", disa.SAVEEntryLength, 1);
+                    f.AddListItem(0x038, 8, "DATA Entry Table offset", disa.DATAEntryOffset, 1);
+                    f.AddListItem(0x040, 8, "DATA Entry Table length", disa.DATAEntryLength, 1);
+                    f.AddListItem(0x048, 8, "SAVE Partition Offset", disa.SAVEPartitionOffset, 1);
+                    f.AddListItem(0x050, 8, "SAVE Partition Length", disa.SAVEPartitionLength, 1);
+                    f.AddListItem(0x058, 8, "DATA Partition Offset", disa.DATAPartitionOffset, 1);
+                    f.AddListItem(0x060, 8, "DATA Partition Length", disa.DATAPartitionLength, 1);
+                    f.AddListItem(0x068, 4, "Active Table is " + ((disa.ActiveTable & 1) == 1 ? "Primary" : "Secondary"), disa.ActiveTable, 1);
+                    f.AddListItem(0x06C, 0x20, "Hash", disa.Hash, 1);
+                    f.AddListItem(0x08C, 4, "Zero Padding 0(to 8 bytes)", disa.ZeroPad0, 1);
+                    f.AddListItem(0x090, 4, "Flag 0 ?", disa.Flag0, 1);
+                    f.AddListItem(0x094, 4, "Zero Padding 1(to 8 bytes)", disa.ZeroPad1, 1);
+                    f.AddListItem(0x098, 4, "Unknown 1", disa.Unknown1, 1);
+                    f.AddListItem(0x09C, 4, "Unknown 2 (Magic?)", disa.Unknown2, 1);
+                    f.AddListItem(0x0A0, 8, "Data FS Length", disa.DataFsLength, 1);
+                    f.AddListItem(0x0A8, 8, "Unknown 3", disa.Unknown3, 1);
+                    f.AddListItem(0x0B0, 4, "Unknown 4", disa.Unknown4, 1);
+                    f.AddListItem(0x0B4, 4, "Unknown 5", disa.Unknown5, 1);
+                    f.AddListItem(0x0B8, 4, "Unknown 6", disa.Unknown6, 1);
+                    f.AddListItem(0x0BC, 4, "Unknown 7", disa.Unknown7, 1);
+                    f.AddListItem(0x0C0, 4, "Unknown 8", disa.Unknown8, 1);
+                    f.AddListItem(0x0C4, 4, "Flag 1 ?", disa.Flag1, 1);
+                    f.AddListItem(0x0C8, 4, "Flag 2 ?", disa.Flag2, 1);
+                    f.AddListItem(0x0CC, 4, "Flag 3 ?", disa.Flag3, 1);
+                    f.AddListItem(0x0D0, 4, "Flag 4 ?", disa.Flag4, 1);
+                    f.AddListItem(0x0D4, 4, "Unknown 14", disa.Unknown14, 1);
+                    f.AddListItem(0x0D8, 4, "Flag 5 ?", disa.Flag5, 1);
+                    f.AddListItem(0x0DC, 4, "Unknown 16", disa.Unknown16, 1);
+                    f.AddListItem(0x0E0, 4, "Magic 17", disa.Magic17, 1);
+                    f.AddListItem(0x0E4, 4, "Unknown 18", disa.Unknown18, 1);
+                    f.AddListItem(0x0E8, 4, "Flag 6 ?", disa.Flag6, 1);
+                    f.AddListItem(0x0EC, 4, "Flag 7 ?", disa.Flag7, 1);
+                    f.AddListItem(0x0F0, 4, "Flag 8 ?", disa.Flag8, 1);
+                    f.AddListItem(0x0F4, 4, "Unknown 21", disa.Unknown21, 1);
+                    f.AddListItem(0x0F8, 4, "Unknown 22", disa.Unknown22, 1);
+                    f.AddListItem(0x0FC, 4, "Unknown 23", disa.Unknown23, 1);
+                    break;
+                case SRAMView.Partition:
+                    DIFI difi = cxt.Partitions[cxt.currentPartition].Difi;
+                    IVFC ivfc = cxt.Partitions[cxt.currentPartition].Ivfc;
+                    DPFS dpfs = cxt.Partitions[cxt.currentPartition].Dpfs;
+                    SAVE save = cxt.Save;
+
+                    f.SetGroupHeaders("DIFI", "IVFC", "DPFS", "Hash", "SAVE", "Folders", "Files");
+                    f.AddListItem(0x000, 4, "Magic DIFI", difi.Magic, 0);
+                    f.AddListItem(0x004, 4, "Magic Padding", difi.MagicPadding, 0);
+                    f.AddListItem(0x008, 8, "IVFC Offset", difi.IVFCOffset, 0);
+                    f.AddListItem(0x010, 8, "IVFC Size", difi.IVFCSize, 0);
+                    f.AddListItem(0x018, 8, "DPFS Offset", difi.DPFSOffset, 0);
+                    f.AddListItem(0x020, 8, "DPFS Size", difi.DPFSSize, 0);
+                    f.AddListItem(0x028, 8, "Hash Offset", difi.HashOffset, 0);
+                    f.AddListItem(0x030, 8, "Hash Size", difi.HashSize, 0);
+                    f.AddListItem(0x038, 4, "Flags", difi.Flags, 0);
+                    f.AddListItem(0x03C, 8, "File Base (for DATA partitions)", difi.FileBase, 0);
+
+                    f.AddListItem(0x000, 4, "Magic IVFC", ivfc.Magic, 1);
+                    f.AddListItem(0x004, 4, "Magic Padding", ivfc.MagicPadding, 1);
+                    f.AddListItem(0x008, 8, "Unknown 1", ivfc.Unknown1, 1);
+                    f.AddListItem(0x010, 8, "FirstHash Offset", ivfc.FirstHashOffset, 1);
+                    f.AddListItem(0x018, 8, "FirstHash Length", ivfc.FirstHashLength, 1);
+                    f.AddListItem(0x020, 8, "FirstHash Block" + " (=" + (1 << (int)ivfc.FirstHashBlock) + ")", ivfc.FirstHashBlock, 1);
+                    f.AddListItem(0x028, 8, "SecondHash Offset", ivfc.SecondHashOffset, 1);
+                    f.AddListItem(0x030, 8, "SecondHash Length", ivfc.SecondHashLength, 1);
+                    f.AddListItem(0x038, 8, "SecondHash Block" + " (=" + (1 << (int)ivfc.SecondHashBlock) + ")", ivfc.SecondHashBlock, 1);
+                    f.AddListItem(0x040, 8, "HashTable Offset", ivfc.HashTableOffset, 1);
+                    f.AddListItem(0x048, 8, "HashTable Length", ivfc.HashTableLength, 1);
+                    f.AddListItem(0x050, 8, "HashTable Block" + " (=" + (1 << (int)ivfc.HashTableBlock) + ")", ivfc.HashTableBlock, 1);
+                    f.AddListItem(0x058, 8, "FileSystem Offset", ivfc.FileSystemOffset, 1);
+                    f.AddListItem(0x060, 8, "FileSystem Length", ivfc.FileSystemLength, 1);
+                    f.AddListItem(0x068, 8, "FileSystem Block" + " (=" + (1 << (int)ivfc.FileSystemBlock) + ")", ivfc.FileSystemBlock, 1);
+                    f.AddListItem(0x070, 8, "Unknown 3 (?=0x78)", ivfc.Unknown3, 1);
+
+                    f.AddListItem(0x000, 4, "Magic DPFS", dpfs.Magic, 2);
+                    f.AddListItem(0x004, 4, "Magic Padding", dpfs.MagicPadding, 2);
+                    f.AddListItem(0x008, 8, "First Table Offset", dpfs.FirstTableOffset, 2);
+                    f.AddListItem(0x010, 8, "First Table Length", dpfs.FirstTableLength, 2);
+                    f.AddListItem(0x018, 8, "First Table Block", dpfs.FirstTableBlock, 2);
+                    f.AddListItem(0x020, 8, "Second Table Offset", dpfs.SecondTableOffset, 2);
+                    f.AddListItem(0x028, 8, "Second Table Length", dpfs.SecondTableLength, 2);
+                    f.AddListItem(0x030, 8, "Second Table Block", dpfs.SecondTableBlock, 2);
+                    f.AddListItem(0x038, 8, "Offset to Data", dpfs.OffsetToData, 2);
+                    f.AddListItem(0x040, 8, "Data Length", dpfs.DataLength, 2);
+                    f.AddListItem(0x048, 8, "Data Block", dpfs.DataBlock, 2);
+
+#if DEBUG
+            f.AddListItem(0x000, 4, "* First Flag", cxt.Partitions[cxt.currentPartition].FirstFlag, 2);
+            f.AddListItem(0x000, 4, "* First Flag Dupe", cxt.Partitions[cxt.currentPartition].FirstFlagDupe,2);
+            f.AddListItem(0x000, 4, "* Second Flag", cxt.Partitions[cxt.currentPartition].SecondFlag, 2);
+            f.AddListItem(0x000, 4, "* Second Flag Dupe", cxt.Partitions[cxt.currentPartition].SecondFlagDupe, 2);
+#endif
+
+                    f.AddListItem(0x000, 0x20, "Hash", cxt.Partitions[cxt.currentPartition].Hash, 3);
+
+                    if (cxt.currentPartition == 0)
+                    {
+                        f.AddListItem(0x000, 4, "SAVE Magic", save.Magic, 4);
+                        f.AddListItem(0x004, 4, "Magic Padding", save.MagicPadding, 4);
+                        f.AddListItem(0x008, 8, "Unknown 1 (?=0x020)", save.Unknown1, 4);
+                        f.AddListItem(0x010, 8, "Size of data Partition [medias]", save.PartitionSize, 4);
+                        f.AddListItem(0x018, 4, "Partition Media Size", save.PartitionMediaSize, 4);
+                        f.AddListItem(0x01C, 8, "Unknown 3 (?=0x000)", save.Unknown3, 4);
+                        f.AddListItem(0x024, 4, "Unknown 4 (?=0x200)", save.Unknown4, 4);
+                        f.AddListItem(0x028, 8, "File Map Offset", save.FileMapOffset, 4);
+                        f.AddListItem(0x030, 4, "File Map Size", save.FileMapSize, 4);
+                        f.AddListItem(0x034, 4, "File Map MediaSize", save.FileMapMediaSize, 4);
+                        f.AddListItem(0x038, 8, "Folder Map Offset", save.FolderMapOffset, 4);
+                        f.AddListItem(0x040, 4, "Folder Map Size", save.FolderMapSize, 4);
+                        f.AddListItem(0x044, 4, "Folder Map Media Size", save.FolderMapMediaSize, 4);
+                        f.AddListItem(0x048, 8, "Block Map Offset", save.BlockMapOffset, 4);
+                        f.AddListItem(0x050, 4, "Block Map Size", save.BlockMapSize, 4);
+                        f.AddListItem(0x054, 4, "Block Map Media Size", save.BlockMapMediaSize, 4);
+                        f.AddListItem(0x058, 8, "Filestore Offset (from SAVE)", save.FileStoreOffset, 4);
+                        f.AddListItem(0x060, 4, "Filestore Length (medias)", save.FileStoreLength, 4);
+                        f.AddListItem(0x064, 4, "Filestore Media", save.FileStoreMedia, 4);
+                        f.AddListItem(0x068, 4, "Folders Table offset (medias/exact)", save.FolderTableOffset, 4);
+                        f.AddListItem(0x06C, 4, "Folders Table Length (medias)", save.FolderTableLength, 4);
+                        f.AddListItem(0x070, 4, "Folders Table Unknown", save.FolderTableUnknown, 4);
+                        f.AddListItem(0x074, 4, "Folders Table Media Size", save.FolderTableMedia, 4);
+                        f.AddListItem(0x078, 4, "Files Table Offset (medias/exact)", save.FSTOffset, 4);
+                        f.AddListItem(0x07C, 4, "Files Table Length", save.FSTLength, 4);
+                        f.AddListItem(0x080, 4, "Files Table Unknown", save.FSTUnknown, 4);
+                        f.AddListItem(0x084, 4, "Files Table Media Size", save.FSTMedia, 4);
+
+                        if (SRAMTool.isSaveMagic(save.Magic))
+                        {
+                            int i = 1;
+                            foreach (FileSystemFolderEntry fse in cxt.Folders)
+                                f.AddListItem(i++.ToString(),
+                                            fse.Index.ToString(),
+                                            Util.charArrayToString(fse.FolderName),
+                                            fse.ParentFolderIndex.ToString(),
+                                            Util.toHexString(8, fse.LastFileIndex),
+                                            5);
+                            i = 1;
+                            foreach (FileSystemFileEntry fse in cxt.Files)
+                                f.AddListItem(i++.ToString(),
+                                            fse.BlockOffset.ToString(),
+                                            "[" + fse.Index + "] " + Util.charArrayToString(fse.Filename) + ", (" + fse.FileSize + "b)",
+                                            fse.ParentFolderIndex.ToString(),
+                                            Util.toHexString(8, fse.Unknown2) + " " + Util.toHexString(8, fse.Magic),
+                                            6);
+                        }
+                    }
+                    break;
+                case SRAMView.Tables:
+                    f.SetGroupHeaders("Files", "Folders", "Unknown");
+                    if (SRAMTool.isSaveMagic(cxt.Save.Magic))
+                    {
+                        for (int i = 0; i < cxt.FilesMap.Length; i++)
+                            f.AddListItem(i, 4, "UInt32", cxt.FilesMap[i], 0);
+                        for (int i = 0; i < cxt.FoldersMap.Length; i++)
+                            f.AddListItem(i, 4, "UInt32", cxt.FoldersMap[i], 1);
+
+                        f.AddListItem("", "", "Start", "Start:" + (cxt.BlockMap[0].StartBlock & 0xff) + ", End: " + (cxt.BlockMap[0].EndBlock & 0xff), "Start:" + cxt.BlockMap[0].StartBlock.ToString("X8") + ", End: " + cxt.BlockMap[0].EndBlock.ToString("X8"), 2);
+                        for (int i = 1; i < cxt.BlockMap.Length - 1; i++)
+                            f.AddListItem("", (i - 1).ToString(), "Block " + i + (cxt.BlockMap[i].EndBlock == 0x80000000 && cxt.BlockMap[i].StartBlock == 0x80000000 ? " (Start of data)" : ""), "Start:" + (cxt.BlockMap[i].StartBlock & 0xff) + ", End: " + (cxt.BlockMap[i].EndBlock & 0xff), "Start:" + cxt.BlockMap[i].StartBlock.ToString("X8") + ", End: " + cxt.BlockMap[i].EndBlock.ToString("X8"), 2);
+                        f.AddListItem("", "", "End", "", "Start:" + (cxt.BlockMap[cxt.BlockMap.Length - 1].StartBlock & 0xff) + ", End: " + (cxt.BlockMap[cxt.BlockMap.Length - 1].EndBlock & 0xff), 2);
+                    }
+                    break;
+            }
+            f.AutoAlignColumns();
         }
     }
 }

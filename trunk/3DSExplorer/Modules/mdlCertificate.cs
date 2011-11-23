@@ -55,5 +55,42 @@ namespace _3DSExplorer
                 list.Add(tcert);
             }
         }
+
+        public static void View(frmExplorer f, ArrayList certs, int i)
+        {
+            f.ClearInformation();
+            if (i < 0)
+            {
+                f.SetGroupHeaders("Certificates");
+                f.AddListItem(0, 4, "Certificate Count", (ulong)certs.Count, 0);
+            }
+            else
+            {
+                CertificateEntry entry = (CertificateEntry)certs[i];
+                Certificate cert = entry.cert;
+                f.SetGroupHeaders("Certificate");
+                f.AddListItem(0, 4, "Signature Type", (ulong)entry.SignatureType, 0);
+                int off = 4;
+                if (entry.SignatureType == SignatureType.RSA_2048_SHA256 || entry.SignatureType == SignatureType.RSA_2048_SHA1)
+                {
+                    f.AddListItem(off, 0x100, "RSA-2048 signature of the content", entry.Hash, 0);
+                    off += 0x100;
+                }
+                else
+                {
+                    f.AddListItem(off, 0x200, "RSA-4096 signature of the content", entry.Hash, 0);
+                    off += 0x200;
+                }
+                f.AddListItem(off, 60, "Reserved0", cert.Reserved0, 0);
+                f.AddListItem(off + 60, 64, "Issuer", cert.Issuer, 0);
+                f.AddListItem(off + 124, 4, "Tag", cert.Tag, 0);
+                f.AddListItem(off + 128, 64, "Name", cert.Name, 0);
+                f.AddListItem(off + 292, 0x104, "Key", cert.Key, 0);
+                f.AddListItem(off + 552, 2, "Unknown0", cert.Unknown1, 0);
+                f.AddListItem(off + 554, 2, "Unknown1", cert.Unknown2, 0);
+                f.AddListItem(off + 556, 52, "Padding", cert.Padding, 0);
+            }
+            f.AutoAlignColumns();
+        }
     }
 }
