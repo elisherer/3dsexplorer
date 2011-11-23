@@ -6,6 +6,16 @@ using System.Runtime.InteropServices;
 
 namespace _3DSExplorer
 {
+    public class TMDContext : Context
+    {
+        public TMDHeader head;
+        public SignatureType SignatureType;
+        public TMDContentInfoRecord[] ContentInfoRecords;
+        public TMDContentChunkRecord[] chunks;
+        public byte[] Hash;
+        public ArrayList Certificates; //of CertificateEntry
+    }
+
     public enum SignatureType
     {
         RSA_2048_SHA256 = 0x04000100,
@@ -65,7 +75,7 @@ namespace _3DSExplorer
 
     public class TMDTool
     {
-        public static string typeToString(ushort type)
+        private static string typeToString(ushort type)
         {
             string ret = "";
             if ((type & 1) != 0)
@@ -127,5 +137,76 @@ namespace _3DSExplorer
             }
             return (supported ? cxt : null);
         }
+
+        public enum TMDView{
+            TMD,
+            ContentInfoRecord,
+            ContentChunkRecord
+        };
+
+        public static void View(frmExplorer f, TMDContext cxt, TMDView view)
+        {
+            f.ClearInformation();
+            switch (view)
+            {
+                case TMDView.TMD:
+                    TMDHeader head = cxt.head;
+                    f.SetGroupHeaders("TMD");
+                    f.AddListItem(0, 4, "Signature Type", (ulong)cxt.SignatureType, 0);
+                    int off = 4;
+                    if (cxt.SignatureType == SignatureType.RSA_2048_SHA256 || cxt.SignatureType == SignatureType.RSA_2048_SHA1)
+                    {
+                        f.AddListItem(off, 0x100, "RSA-2048 signature of the TMD", cxt.Hash, 0);
+                        off += 0x100;
+                    }
+                    else
+                    {
+                        f.AddListItem(off, 0x200, "RSA-4096 signature of the TMD", cxt.Hash, 0);
+                        off += 0x200;
+                    }
+                    f.AddListItem(off, 60, "Reserved0", head.Reserved0, 0);
+                    f.AddListItem(off + 60, 64, "Issuer", head.Issuer, 0);
+                    f.AddListItem(off + 124, 4, "Version", head.Version, 0);
+                    f.AddListItem(off + 128, 1, "Car Crl Version", head.CarCrlVersion, 0);
+                    f.AddListItem(off + 129, 1, "Signer Version", head.SignerVersion, 0);
+                    f.AddListItem(off + 130, 1, "Reserved1", head.Reserved1, 0);
+                    f.AddListItem(off + 131, 8, "System Version", head.SystemVersion, 0);
+                    f.AddListItem(off + 139, 8, "Title ID", head.TitleID, 0);
+                    f.AddListItem(off + 147, 4, "Title Type", head.TitleType, 0);
+                    f.AddListItem(off + 151, 2, "Group ID", head.GroupID, 0);
+                    f.AddListItem(off + 153, 62, "Reserved2", head.Reserved2, 0);
+                    f.AddListItem(off + 215, 4, "Access Rights", head.AccessRights, 0);
+                    f.AddListItem(off + 219, 2, "Title Version", head.TitleVersion, 0);
+                    f.AddListItem(off + 221, 2, "Content Count", head.ContentCount, 0);
+                    f.AddListItem(off + 223, 2, "Boot Content", head.BootContent, 0);
+                    f.AddListItem(off + 225, 2, "Padding", head.Padding0, 0);
+                    f.AddListItem(off + 227, 32, "Content Info Records Hash", head.ContentInfoRecordsHash, 0);
+                    break;
+                case TMDView.ContentInfoRecord:
+                    f.SetGroupHeaders("TMD Content Records");
+                    for (int i = 0; i < 64; i++)
+                    {
+                        f.AddListItem(i * 36, 2, "Content Command Count", cxt.ContentInfoRecords[i].ContentCommandCount, 0);
+                        f.AddListItem(i * 36 + 2, 2, "Content Index Offset", cxt.ContentInfoRecords[i].ContentIndexOffset, 0);
+                        f.AddListItem(i * 36 + 4, 32, "Next Content Hash", cxt.ContentInfoRecords[i].NextContentHash, 0);
+                    }
+                    break;
+                case TMDView.ContentChunkRecord:
+                    TMDContentChunkRecord cr;
+                    f.SetGroupHeaders("TMD Content Chunks");
+                    for (int i = 0; i < cxt.chunks.Length; i++)
+                    {
+                        cr = (TMDContentChunkRecord)cxt.chunks[i];
+                        f.AddListItem(i, 4, "Content ID", cr.ContentID, 0);
+                        f.AddListItem(0, 2, "Content Index", cr.ContentIndex, 0);
+                        f.AddListItem(0, 2, "Content Type (=" + typeToString(cr.ContentType) + ")", cr.ContentType, 0);
+                        f.AddListItem(0, 8, "Content Size", cr.ContentSize, 0);
+                        f.AddListItem(0, 32, "Content Hash", cr.ContentHash, 0);
+                    }
+                    break;
+            }
+            f.AutoAlignColumns();
+        }
+
     }
 }
