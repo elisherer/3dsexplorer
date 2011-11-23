@@ -122,11 +122,38 @@ namespace _3DSExplorer
             return cxt;
         }
 
-        static class RawDecoder
+        public static class RawDecoder
         {
-            private const double CNV_5BIT_TO_8BIT = 0xFF / 0x1F;
-            private const double CNV_6BIT_TO_8BIT = 0xFF / 0x3F;
+            //private const double CNV_5BIT_TO_8BIT = 0xFF / 0x1F;
+            //private const double CNV_6BIT_TO_8BIT = 0xFF / 0x3F;
 
+            //Decode RGB5A3 Taken from the dolphin project
+            private static int[] lut5to8 = { 0x00,0x08,0x10,0x18,0x20,0x29,0x31,0x39,
+                                                0x41,0x4A,0x52,0x5A,0x62,0x6A,0x73,0x7B,
+                                                0x83,0x8B,0x94,0x9C,0xA4,0xAC,0xB4,0xBD,
+                                                0xC5,0xCD,0xD5,0xDE,0xE6,0xEE,0xF6,0xFF };
+            private static int[] lut3to8 = { 0x00, 0x24, 0x48, 0x6D, 0x91, 0xB6, 0xDA, 0xFF };
+
+            public static Color Decode5A3(int val)
+            {
+                int blue, red, green, alpha = 0xFF;
+                if ((val & 0x8000) > 0) //If Alpha flag is set then it's Full - 0xFF
+                {
+                    red = lut5to8[(val >> 5) & 0x1f];       //5 bits
+                    green = lut5to8[(val) & 0x1f];          //5 bits
+                    blue = lut5to8[(val >> 10) & 0x1f];     //5 bits
+                }
+                else  //Otherwise the alpha channel is the 3 bits after the flag
+                {
+                    alpha = lut3to8[(val >> 12) & 0x7];     //3 bits
+                    red = 0x11 * ((val >> 4) & 0xf);        //4 bits
+                    green = 0x11 * ((val) & 0xf);           //4 bits
+                    blue = 0x11 * ((val >> 8) & 0xf);       //4 bits
+                }
+                return Color.FromArgb(alpha, red, green, blue);
+            }
+
+            /*
             public static Color colorFrom2Bytes(byte[] bytes) //Using GBR655
             {
                 int green = (bytes[0] & 0xFC) >> 2;
@@ -134,7 +161,7 @@ namespace _3DSExplorer
                 blue += ((bytes[1] & 0xE0) >> 5);
                 int red = bytes[1] & 0x1F;
                 return Color.FromArgb((int)(red * CNV_5BIT_TO_8BIT), (int)(green * CNV_6BIT_TO_8BIT), (int)(blue * CNV_5BIT_TO_8BIT));
-            }
+            }*/
 
             private static void fillBitmap(int iconSize, int tileSize, int ax, int ay, Bitmap bmp, FileStream fs)
             {
@@ -142,7 +169,8 @@ namespace _3DSExplorer
                 {
                     byte[] rgbVal = new byte[2];
                     fs.Read(rgbVal, 0, 2);
-                    bmp.SetPixel(ax, ay, colorFrom2Bytes(rgbVal));
+
+                    bmp.SetPixel(ax, ay, Decode5A3((rgbVal[1] << 8) + rgbVal[0]));
                 }
                 else
                     for (int y = 0; y < iconSize; y += tileSize)

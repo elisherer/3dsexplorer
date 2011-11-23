@@ -19,6 +19,7 @@ namespace _3DSExplorer
         public void setImage(Image image)
         {
             pictureBox.Image = image;
+            pictureBox.Size = pictureBox.Image.Size;
         }
 
         public static DialogResult ShowDialog(Image image)
@@ -40,6 +41,13 @@ namespace _3DSExplorer
         private void btnCopy_Click(object sender, EventArgs e)
         {
             Clipboard.SetImage(pictureBox.Image);
+        }
+
+        private void btnZoomIn_Click(object sender, EventArgs e)
+        {
+            btnZoomIn.Checked = !btnZoomIn.Checked;
+            pictureBox.Width = pictureBox.Image.Width * (btnZoomIn.Checked ? 2 : 1);
+            pictureBox.Height = pictureBox.Image.Height * (btnZoomIn.Checked ? 2 : 1);
         }
     }
 }
