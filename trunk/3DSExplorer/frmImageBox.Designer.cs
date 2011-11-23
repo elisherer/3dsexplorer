@@ -31,8 +31,9 @@
             this.pictureBox = new System.Windows.Forms.PictureBox();
             this.toolBar = new System.Windows.Forms.ToolStrip();
             this.btnSave = new System.Windows.Forms.ToolStripButton();
-            this.btnCopy = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator0 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnCopy = new System.Windows.Forms.ToolStripButton();
+            this.btnZoomIn = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.toolBar.SuspendLayout();
             this.SuspendLayout();
@@ -43,7 +44,7 @@
             this.pictureBox.Location = new System.Drawing.Point(0, 26);
             this.pictureBox.Name = "pictureBox";
             this.pictureBox.Size = new System.Drawing.Size(58, 39);
-            this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox.TabIndex = 0;
             this.pictureBox.TabStop = false;
             // 
@@ -52,7 +53,8 @@
             this.toolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.btnSave,
             this.toolStripSeparator0,
-            this.btnCopy});
+            this.btnCopy,
+            this.btnZoomIn});
             this.toolBar.Location = new System.Drawing.Point(0, 0);
             this.toolBar.Name = "toolBar";
             this.toolBar.Size = new System.Drawing.Size(183, 25);
@@ -69,6 +71,11 @@
             this.btnSave.Text = "Save Image to file...";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
+            // toolStripSeparator0
+            // 
+            this.toolStripSeparator0.Name = "toolStripSeparator0";
+            this.toolStripSeparator0.Size = new System.Drawing.Size(6, 25);
+            // 
             // btnCopy
             // 
             this.btnCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -79,10 +86,15 @@
             this.btnCopy.Text = "Copy Image to clipboard";
             this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
             // 
-            // toolStripSeparator0
+            // btnZoomIn
             // 
-            this.toolStripSeparator0.Name = "toolStripSeparator0";
-            this.toolStripSeparator0.Size = new System.Drawing.Size(6, 25);
+            this.btnZoomIn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnZoomIn.Image = global::_3DSExplorer.Properties.Resources.magnifier;
+            this.btnZoomIn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnZoomIn.Name = "btnZoomIn";
+            this.btnZoomIn.Size = new System.Drawing.Size(23, 22);
+            this.btnZoomIn.Text = "Zoom In";
+            this.btnZoomIn.Click += new System.EventHandler(this.btnZoomIn_Click);
             // 
             // ImageBox
             // 
@@ -114,5 +126,6 @@
         private System.Windows.Forms.ToolStripButton btnSave;
         private System.Windows.Forms.ToolStripButton btnCopy;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator0;
+        private System.Windows.Forms.ToolStripButton btnZoomIn;
     }
 }
