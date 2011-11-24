@@ -124,9 +124,6 @@ namespace _3DSExplorer
 
         public static class RawDecoder
         {
-            //private const double CNV_5BIT_TO_8BIT = 0xFF / 0x1F;
-            //private const double CNV_6BIT_TO_8BIT = 0xFF / 0x3F;
-
             //Decode RGB5A3 Taken from the dolphin project
             private static int[] lut5to8 = { 0x00,0x08,0x10,0x18,0x20,0x29,0x31,0x39,
                                                 0x41,0x4A,0x52,0x5A,0x62,0x6A,0x73,0x7B,
@@ -152,16 +149,15 @@ namespace _3DSExplorer
                 }
                 return Color.FromArgb(alpha, red, green, blue);
             }
-
-            /*
-            public static Color colorFrom2Bytes(byte[] bytes) //Using GBR655
+            
+            public static Color colorFrom2Bytes(byte[] bytes) //Using RGB565
             {
-                int green = (bytes[0] & 0xFC) >> 2;
-                int blue = ((bytes[0] & 0x03) << 3);
-                blue += ((bytes[1] & 0xE0) >> 5);
-                int red = bytes[1] & 0x1F;
-                return Color.FromArgb((int)(red * CNV_5BIT_TO_8BIT), (int)(green * CNV_6BIT_TO_8BIT), (int)(blue * CNV_5BIT_TO_8BIT));
-            }*/
+                int r = (bytes[1] >> 3) & 0x1F;
+                int g = ((bytes[1] & 0x07) << 3);
+                g += ((bytes[0] & 0xE0) >> 5);
+                int b = bytes[0] & 0x1F;
+                return Color.FromArgb(lut5to8[r], g * 4, lut5to8[b]);
+            }
 
             private static void fillBitmap(int iconSize, int tileSize, int ax, int ay, Bitmap bmp, FileStream fs)
             {
@@ -169,8 +165,11 @@ namespace _3DSExplorer
                 {
                     byte[] rgbVal = new byte[2];
                     fs.Read(rgbVal, 0, 2);
-
-                    bmp.SetPixel(ax, ay, Decode5A3((rgbVal[1] << 8) + rgbVal[0]));
+                    if ((ax == 9) && (ay == 9))
+                    {
+                        bmp.GetPixel(2, 2);
+                    }
+                    bmp.SetPixel(ax, ay, colorFrom2Bytes(rgbVal)/*Decode5A3((rgbVal[1] << 8) + rgbVal[0])*/);
                 }
                 else
                     for (int y = 0; y < iconSize; y += tileSize)

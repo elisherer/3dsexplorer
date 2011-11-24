@@ -25,7 +25,6 @@ namespace _3DSExplorer
         {
             InitializeComponent();
             Text = "3DS Explorer v." + Application.ProductVersion;
-            MessageBox.Show(CIATool.RawDecoder.Decode5A3(0x00FC).ToString());
         }
 
         public frmExplorer(string path)
