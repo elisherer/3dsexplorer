@@ -107,13 +107,15 @@ namespace _3DSExplorer
             //Determin what kind of file it is
             int type = -1;
 
-            if (filePath.EndsWith("3ds") || filePath.EndsWith("cci"))
+            string Extenstion = Path.GetExtension(filePath).ToLower();
+
+            if (Extenstion == "3ds" || Extenstion == "cci")
                 type = 0;
-            else if (filePath.EndsWith("sav") || filePath.EndsWith("bin"))
+            else if (Extenstion == "sav" || Extenstion == "bin")
                 type = 1;
-            else if (filePath.EndsWith("tmd"))
+            else if (Extenstion == "tmd")
                 type = 2;
-            else if (filePath.EndsWith("cia"))
+            else if (Extenstion == "cia")
                 type = 3;
             else //Autodetect by content
             {

@@ -19,7 +19,7 @@ namespace _3DSExplorer
         public void setImage(Image image)
         {
             pictureBox.Image = image;
-            pictureBox.Size = pictureBox.Image.Size;
+            pictureBox.Size = new Size(image.Width + 2,image.Height + 2);
         }
 
         public static DialogResult ShowDialog(Image image)
