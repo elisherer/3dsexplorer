@@ -1,13 +1,15 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
+// ReSharper disable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global
 namespace _3DSExplorer
 {
 
-    public class SRAMContext : Context
+    public class SRAMContext : IContext
     {
         public bool Encrypted;
         public bool FirstSave;
@@ -20,24 +22,24 @@ namespace _3DSExplorer
         public SRAMHeaderEntry[] Blockmap;
         public SRAMLongSectorEntry[] Journal;
         public uint JournalSize;
-        public SRAMHeader fileHeader;
-        public byte[] image;
+        public SRAMHeader FileHeader;
+        public byte[] Image;
 
         //Image stuff
 
-        public bool isData;
+        public bool IsData;
 
         public byte[] ImageHash; //0x10 - ??
         public DISA Disa;
 
-        public int currentPartition;
+        public int CurrentPartition;
         public Partition[] Partitions;
 
         //SAVE Stuff
         public SAVE Save;
         public FileSystemFolderEntry[] Folders;
         public FileSystemFileEntry[] Files;
-        public long fileBase;
+        public long FileBase;
         public uint[] FilesMap;
         public uint[] FoldersMap;
         public SRAMBlockMapEntry[] BlockMap;
@@ -85,6 +87,7 @@ namespace _3DSExplorer
         public byte PhysicalSector; // when bit7 is set, block has checksums, otherwise checksums are all zero
         public byte AllocationCount;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+
         public byte[] CheckSums; // 8*0x200=0x1000, each byte hashes 0x200 block with ModbusCRC16 XORed to 1 byte
     }
 
@@ -298,74 +301,68 @@ namespace _3DSExplorer
             public int Count;
         }
 
-        public static bool isJournalMagic(byte[] buf, int offset)
+        public static bool IsJournalMagic(byte[] buf, int offset)
         {
             return (buf[offset] == 0xE0 && buf[offset + 1] == 0x6C && buf[offset + 2] == 0x0D && buf[offset + 3] == 0x08);
         }
 
-        public static bool isDifiMagic(char[] buf)
+        public static bool IsDifiMagic(char[] buf)
         {
             return (buf[0] == 'D' && buf[1] == 'I' && buf[2] == 'F' && buf[3] == 'I');
         }
 
-        public static bool isDisaMagic(char[] buf)
+        private static bool IsDisaMagic(IList<char> buf)
         {
             return (buf[0] == 'D' && buf[1] == 'I' && buf[2] == 'S' && buf[3] == 'A');
         }
 
-        public static bool isSaveMagic(char[] buf)
+        private static bool IsSaveMagic(IList<char> buf)
         {
             return (buf[0] == 'S' && buf[1] == 'A' && buf[2] == 'V' && buf[3] == 'E');
         }
-        public static bool isSaveMagic(byte[] buf)
+        public static bool IsSaveMagic(byte[] buf)
         {
             return (buf[0] == 'S' && buf[1] == 'A' && buf[2] == 'V' && buf[3] == 'E');
         }
 
-        public static bool isFF(byte[] buf)
+        private static bool IsFF(IEnumerable<byte> buf)
         {
-            for (int i = 0; i < buf.Length; i++)
-                if (buf[i] != 0xFF)
-                    return false;
-            return true;
+            return buf.All(t => t == 0xFF);
         }
 
-        public static bool is00(byte[] buf)
+        private static bool Is00(IEnumerable<byte> buf)
         {
-            for (int i = 0; i < buf.Length; i++)
-                if (buf[i] != 0x00)
-                    return false;
-            return true;
+            return buf.All(t => t == 0x00);
         }
 
-        public static void XorByteArray(byte[] array, byte[] mask, int start)
+        private static void XorByteArray(byte[] array, byte[] mask, int start)
         {
-            for (int i = start; i < array.Length; i++)
+            for (var i = start; i < array.Length; i++)
                 array[i] ^= mask[i % mask.Length];
         }
 
         public static void XorExperimental(byte[] array, byte[] mask, int start)
         {
-            for (int j = start; j < array.Length; j += 0x200)
+            for (var j = start; j < array.Length; j += 0x200)
             {
-                int lastNonFF = j + 0x200 - 1 < array.Length ? j + 0x200 - 1 : array.Length - 1;
+                var lastNonFF = j + 0x200 - 1 < array.Length ? j + 0x200 - 1 : array.Length - 1;
                 //find to what point need to be xored
                 while (array[lastNonFF] == 0xFF)
                     lastNonFF--;
                 //xor it
-                for (int i = j; i <= lastNonFF; i++)
+                for (var i = j; i <= lastNonFF; i++)
                     array[i] ^= mask[i % mask.Length];
             }
         }
 
         public static byte[] FindKey2(byte[] input)
         {
-            MemoryStream ms = new MemoryStream(input);
-            byte[] disa = new byte[4];
+            var ms = new MemoryStream(input);
+            var disa = new byte[4];
             ms.Seek(0x100,SeekOrigin.Begin);
             ms.Read(disa, 0, disa.Length);
             ms.Seek(0x200, SeekOrigin.Current);
-            byte[] check = new byte[4];
+            var check = new byte[4];
             while (ms.Position < ms.Length)
             {
                 ms.Read(check, 0, check.Length);
@@ -373,7 +370,7 @@ namespace _3DSExplorer
                 if (check[0] == 'D' && check[1] == 'I' && check[2] == 'S' && check[3] == 'A')
                 {
                     ms.Seek(-0x104, SeekOrigin.Current);
-                    byte[] key = new byte[0x200];
+                    var key = new byte[0x200];
                     ms.Read(key, 0, key.Length);
                     return key;
                 }
@@ -382,221 +379,204 @@ namespace _3DSExplorer
             return null; //key not found
         }
 
-        public static byte[] MakeKey(byte[] input)
+        private static byte[] MakeKey(byte[] input)
         {
-            byte[] keyArray = new byte[0x200];
+            var keyArray = new byte[0x200];
             
             //copy from 0x0010
-            for (int i = 0x10; i < 0x100; i++)
+            for (var i = 0x10; i < 0x100; i++)
                 keyArray[i] = (byte)(input[i] ^ 0);
             //copy from 0x0100
-            byte[] x00100 = new byte[] { 0x44, 0x49, 0x53, 0x41, 00, 00, 04, 00 };
-            for (int i = 0; i < 8; i++)
+            var x00100 = new byte[] { 0x44, 0x49, 0x53, 0x41, 00, 00, 04, 00 };
+            for (var i = 0; i < 8; i++)
                 keyArray[0x100+i] = (byte)(input[0x100+i] ^ x00100[i]);
             //copy from 0x1000
-            byte[] x01000 = new byte[] { 0, 0, 0, 8 };
-            for (int i = 0; i < 4; i++)
+            var x01000 = new byte[] { 0, 0, 0, 8 };
+            for (var i = 0; i < 4; i++)
                 keyArray[i] = (byte)(input[0x1000 + i] ^ x01000[i]);
             //find where SAVE is
-            int saveOffset = 0x2400;
+            var saveOffset = 0x2400;
             if ((input[saveOffset] ^ keyArray[0]) != 'S' ||
                 (input[saveOffset + 1] ^ keyArray[1]) != 'A' ||
                 (input[saveOffset + 2] ^ keyArray[2]) != 'S' ||
                 (input[saveOffset + 3] ^ keyArray[3]) != 'S')
                 saveOffset += 0xC00;
             //copy from SAVE
-            byte[] xSave = new byte[] { 00, 00, 04, 00, 0x20, 00, 00, 00, 00, 00, 00, 00};
+            var xSave = new byte[] { 00, 00, 04, 00, 0x20, 00, 00, 00, 00, 00, 00, 00};
             for (int i = 0x04; i < 0x10; i++)
                 keyArray[i] = (byte)(input[saveOffset + i] ^ xSave[i - 0x04]);
             
             return keyArray;
         }
 
-        public static byte[] FindKey(byte[] input)
+        private static byte[] FindKey(byte[] input)
         {
-            MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-            int count = 0, rec_idx = 0, rec_count = 0;
-            bool found;
-            HashEntry[] hash_list;
-            byte[] outbuf;
+            var md5 = new MD5CryptoServiceProvider();
+            int count = 0, recIdx = 0, recCount = 0;
+            var found = false;
 
-            byte[] hash;
-            byte[] ff_hash = new byte[] { 0xde, 0x03, 0xfe, 0x65, 0xa6, 0x76, 0x5c, 0xaa, 0x8c, 0x91, 0x34, 0x3a, 0xcc, 0x62, 0xcf, 0xfc };
+            var ffHash = new byte[] { 0xde, 0x03, 0xfe, 0x65, 0xa6, 0x76, 0x5c, 0xaa, 0x8c, 0x91, 0x34, 0x3a, 0xcc, 0x62, 0xcf, 0xfc };
 
-            hash_list = new HashEntry[(input.Length / 0x200) + 1];
+            var hashList = new HashEntry[(input.Length / 0x200) + 1];
 
-            for (int i = 0; i < (input.Length / 0x200); i++)
+            for (var i = 0; i < (input.Length / 0x200); i++, found = false)
             {
-                hash = md5.ComputeHash(input, i * 0x200, 0x200);
+                var hash = md5.ComputeHash(input, i * 0x200, 0x200);
 
-                if (memcmp(hash, ff_hash, 16) == 0) //skip ff blocks...
+                if (memcmp(hash, ffHash, 16) == 0) //skip ff blocks...
                     continue;
 
-                found = false;
                 // see if we already came up with that hash
-                for (int j = 0; j < count; j++)
-                    if (memcmp(hash_list[j].Hash, hash, 16) == 0)
+                for (var j = 0; j < count; j++)
+                    if (memcmp(hashList[j].Hash, hash, 16) == 0)
                     {
-                        hash_list[j].Count++;
+                        hashList[j].Count++;
                         found = true;
                         break;
                     }
 
                 // push new hashlist entry
-                if (!found)
-                {
-                    hash_list[count] = new HashEntry();
-                    hash_list[count].Hash = new byte[hash.Length];
-                    Buffer.BlockCopy(hash, 0, hash_list[count].Hash, 0, hash.Length);
-                    hash_list[count].Count = 1;
-                    hash_list[count].BlockIndex = i;
-                    count++;
-                }
+                if (found) continue;
+                hashList[count] = new HashEntry {Hash = new byte[hash.Length]};
+                Buffer.BlockCopy(hash, 0, hashList[count].Hash, 0, hash.Length);
+                hashList[count].Count = 1;
+                hashList[count].BlockIndex = i;
+                count++;
             }
             // find the most common hash
-            for (int i = 0; i < count; i++)
-                if (hash_list[i].Count > rec_count)
+            for (var i = 0; i < count; i++)
+                if (hashList[i].Count > recCount)
                 {
-                    rec_count = hash_list[i].Count;
-                    rec_idx = i;
+                    recCount = hashList[i].Count;
+                    recIdx = i;
                 }
 
-            if (rec_count == 0)
+            if (recCount == 0)
                 return null;
 
             //final DISA check
-            int foundOffset = hash_list[rec_idx].BlockIndex * 0x200;
+            var foundOffset = hashList[recIdx].BlockIndex * 0x200;
             if (((input[0x100] ^ input[foundOffset + 0x100]) != 'D') ||
                 ((input[0x101] ^ input[foundOffset + 0x101]) != 'I') ||
                 ((input[0x102] ^ input[foundOffset + 0x102]) != 'S') ||
                 ((input[0x103] ^ input[foundOffset + 0x103]) != 'A'))
                 return null; //That's not it
 
-            outbuf = new byte[0x200];
+            var outbuf = new byte[0x200];
             Buffer.BlockCopy(input, foundOffset, outbuf, 0, 0x200);
 
             return outbuf;
         }
 
-        public static bool isEncrypted(string path)
+        private static bool IsEncrypted(string path)
         {
             //check if encrypted
-            FileStream fs = File.OpenRead(path);
-            byte[] magic = new byte[4];
+            var fs = File.OpenRead(path);
+            var magic = new byte[4];
             fs.Seek(0x1000, SeekOrigin.Begin); //Start of information
-            while ((fs.Length - fs.Position > 0x200) & !SRAMTool.isSaveMagic(magic))
+            while ((fs.Length - fs.Position > 0x200) & !IsSaveMagic(magic))
             {
                 fs.Read(magic, 0, 4);
                 fs.Seek(0x200 - 4, SeekOrigin.Current);
             }
-            long result = fs.Length - fs.Position;
+            var result = fs.Length - fs.Position;
             fs.Close();
             return (result <= 0x200);
         }
 
-        public static byte[] ReadByteArray(Stream fs, int size)
+        private static byte[] ReadByteArray(Stream fs, int size)
         {
-            byte[] buffer = new byte[size];
+            var buffer = new byte[size];
             fs.Read(buffer, 0, size);
             return buffer;
         }
 
-        public static uint ReadUInt32(Stream fs)
+        private static uint ReadUInt32(Stream fs)
         {
-            byte[] buffer = new byte[4];
+            var buffer = new byte[4];
             fs.Read(buffer, 0, 4);
             return BitConverter.ToUInt32(buffer, 0);
         }
 
         public static ulong ReadUInt64(Stream fs)
         {
-            byte[] buffer = new byte[8];
+            var buffer = new byte[8];
             fs.Read(buffer, 0, 8);
             return BitConverter.ToUInt64(buffer, 0);
         }
 
         public static SRAMContext Open(string path, ref string errorMessage)
         {
-            SRAMContext cxt = new SRAMContext();
-
-            cxt.Encrypted = isEncrypted(path);
+            var cxt = new SRAMContext {Encrypted = IsEncrypted(path)};
 
             //get the file into buffer to find the key if needed
-            byte[] fileBuffer = File.ReadAllBytes(path);
-            MemoryStream ms = new MemoryStream(fileBuffer);
+            var fileBuffer = File.ReadAllBytes(path);
+            var ms = new MemoryStream(fileBuffer);
 
-            cxt.fileHeader = MarshalTool.ReadStruct<SRAMHeader>(ms);
+            cxt.FileHeader = MarshalTool.ReadStruct<SRAMHeader>(ms);
 
             //get the blockmap headers
-            int bmSize = (int)(ms.Length >> 12) - 1;
+            var bmSize = (int)(ms.Length >> 12) - 1;
             cxt.Blockmap = new SRAMHeaderEntry[bmSize];
             cxt.MemoryMap = new byte[bmSize];
-            for (int i = 0; i < cxt.Blockmap.Length; i++)
+            for (var i = 0; i < cxt.Blockmap.Length; i++)
             {
                 cxt.Blockmap[i] = MarshalTool.ReadStruct<SRAMHeaderEntry>(ms);
                 cxt.MemoryMap[i] = cxt.Blockmap[i].PhysicalSector;
             }
             //Check crc16
-            byte[] twoBytes = new byte[2], crcBytes = new byte[2];
+            var crcBytes = new byte[2];
             ms.Read(crcBytes, 0, 2);
-            twoBytes = CRC16.GetCRC(fileBuffer, 0, ms.Position - 2);
+            var twoBytes = CRC16.GetCRC(fileBuffer, 0, ms.Position - 2);
             if (crcBytes[0] != twoBytes[0] || crcBytes[1] != twoBytes[1])
             {
                 errorMessage = "CRC Error or Corrupt Save file.";
                 ms.Close();
                 return null;
             }
-            else
+            //get journal updates
+            var jSize = (int)(0x1000 - ms.Position) / Marshal.SizeOf(typeof(SRAMLongSectorEntry));
+            cxt.Journal = new SRAMLongSectorEntry[jSize];
+            cxt.JournalSize = 0;
+            uint jc = 0;
+            while (ms.Position < 0x1000) //assure stopping
             {
-                //get journal updates
-                int jSize = (int)(0x1000 - ms.Position) / Marshal.SizeOf(typeof(SRAMLongSectorEntry));
-                cxt.Journal = new SRAMLongSectorEntry[jSize];
-                cxt.JournalSize = 0;
-                uint jc = 0;
-                while (ms.Position < 0x1000) //assure stopping
+                cxt.Journal[jc] = MarshalTool.ReadStruct<SRAMLongSectorEntry>(ms);
+                if (IsFF(cxt.Journal[jc].Sector.CheckSums))
+                    break;
+                cxt.MemoryMap[cxt.Journal[jc].Sector.VirtualSector] = cxt.Journal[jc].Sector.PhysicalSector;
+                jc++;
+            }
+            cxt.JournalSize = jc;
+
+            //rearragne by virtual
+            cxt.Image = new byte[fileBuffer.Length - 0x1000];
+            for (var i = 0; i < cxt.MemoryMap.Length; i++)
+                Buffer.BlockCopy(fileBuffer, (cxt.MemoryMap[i] & 0x7F) * 0x1000, cxt.Image, i * 0x1000, 0x1000);
+
+            if (cxt.Encrypted)
+            {
+                var key = FindKey(cxt.Image);
+                if (key == null)
                 {
-                    cxt.Journal[jc] = MarshalTool.ReadStruct<SRAMLongSectorEntry>(ms);
-                    if (!SRAMTool.isFF(cxt.Journal[jc].Sector.CheckSums)) //check if we got a valid checksum
-                    {
-                        cxt.MemoryMap[cxt.Journal[jc].Sector.VirtualSector] = cxt.Journal[jc].Sector.PhysicalSector;
-                        jc++;
-                    }
-                    else //if not then it's probably the end of the journal
-                        break;
+                    ms.Close();
+                    key = MakeKey(cxt.Image);
+                    File.WriteAllBytes(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + "_img.bin", cxt.Image);
+                    XorByteArray(cxt.Image, key, 0);
+                    File.WriteAllBytes(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + "_dec.bin", cxt.Image);
+                    File.WriteAllBytes(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + "_key.bin", key);
+                    errorMessage = "Can't find key in binary file." + Environment.NewLine + 
+                                   "Tried to create a key and saved the binaries to " + Environment.NewLine + 
+                                   Environment.NewLine +
+                                   "_img, _dec & _key";
+                    return null;
                 }
-                cxt.JournalSize = jc;
+                XorByteArray(cxt.Image, key, 0);
+                //XorExperimental(fileBuffer, key, 0x1000);
+                cxt.Key = key;
+            }
 
-                //rearragne by virtual
-                cxt.image = new byte[fileBuffer.Length - 0x1000];
-                for (int i = 0; i < cxt.MemoryMap.Length; i++)
-                    Buffer.BlockCopy(fileBuffer, (cxt.MemoryMap[i] & 0x7F) * 0x1000, cxt.image, i * 0x1000, 0x1000);
-
-                if (cxt.Encrypted)
-                {
-                    byte[] key = FindKey(cxt.image);
-                    if (key == null)
-                    {
-                        ms.Close();
-                        key = MakeKey(cxt.image);
-                        File.WriteAllBytes(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + "_img.bin", cxt.image);
-                        XorByteArray(cxt.image, key, 0);
-                        File.WriteAllBytes(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + "_dec.bin", cxt.image);
-                        File.WriteAllBytes(Path.GetDirectoryName(path) + "\\" + Path.GetFileNameWithoutExtension(path) + "_key.bin", key);
-                        errorMessage = "Can't find key in binary file." + Environment.NewLine + 
-                                        "Tried to create a key and saved the binaries to " + Environment.NewLine + 
-                                        Environment.NewLine +
-                                        "_img, _dec & _key";
-                        return null;
-                    }
-                    else
-                    {
-                        XorByteArray(cxt.image, key, 0);
-                        //XorExperimental(fileBuffer, key, 0x1000);
-                        cxt.Key = key;
-                    }
-                }
-
-                /*
+            /*
                 if ((cxt.image[0x100] != 'D') || (cxt.image[0x101] != 'I') || (cxt.image[0x102] != 'S') || (cxt.image[0x103] != 'A'))
                 {   //Might be second encryption
                     byte[] key = FindKey(fileBuffer);
@@ -608,56 +588,55 @@ namespace _3DSExplorer
                     File.WriteAllBytes("image.bin", cxt.image);
                 }*/
 
-                MemoryStream ims = new MemoryStream(cxt.image);
-                cxt.ImageHash = ReadByteArray(ims, Sizes.MD5);
-                //Go to start of image
-                ims.Seek(0x100, SeekOrigin.Begin);
-                cxt.Disa = MarshalTool.ReadStruct<DISA>(ims);
-                cxt.isData = cxt.Disa.TableSize > 1;
-                if (!SRAMTool.isDisaMagic(cxt.Disa.Magic))
-                {
-                    errorMessage = "Corrupt Save File!";
-                    ms.Close();
-                    ims.Close();
-                    return null;
-                }
-                //Which table to read
-                if ((cxt.Disa.ActiveTable & 1) == 1) //second table
-                    ims.Seek((long)cxt.Disa.PrimaryTableOffset, SeekOrigin.Begin);
+            var ims = new MemoryStream(cxt.Image);
+            cxt.ImageHash = ReadByteArray(ims, Sizes.MD5);
+            //Go to start of image
+            ims.Seek(0x100, SeekOrigin.Begin);
+            cxt.Disa = MarshalTool.ReadStruct<DISA>(ims);
+            cxt.IsData = cxt.Disa.TableSize > 1;
+            if (!IsDisaMagic(cxt.Disa.Magic))
+            {
+                errorMessage = "Corrupt Save File!";
+                ms.Close();
+                ims.Close();
+                return null;
+            }
+            //Which table to read
+            if ((cxt.Disa.ActiveTable & 1) == 1) //second table
+                ims.Seek((long)cxt.Disa.PrimaryTableOffset, SeekOrigin.Begin);
+            else
+                ims.Seek((long)cxt.Disa.SecondaryTableOffset, SeekOrigin.Begin);
+
+            cxt.Partitions = new Partition[cxt.Disa.TableSize];
+            for (var i = 0; i < cxt.Partitions.Length; i++)
+            {
+                //var startOfDifi = ims.Position;
+                cxt.Partitions[i] = new Partition
+                                        {
+                                            Difi = MarshalTool.ReadStruct<DIFI>(ims),
+                                            Ivfc = MarshalTool.ReadStruct<IVFC>(ims),
+                                            Dpfs = MarshalTool.ReadStruct<DPFS>(ims),
+                                            Hash = ReadByteArray(ims, Sizes.SHA256)
+                                        };
+                ims.Seek(4, SeekOrigin.Current); // skip garbage
+            }
+
+            for (var p = 0; p < cxt.Partitions.Length; p++)
+            {
+                if (p == 0)
+                    ims.Seek((long)cxt.Disa.SAVEPartitionOffset, SeekOrigin.Begin);
                 else
-                    ims.Seek((long)cxt.Disa.SecondaryTableOffset, SeekOrigin.Begin);
+                    ims.Seek((long)cxt.Disa.DATAPartitionOffset, SeekOrigin.Begin);
 
-                cxt.Partitions = new Partition[cxt.Disa.TableSize];
-                for (int i = 0; i < cxt.Partitions.Length; i++)
-                {
-                    long startOfDifi = ims.Position;
-                    cxt.Partitions[i] = new Partition();
-                    cxt.Partitions[i].Difi = MarshalTool.ReadStruct<DIFI>(ims);
-                    //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.IVFCOffset, SeekOrigin.Begin);
-                    cxt.Partitions[i].Ivfc = MarshalTool.ReadStruct<IVFC>(ims);
-                    //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.DPFSOffset, SeekOrigin.Begin);
-                    cxt.Partitions[i].Dpfs = MarshalTool.ReadStruct<DPFS>(ims);
-                    //ims.Seek(startOfDifi + cxt.Partitions[i].Difi.HashOffset, SeekOrigin.Begin);
-                    cxt.Partitions[i].Hash = ReadByteArray(ims, Sizes.SHA256);
-                    ims.Seek(4, SeekOrigin.Current); // skip garbage
-                }
+                cxt.Partitions[p].OffsetInImage = (ulong)ims.Position;
 
-                for (int p = 0; p < cxt.Partitions.Length; p++)
-                {
-                    if (p == 0)
-                        ims.Seek((long)cxt.Disa.SAVEPartitionOffset, SeekOrigin.Begin);
-                    else
-                        ims.Seek((long)cxt.Disa.DATAPartitionOffset, SeekOrigin.Begin);
-
-                    cxt.Partitions[p].OffsetInImage = (ulong)ims.Position;
-
-                    ims.Seek((long)cxt.Partitions[p].Dpfs.FirstTableOffset, SeekOrigin.Current);
-                    cxt.Partitions[p].FirstFlag = ReadUInt32(ims);
-                    cxt.Partitions[p].FirstFlagDupe = ReadUInt32(ims);
-                    cxt.Partitions[p].SecondFlag = ReadUInt32(ims);
-                    ims.Seek((long)cxt.Partitions[p].Dpfs.SecondTableLength - 4, SeekOrigin.Current);
-                    cxt.Partitions[p].SecondFlagDupe = ReadUInt32(ims);
-                    /*
+                ims.Seek((long)cxt.Partitions[p].Dpfs.FirstTableOffset, SeekOrigin.Current);
+                cxt.Partitions[p].FirstFlag = ReadUInt32(ims);
+                cxt.Partitions[p].FirstFlagDupe = ReadUInt32(ims);
+                cxt.Partitions[p].SecondFlag = ReadUInt32(ims);
+                ims.Seek((long)cxt.Partitions[p].Dpfs.SecondTableLength - 4, SeekOrigin.Current);
+                cxt.Partitions[p].SecondFlagDupe = ReadUInt32(ims);
+                /*
                     cxt.Partitions[p].FirstFlagTableDupe = new byte[cxt.Partitions[p].Dpfs.FirstTableLength / 4];
                     for (int i = 0; i < cxt.Partitions[p].FirstFlagTableDupe.Length; i++)
                         cxt.Partitions[p].FirstFlagTableDupe[i] = ReadUInt32(ims);
@@ -669,111 +648,110 @@ namespace _3DSExplorer
                         cxt.Partitions[p].SecondFlagTableDupe[i] = ReadUInt32(ims); 
                     */
 
-                    ims.Seek((long)(cxt.Partitions[p].OffsetInImage + cxt.Partitions[p].Dpfs.OffsetToData), SeekOrigin.Begin);
+                ims.Seek((long)(cxt.Partitions[p].OffsetInImage + cxt.Partitions[p].Dpfs.OffsetToData), SeekOrigin.Begin);
 
-                    //Get hashes table
-                    ims.Seek((long)cxt.Partitions[p].Ivfc.HashTableOffset, SeekOrigin.Current);
-                    cxt.Partitions[p].HashTable = new byte[cxt.Partitions[p].Ivfc.HashTableLength / 0x20][];
-                    for (int i = 0; i < cxt.Partitions[p].HashTable.Length; i++)
-                        cxt.Partitions[p].HashTable[i] = ReadByteArray(ims, 0x20);
+                //Get hashes table
+                ims.Seek((long)cxt.Partitions[p].Ivfc.HashTableOffset, SeekOrigin.Current);
+                cxt.Partitions[p].HashTable = new byte[cxt.Partitions[p].Ivfc.HashTableLength / 0x20][];
+                for (int i = 0; i < cxt.Partitions[p].HashTable.Length; i++)
+                    cxt.Partitions[p].HashTable[i] = ReadByteArray(ims, 0x20);
 
-                    ims.Seek((long)(cxt.Partitions[p].OffsetInImage + cxt.Partitions[p].Dpfs.OffsetToData), SeekOrigin.Begin);
+                ims.Seek((long)(cxt.Partitions[p].OffsetInImage + cxt.Partitions[p].Dpfs.OffsetToData), SeekOrigin.Begin);
 
-                    //jump to dupe if needed (SAVE partition is written twice)
-                    if ((cxt.Partitions[p].SecondFlag & 0x20000000) == 0) //*** EXPERIMENTAL ***
-                        ims.Seek((long)cxt.Partitions[p].Dpfs.DataLength, SeekOrigin.Current);
+                //jump to dupe if needed (SAVE partition is written twice)
+                if ((cxt.Partitions[p].SecondFlag & 0x20000000) == 0) //*** EXPERIMENTAL ***
+                    ims.Seek((long)cxt.Partitions[p].Dpfs.DataLength, SeekOrigin.Current);
 
-                    ims.Seek((long)cxt.Partitions[p].Ivfc.FileSystemOffset, SeekOrigin.Current);
+                ims.Seek((long)cxt.Partitions[p].Ivfc.FileSystemOffset, SeekOrigin.Current);
 
-                    if (p == 0)
+                if (p == 0)
+                {
+                    long saveOffset = ims.Position;
+                    cxt.Save = MarshalTool.ReadStruct<SAVE>(ims);
+                    //add SAVE information (if exists) (suppose to...)
+                    if (IsSaveMagic(cxt.Save.Magic)) //read 
                     {
-                        long saveOffset = ims.Position;
-                        cxt.Save = MarshalTool.ReadStruct<SAVE>(ims);
-                        //add SAVE information (if exists) (suppose to...)
-                        if (SRAMTool.isSaveMagic(cxt.Save.Magic)) //read 
-                        {
-                            ims.Seek(saveOffset + (long)cxt.Save.FileMapOffset, SeekOrigin.Begin);
-                            cxt.FilesMap = new uint[cxt.Save.FileMapSize];
-                            for (int i = 0; i < cxt.FilesMap.Length; i++)
-                                cxt.FilesMap[i] = ReadUInt32(ims);
-                            ims.Seek(saveOffset + (long)cxt.Save.FolderMapOffset, SeekOrigin.Begin);
-                            cxt.FoldersMap= new uint[cxt.Save.FolderMapSize];
-                            for (int i = 0; i < cxt.FoldersMap.Length; i++)
-                                cxt.FoldersMap[i] = ReadUInt32(ims);
-                            ims.Seek(saveOffset + (long)cxt.Save.BlockMapOffset, SeekOrigin.Begin);
-                            SRAMBlockMapEntry first = MarshalTool.ReadStruct<SRAMBlockMapEntry>(ims);
-                            cxt.BlockMap = new SRAMBlockMapEntry[first.EndBlock + 2];
-                            cxt.BlockMap[0] = first;
-                            for (uint i = 1; i < cxt.BlockMap.Length; i++)
-                                cxt.BlockMap[i] = MarshalTool.ReadStruct<SRAMBlockMapEntry>(ims);
+                        ims.Seek(saveOffset + (long)cxt.Save.FileMapOffset, SeekOrigin.Begin);
+                        cxt.FilesMap = new uint[cxt.Save.FileMapSize];
+                        for (int i = 0; i < cxt.FilesMap.Length; i++)
+                            cxt.FilesMap[i] = ReadUInt32(ims);
+                        ims.Seek(saveOffset + (long)cxt.Save.FolderMapOffset, SeekOrigin.Begin);
+                        cxt.FoldersMap= new uint[cxt.Save.FolderMapSize];
+                        for (int i = 0; i < cxt.FoldersMap.Length; i++)
+                            cxt.FoldersMap[i] = ReadUInt32(ims);
+                        ims.Seek(saveOffset + (long)cxt.Save.BlockMapOffset, SeekOrigin.Begin);
+                        var first = MarshalTool.ReadStruct<SRAMBlockMapEntry>(ims);
+                        cxt.BlockMap = new SRAMBlockMapEntry[first.EndBlock + 2];
+                        cxt.BlockMap[0] = first;
+                        for (uint i = 1; i < cxt.BlockMap.Length; i++)
+                            cxt.BlockMap[i] = MarshalTool.ReadStruct<SRAMBlockMapEntry>(ims);
                             
-                            //-- Get folders -- (and set filebase 'while at it')
-                            if (!cxt.isData)
-                            {
-                                cxt.fileBase = saveOffset + (long)cxt.Save.FileStoreOffset;
-                                ims.Seek(cxt.fileBase + cxt.Save.FolderTableOffset * 0x200, SeekOrigin.Begin);
-                            }
-                            else
-                            {   //file base is remote
-                                cxt.fileBase = (long)(cxt.Disa.DATAPartitionOffset + cxt.Partitions[1].Difi.FileBase);
-                                ims.Seek(saveOffset + cxt.Save.FolderTableOffset, SeekOrigin.Begin);
-                            }
-                            FileSystemFolderEntry froot = MarshalTool.ReadStruct<FileSystemFolderEntry>(ims);
-                            cxt.Folders = new FileSystemFolderEntry[froot.ParentFolderIndex - 1];
-                            if (froot.ParentFolderIndex > 1) //if has folders
-                                for (int i = 0; i < cxt.Folders.Length; i++)
-                                    cxt.Folders[i] = MarshalTool.ReadStruct<FileSystemFolderEntry>(ims);
-
-                            //-- Get files --
-                            //go to FST
-                            if (!cxt.isData)
-                                ims.Seek(cxt.fileBase + cxt.Save.FSTOffset * 0x200, SeekOrigin.Begin);
-                            else //file base is remote
-                                ims.Seek(saveOffset + cxt.Save.FSTOffset, SeekOrigin.Begin);
-
-                            FileSystemFileEntry root = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
-                            cxt.Files = new FileSystemFileEntry[root.ParentFolderIndex - 1];
-                            if ((root.ParentFolderIndex > 1) && (root.Magic == 0)) //if has files
-                                for (int i = 0; i < cxt.Files.Length; i++)
-                                    cxt.Files[i] = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
+                        //-- Get folders -- (and set filebase 'while at it')
+                        if (!cxt.IsData)
+                        {
+                            cxt.FileBase = saveOffset + (long)cxt.Save.FileStoreOffset;
+                            ims.Seek(cxt.FileBase + cxt.Save.FolderTableOffset * 0x200, SeekOrigin.Begin);
                         }
                         else
-                        {   //Not a legal SAVE filesystem
-                            cxt.Folders = new FileSystemFolderEntry[0];
-                            cxt.Files = new FileSystemFileEntry[0]; 
+                        {   //file base is remote
+                            cxt.FileBase = (long)(cxt.Disa.DATAPartitionOffset + cxt.Partitions[1].Difi.FileBase);
+                            ims.Seek(saveOffset + cxt.Save.FolderTableOffset, SeekOrigin.Begin);
                         }
-                    } // end if (p == 0)
-                } //end foreach (partitions)
-                ims.Close();
-            } //end if crc is ok
+                        var froot = MarshalTool.ReadStruct<FileSystemFolderEntry>(ims);
+                        cxt.Folders = new FileSystemFolderEntry[froot.ParentFolderIndex - 1];
+                        if (froot.ParentFolderIndex > 1) //if has folders
+                            for (int i = 0; i < cxt.Folders.Length; i++)
+                                cxt.Folders[i] = MarshalTool.ReadStruct<FileSystemFolderEntry>(ims);
+
+                        //-- Get files --
+                        //go to FST
+                        if (!cxt.IsData)
+                            ims.Seek(cxt.FileBase + cxt.Save.FSTOffset * 0x200, SeekOrigin.Begin);
+                        else //file base is remote
+                            ims.Seek(saveOffset + cxt.Save.FSTOffset, SeekOrigin.Begin);
+
+                        var root = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
+                        cxt.Files = new FileSystemFileEntry[root.ParentFolderIndex - 1];
+                        if ((root.ParentFolderIndex > 1) && (root.Magic == 0)) //if has files
+                            for (int i = 0; i < cxt.Files.Length; i++)
+                                cxt.Files[i] = MarshalTool.ReadStruct<FileSystemFileEntry>(ims);
+                    }
+                    else
+                    {   //Not a legal SAVE filesystem
+                        cxt.Folders = new FileSystemFolderEntry[0];
+                        cxt.Files = new FileSystemFileEntry[0]; 
+                    }
+                } // end if (p == 0)
+            } //end foreach (partitions)
+            ims.Close();
             ms.Close();
 
             return cxt;
         }
 
-        public static byte[] createSAV(SRAMContext cxt)
+        public static byte[] CreateSAV(SRAMContext cxt)
         {
             //Recompute the partitions' hash tables
             HashAlgorithm ha = SHA256.Create();
-            int offset, hashSize;
-            for (int i = 0; i < cxt.Partitions.Length; i++)
+            int offset;
+            foreach (var partition in cxt.Partitions)
             {
                 // itrerate thorugh the hashes table
-                hashSize = (1 << (int)cxt.Partitions[i].Ivfc.FileSystemBlock);
-                for (int j = 0; j < cxt.Partitions[i].HashTable.Length; j++)
-                    if (!is00(cxt.Partitions[i].HashTable[j])) //hash isn't zero
+                var hashSize = (1 << (int)partition.Ivfc.FileSystemBlock);
+                for (var j = 0; j < partition.HashTable.Length; j++)
+                    if (!Is00(partition.HashTable[j])) //hash isn't zero
                     {
-                        offset = (int)(cxt.Partitions[i].OffsetInImage + cxt.Partitions[i].Dpfs.OffsetToData  + cxt.Partitions[i].Ivfc.FileSystemOffset);
+                        offset = (int)(partition.OffsetInImage + partition.Dpfs.OffsetToData  + partition.Ivfc.FileSystemOffset);
                         offset += j * hashSize;
-                        cxt.Partitions[i].HashTable[j] = ha.ComputeHash(cxt.image, offset, hashSize);
+                        partition.HashTable[j] = ha.ComputeHash(cxt.Image, offset, hashSize);
                         //write it into the image
-                        offset = (int)(cxt.Partitions[i].OffsetInImage + cxt.Partitions[i].Dpfs.OffsetToData + cxt.Partitions[i].Ivfc.HashTableOffset);
+                        offset = (int)(partition.OffsetInImage + partition.Dpfs.OffsetToData + partition.Ivfc.HashTableOffset);
                         offset += j * Sizes.SHA256;
-                        Buffer.BlockCopy(cxt.Partitions[i].HashTable[j], 0, cxt.image, offset, Sizes.SHA256);
+                        Buffer.BlockCopy(partition.HashTable[j], 0, cxt.Image, offset, Sizes.SHA256);
                     }
             }
 
-            SHA256 sha256 = SHA256.Create();
+            var sha256 = SHA256.Create();
 
             /*TODO:
             
@@ -783,9 +761,9 @@ namespace _3DSExplorer
             */
 
             offset = (int)((cxt.Disa.ActiveTable & 1) == 1 ? cxt.Disa.PrimaryTableOffset : cxt.Disa.SecondaryTableOffset);
-            byte[] newDisaHash = sha256.ComputeHash(cxt.image, offset, (int)cxt.Disa.TableLength);
+            var newDisaHash = sha256.ComputeHash(cxt.Image, offset, (int)cxt.Disa.TableLength);
             Buffer.BlockCopy(newDisaHash, 0, cxt.Disa.Hash, 0, Sizes.SHA256); //fix context
-            Buffer.BlockCopy(newDisaHash, 0, cxt.image, 0x16C, Sizes.SHA256); //fix image
+            Buffer.BlockCopy(newDisaHash, 0, cxt.Image, 0x16C, Sizes.SHA256); //fix image
 
             /*TODO:
             
@@ -794,14 +772,14 @@ namespace _3DSExplorer
             */
 
 
-            MemoryStream ms = new MemoryStream();
+            var ms = new MemoryStream();
 
-            int blockmapEntrySize = Marshal.SizeOf(typeof(SRAMHeaderEntry));
-            int sfHeaderSize = Marshal.SizeOf(typeof(SRAMHeader));
-            byte[] crcBlock = new byte[blockmapEntrySize * cxt.Blockmap.Length + sfHeaderSize];
+            var blockmapEntrySize = Marshal.SizeOf(typeof(SRAMHeaderEntry));
+            var sfHeaderSize = Marshal.SizeOf(typeof(SRAMHeader));
+            var crcBlock = new byte[blockmapEntrySize * cxt.Blockmap.Length + sfHeaderSize];
             
             //Prepare the file header
-            byte[] temp = MarshalTool.StructureToByteArray<SRAMHeader>(cxt.fileHeader);
+            var temp = MarshalTool.StructureToByteArray(cxt.FileHeader);
             Buffer.BlockCopy(temp, 0, crcBlock, 0, temp.Length);
 
             //Update & Prepare the blockmap (straight)
@@ -814,9 +792,9 @@ namespace _3DSExplorer
             {
                 cxt.Blockmap[i].AllocationCount = 0;
                 cxt.Blockmap[i].PhysicalSector = (byte)(i + 0x81); //checksum flag + 1 (offset from file header)
-                for (int j = 0; j < cxt.Blockmap[i].CheckSums.Length; j++)
-                    cxt.Blockmap[i].CheckSums[j] = CRC16.CS(CRC16.GetCRC(cxt.image, 0x1000 * i + 0x200 * j, 0x200));
-                temp = MarshalTool.StructureToByteArray<SRAMHeaderEntry>(cxt.Blockmap[i]);
+                for (var j = 0; j < cxt.Blockmap[i].CheckSums.Length; j++)
+                    cxt.Blockmap[i].CheckSums[j] = CRC16.Xor2(CRC16.GetCRC(cxt.Image, 0x1000 * i + 0x200 * j, 0x200));
+                temp = MarshalTool.StructureToByteArray(cxt.Blockmap[i]);
                 Buffer.BlockCopy(temp,0,crcBlock, sfHeaderSize + i * blockmapEntrySize,blockmapEntrySize);
             }
             //Write the header and the blockmap
@@ -830,8 +808,8 @@ namespace _3DSExplorer
                 ms.WriteByte(0xFF);
 
             //Write the image
-            ms.Write(cxt.image, 0, cxt.image.Length);
-            byte[] buffer = ms.ToArray();
+            ms.Write(cxt.Image, 0, cxt.Image.Length);
+            var buffer = ms.ToArray();
 
             //XOR with the key
             XorByteArray(buffer, cxt.Key, 0x1000);
@@ -854,8 +832,8 @@ namespace _3DSExplorer
                 case SRAMView.Image:
                     DISA disa = cxt.Disa;
                     f.SetGroupHeaders("SRAM", "Image");
-                    f.AddListItem(0x000, 4, "Unknown 1", cxt.fileHeader.Unknown1, 0);
-                    f.AddListItem(0x004, 4, "Unknown 2", cxt.fileHeader.Unknown2, 0);
+                    f.AddListItem(0x000, 4, "Unknown 1", cxt.FileHeader.Unknown1, 0);
+                    f.AddListItem(0x004, 4, "Unknown 2", cxt.FileHeader.Unknown2, 0);
                     f.AddListItem(0, 4, "** Blockmap length", (ulong)cxt.Blockmap.Length, 0);
                     f.AddListItem(0, 4, "** Journal size", cxt.JournalSize, 0);
                     f.AddListItem(0, 0x10, "** Image Hash", cxt.ImageHash, 1);
@@ -904,10 +882,10 @@ namespace _3DSExplorer
                     f.AddListItem(0x0FC, 4, "Unknown 23", disa.Unknown23, 1);
                     break;
                 case SRAMView.Partition:
-                    DIFI difi = cxt.Partitions[cxt.currentPartition].Difi;
-                    IVFC ivfc = cxt.Partitions[cxt.currentPartition].Ivfc;
-                    DPFS dpfs = cxt.Partitions[cxt.currentPartition].Dpfs;
-                    SAVE save = cxt.Save;
+                    var difi = cxt.Partitions[cxt.CurrentPartition].Difi;
+                    var ivfc = cxt.Partitions[cxt.CurrentPartition].Ivfc;
+                    var dpfs = cxt.Partitions[cxt.CurrentPartition].Dpfs;
+                    var save = cxt.Save;
 
                     f.SetGroupHeaders("DIFI", "IVFC", "DPFS", "Hash", "SAVE", "Folders", "Files");
                     f.AddListItem(0x000, 4, "Magic DIFI", difi.Magic, 0);
@@ -957,9 +935,9 @@ namespace _3DSExplorer
             f.AddListItem(0x000, 4, "* Second Flag Dupe", cxt.Partitions[cxt.currentPartition].SecondFlagDupe, 2);
 #endif
 
-                    f.AddListItem(0x000, 0x20, "Hash", cxt.Partitions[cxt.currentPartition].Hash, 3);
+                    f.AddListItem(0x000, 0x20, "Hash", cxt.Partitions[cxt.CurrentPartition].Hash, 3);
 
-                    if (cxt.currentPartition == 0)
+                    if (cxt.CurrentPartition == 0)
                     {
                         f.AddListItem(0x000, 4, "SAVE Magic", save.Magic, 4);
                         f.AddListItem(0x004, 4, "Magic Padding", save.MagicPadding, 4);
@@ -989,38 +967,38 @@ namespace _3DSExplorer
                         f.AddListItem(0x080, 4, "Files Table Unknown", save.FSTUnknown, 4);
                         f.AddListItem(0x084, 4, "Files Table Media Size", save.FSTMedia, 4);
 
-                        if (SRAMTool.isSaveMagic(save.Magic))
+                        if (IsSaveMagic(save.Magic))
                         {
-                            int i = 1;
-                            foreach (FileSystemFolderEntry fse in cxt.Folders)
+                            var i = 1;
+                            foreach (var fse in cxt.Folders)
                                 f.AddListItem(i++.ToString(),
                                             fse.Index.ToString(),
-                                            Util.charArrayToString(fse.FolderName),
+                                            Util.CharArrayToString(fse.FolderName),
                                             fse.ParentFolderIndex.ToString(),
-                                            Util.toHexString(8, fse.LastFileIndex),
+                                            Util.ToHexString(8, fse.LastFileIndex),
                                             5);
                             i = 1;
-                            foreach (FileSystemFileEntry fse in cxt.Files)
+                            foreach (var fse in cxt.Files)
                                 f.AddListItem(i++.ToString(),
                                             fse.BlockOffset.ToString(),
-                                            "[" + fse.Index + "] " + Util.charArrayToString(fse.Filename) + ", (" + fse.FileSize + "b)",
+                                            "[" + fse.Index + "] " + Util.CharArrayToString(fse.Filename) + ", (" + fse.FileSize + "b)",
                                             fse.ParentFolderIndex.ToString(),
-                                            Util.toHexString(8, fse.Unknown2) + " " + Util.toHexString(8, fse.Magic),
+                                            Util.ToHexString(8, fse.Unknown2) + " " + Util.ToHexString(8, fse.Magic),
                                             6);
                         }
                     }
                     break;
                 case SRAMView.Tables:
                     f.SetGroupHeaders("Files", "Folders", "Unknown");
-                    if (SRAMTool.isSaveMagic(cxt.Save.Magic))
+                    if (IsSaveMagic(cxt.Save.Magic))
                     {
-                        for (int i = 0; i < cxt.FilesMap.Length; i++)
+                        for (var i = 0; i < cxt.FilesMap.Length; i++)
                             f.AddListItem(i, 4, "UInt32", cxt.FilesMap[i], 0);
-                        for (int i = 0; i < cxt.FoldersMap.Length; i++)
+                        for (var i = 0; i < cxt.FoldersMap.Length; i++)
                             f.AddListItem(i, 4, "UInt32", cxt.FoldersMap[i], 1);
 
                         f.AddListItem("", "", "Start", "Start:" + (cxt.BlockMap[0].StartBlock & 0xff) + ", End: " + (cxt.BlockMap[0].EndBlock & 0xff), "Start:" + cxt.BlockMap[0].StartBlock.ToString("X8") + ", End: " + cxt.BlockMap[0].EndBlock.ToString("X8"), 2);
-                        for (int i = 1; i < cxt.BlockMap.Length - 1; i++)
+                        for (var i = 1; i < cxt.BlockMap.Length - 1; i++)
                             f.AddListItem("", (i - 1).ToString(), "Block " + i + (cxt.BlockMap[i].EndBlock == 0x80000000 && cxt.BlockMap[i].StartBlock == 0x80000000 ? " (Start of data)" : ""), "Start:" + (cxt.BlockMap[i].StartBlock & 0xff) + ", End: " + (cxt.BlockMap[i].EndBlock & 0xff), "Start:" + cxt.BlockMap[i].StartBlock.ToString("X8") + ", End: " + cxt.BlockMap[i].EndBlock.ToString("X8"), 2);
                         f.AddListItem("", "", "End", "", "Start:" + (cxt.BlockMap[cxt.BlockMap.Length - 1].StartBlock & 0xff) + ", End: " + (cxt.BlockMap[cxt.BlockMap.Length - 1].EndBlock & 0xff), 2);
                     }
@@ -1030,3 +1008,4 @@ namespace _3DSExplorer
         }
     }
 }
+// ReSharper enable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global

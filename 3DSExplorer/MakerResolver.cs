@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace _3DSExplorer
+﻿namespace _3DSExplorer
 {
     class MakerResolver
     {
         public static string Resolve(char[] chars)
         {
-            String makerCode = chars[0].ToString() + chars[1].ToString();
+            var makerCode = chars[0].ToString() + chars[1].ToString();
             switch (makerCode)
             {
                 case "00": return "Nintendo";
@@ -316,7 +311,7 @@ namespace _3DSExplorer
                 case "GB": return "Konami Computer Entertainment Japan";
                 case "GD": return "Square-Enix";
                 case "IH": return "Yojigen";
-                default: return "";
+                default: return string.Empty;
             }
         }
     }

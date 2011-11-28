@@ -121,7 +121,7 @@ namespace _3DSExplorer
 
             if (key != null && iv != null && data != null && key.Length == 16 && iv.Length == 16)
             {
-                AES128CTR aes = new AES128CTR(key, iv);
+                Aes128Ctr aes = new Aes128Ctr(key, iv);
                 aes.TransformBlock(data);
                 txtDecData.Text = byteArrayToString(data);
             }

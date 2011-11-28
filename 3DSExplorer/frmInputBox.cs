@@ -1,41 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace _3DSExplorer
 {
     public partial class InputBox : Form
     {
-        public string Input;
+        private string _input;
 
-        public InputBox()
+        private InputBox()
         {
             InitializeComponent();
             Text = Application.ProductName;
         }
 
-        private void setLabels(string text)
+        private void SetLabels(string text)
         {
             lblMessage.Text = text;
         }
 
-        public static string ShowDialog(string MessageText)
+        public static string ShowDialog(string messageText)
         {
-            InputBox inBox = new InputBox();
-            inBox.setLabels(MessageText);
-            if (inBox.ShowDialog() == DialogResult.OK)
-                return inBox.Input;
-            return null;
+            var inBox = new InputBox();
+            inBox.SetLabels(messageText);
+            return inBox.ShowDialog() == DialogResult.OK ? inBox._input : null;
         }
 
         private void btnOK_Click(object sender, EventArgs e)
         {
-            Input = txtInput.Text;
+            _input = txtInput.Text;
         }
     }
 }
