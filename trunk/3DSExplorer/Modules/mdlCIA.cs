@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Drawing;
-using System.Drawing.Imaging;
 
+// ReSharper disable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global
 namespace _3DSExplorer
 {
-    public class CIAContext : Context
+    public class CIAContext : IContext
     {
         public CIAHeader header;
         public long CertificateChainOffset;
@@ -136,16 +135,16 @@ namespace _3DSExplorer
                 int blue, red, green, alpha = 0xFF;
                 if ((val & 0x8000) > 0) //If Alpha flag is set then it's Full - 0xFF
                 {
-                    red = lut5to8[(val >> 5) & 0x1f];       //5 bits
-                    green = lut5to8[(val) & 0x1f];          //5 bits
-                    blue = lut5to8[(val >> 10) & 0x1f];     //5 bits
+                    red = lut5to8[(val >> 10) & 0x1f];     //5 bits
+                    blue = lut5to8[(val >> 5) & 0x1f];     //5 bits
+                    green = lut5to8[(val) & 0x1f];         //5 bits
                 }
                 else  //Otherwise the alpha channel is the 3 bits after the flag
                 {
-                    alpha = lut3to8[(val >> 12) & 0x7];     //3 bits
-                    red = 0x11 * ((val >> 4) & 0xf);        //4 bits
-                    green = 0x11 * ((val) & 0xf);           //4 bits
-                    blue = 0x11 * ((val >> 8) & 0xf);       //4 bits
+                    //alpha = lut3to8[(val >> 12) & 0x7];    //3 bits
+                    red = 0x11 * ((val >> 8) & 0xf);       //4 bits
+                    green = 0x11 * ((val >> 4) & 0xf);     //4 bits
+                    blue = 0x11 * ((val) & 0xf);           //4 bits
                 }
                 return Color.FromArgb(alpha, red, green, blue);
             }
@@ -245,3 +244,4 @@ namespace _3DSExplorer
         }
     }
 }
+// ReSharper enable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global

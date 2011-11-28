@@ -2,6 +2,7 @@
 
 namespace _3DSExplorer
 {
+    // ReSharper disable ClassNeverInstantiated.Global, UnusedMember.Local
     public class CRC16
     {
         private const ushort InitalValue = 0xFFFF;
@@ -15,26 +16,26 @@ namespace _3DSExplorer
 
         public static byte[] GetCRC(byte[] message, long offset, long length)
         {
-            ushort CRCFull = InitalValue;
-            char CRCLSB;
+            var crcFull = InitalValue;
 
-            for (long i = offset; i < offset + length; i++)
+            for (var i = offset; i < offset + length; i++)
             {
-                CRCFull = (ushort)(CRCFull ^ message[i]);
-                for (int j = 0; j < 8; j++)
+                crcFull = (ushort)(crcFull ^ message[i]);
+                for (var j = 0; j < 8; j++)
                 {
-                    CRCLSB = (char)(CRCFull & 0x0001);
-                    CRCFull = (ushort)((CRCFull >> 1) & 0x7FFF);
-                    if (CRCLSB == 1)
-                        CRCFull = (ushort)(CRCFull ^ RevPolynomial);
+                    var crclsb = (char)(crcFull & 0x0001);
+                    crcFull = (ushort)((crcFull >> 1) & 0x7FFF);
+                    if (crclsb == 1)
+                        crcFull = (ushort)(crcFull ^ RevPolynomial);
                 }
             }
-            return BitConverter.GetBytes(CRCFull);
+            return BitConverter.GetBytes(crcFull);
         }
 
-        public static byte CS(byte[] crcBytes)
+        public static byte Xor2(byte[] crcBytes)
         {
             return (byte)(crcBytes[0] ^ crcBytes[1]);
         }
     }
+    // ReSharper restore ClassNeverInstantiated.Global, UnusedMember.Local
 }

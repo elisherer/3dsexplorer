@@ -1,17 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
+// ReSharper disable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global
 namespace _3DSExplorer
 {
-    public class TMDContext : Context
+    public class TMDContext : IContext
     {
-        public TMDHeader head;
+        public TMDHeader Head;
         public SignatureType SignatureType;
         public TMDContentInfoRecord[] ContentInfoRecords;
-        public TMDContentChunkRecord[] chunks;
+        public TMDContentChunkRecord[] Chunks;
         public byte[] Hash;
         public ArrayList Certificates; //of CertificateEntry
     }
@@ -75,7 +75,7 @@ namespace _3DSExplorer
 
     public class TMDTool
     {
-        private static string typeToString(ushort type)
+        private static string TypeToString(ushort type)
         {
             string ret = "";
             if ((type & 1) != 0)
@@ -93,9 +93,8 @@ namespace _3DSExplorer
 
         public static TMDContext Open(string path)
         {
-            TMDContext cxt;
-            FileStream fs = File.OpenRead(path);
-            cxt = OpenFromStream(fs, 0, fs.Length);
+            var fs = File.OpenRead(path);
+            var cxt = OpenFromStream(fs, 0, fs.Length);
             if (cxt != null)
             {
                 cxt.Certificates = new ArrayList();
@@ -107,13 +106,13 @@ namespace _3DSExplorer
 
         public static TMDContext OpenFromStream(FileStream fs, long offset, long tmdLength)
         {
-            TMDContext cxt = new TMDContext();
+            var cxt = new TMDContext();
 
             fs.Seek(offset, SeekOrigin.Begin);
 
-            bool supported = true;
+            var supported = true;
 
-            byte[] intBytes = new byte[4];
+            var intBytes = new byte[4];
             fs.Read(intBytes, 0, 4);
             cxt.SignatureType = (SignatureType)BitConverter.ToInt32(intBytes, 0);
             // Read the TMD RSA Type 
@@ -127,13 +126,13 @@ namespace _3DSExplorer
             {
                 fs.Read(cxt.Hash, 0, cxt.Hash.Length);
                 //Continue reading header
-                cxt.head = MarshalTool.ReadStructBE<TMDHeader>(fs); //read header
+                cxt.Head = MarshalTool.ReadStructBE<TMDHeader>(fs); //read header
                 cxt.ContentInfoRecords = new TMDContentInfoRecord[64];
-                for (int i = 0; i < cxt.ContentInfoRecords.Length; i++)
+                for (var i = 0; i < cxt.ContentInfoRecords.Length; i++)
                     cxt.ContentInfoRecords[i] = MarshalTool.ReadStructBE<TMDContentInfoRecord>(fs);
-                cxt.chunks = new TMDContentChunkRecord[cxt.head.ContentCount];// new ArrayList();
-                for (int i = 0; i < cxt.head.ContentCount; i++)
-                    cxt.chunks[i] = MarshalTool.ReadStructBE<TMDContentChunkRecord>(fs);
+                cxt.Chunks = new TMDContentChunkRecord[cxt.Head.ContentCount];// new ArrayList();
+                for (var i = 0; i < cxt.Head.ContentCount; i++)
+                    cxt.Chunks[i] = MarshalTool.ReadStructBE<TMDContentChunkRecord>(fs);
             }
             return (supported ? cxt : null);
         }
@@ -150,7 +149,7 @@ namespace _3DSExplorer
             switch (view)
             {
                 case TMDView.TMD:
-                    TMDHeader head = cxt.head;
+                    TMDHeader head = cxt.Head;
                     f.SetGroupHeaders("TMD");
                     f.AddListItem(0, 4, "Signature Type", (ulong)cxt.SignatureType, 0);
                     int off = 4;
@@ -184,7 +183,7 @@ namespace _3DSExplorer
                     break;
                 case TMDView.ContentInfoRecord:
                     f.SetGroupHeaders("TMD Content Records");
-                    for (int i = 0; i < 64; i++)
+                    for (var i = 0; i < 64; i++)
                     {
                         f.AddListItem(i * 36, 2, "Content Command Count", cxt.ContentInfoRecords[i].ContentCommandCount, 0);
                         f.AddListItem(i * 36 + 2, 2, "Content Index Offset", cxt.ContentInfoRecords[i].ContentIndexOffset, 0);
@@ -192,16 +191,14 @@ namespace _3DSExplorer
                     }
                     break;
                 case TMDView.ContentChunkRecord:
-                    TMDContentChunkRecord cr;
                     f.SetGroupHeaders("TMD Content Chunks");
-                    for (int i = 0; i < cxt.chunks.Length; i++)
+                    for (var i = 0; i < cxt.Chunks.Length; i++)
                     {
-                        cr = (TMDContentChunkRecord)cxt.chunks[i];
-                        f.AddListItem(i, 4, "Content ID", cr.ContentID, 0);
-                        f.AddListItem(0, 2, "Content Index", cr.ContentIndex, 0);
-                        f.AddListItem(0, 2, "Content Type (=" + typeToString(cr.ContentType) + ")", cr.ContentType, 0);
-                        f.AddListItem(0, 8, "Content Size", cr.ContentSize, 0);
-                        f.AddListItem(0, 32, "Content Hash", cr.ContentHash, 0);
+                        f.AddListItem(i, 4, "Content ID", cxt.Chunks[i].ContentID, 0);
+                        f.AddListItem(0, 2, "Content Index", cxt.Chunks[i].ContentIndex, 0);
+                        f.AddListItem(0, 2, "Content Type (=" + TypeToString(cxt.Chunks[i].ContentType) + ")", cxt.Chunks[i].ContentType, 0);
+                        f.AddListItem(0, 8, "Content Size", cxt.Chunks[i].ContentSize, 0);
+                        f.AddListItem(0, 32, "Content Hash", cxt.Chunks[i].ContentHash, 0);
                     }
                     break;
             }
@@ -210,3 +207,4 @@ namespace _3DSExplorer
 
     }
 }
+// ReSharper enable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global
