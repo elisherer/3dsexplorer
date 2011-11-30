@@ -2,30 +2,34 @@
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.ComponentModel;
+using System.Net;
 
 namespace _3DSExplorer
 {
     public partial class frmExplorer : Form
     {
-        IContext _currentContext;
-        string _filePath;
+        private IContext _currentContext;
+        private string _filePath, _remoteVer;
+        private bool _checkNow = false;
 
         public frmExplorer()
         {
             InitializeComponent();
             InitializeForm();
+            if (Properties.Settings.Default.CheckForUpdatesOnStartup)
+                bwCheckForUpdates.RunWorkerAsync();
         }
 
-        public frmExplorer(string path)
+        public frmExplorer(string path) : this()
         {
-            InitializeComponent();
-            InitializeForm();
             OpenFile(path);
         }
 
         private void InitializeForm()
         {
             Text = @"3DS Explorer v." + Application.ProductVersion;
+            menuHelpCheckUpdates.Checked = Properties.Settings.Default.CheckForUpdatesOnStartup;
         }
 
         #region ListView Functions
@@ -107,18 +111,18 @@ namespace _3DSExplorer
 
             switch (extension)
             {
-                case "cci":
-                case "3ds":
+                case ".cci":
+                case ".3ds":
                     type = 0;
                     break;
-                case "bin":
-                case "sav":
+                case ".bin":
+                case ".sav":
                     type = 1;
                     break;
-                case "tmd":
+                case ".tmd":
                     type = 2;
                     break;
-                case "cia":
+                case ".cia":
                     type = 3;
                     break;
                 default:
@@ -292,7 +296,7 @@ namespace _3DSExplorer
                         topNode.Nodes.Add("Content Info Records").Tag = TMDTool.TMDView.ContentInfoRecord;
                         topNode.Nodes.Add("Content Chunk Records").Tag = TMDTool.TMDView.ContentChunkRecord;
                     }
-                    if (ccxt.header.BannerLength > 0)
+                    if (ccxt.Header.BannerLength > 0)
                     {
                         var topNode = treeView.TopNode.Nodes.Add("Banner");
                         topNode.Nodes.Add("Meta-Data");
@@ -302,8 +306,12 @@ namespace _3DSExplorer
                             imlFS.Images.RemoveByKey("large");
                         imlFS.Images.Add("small", ccxt.SmallIcon);
                         imlFS.Images.Add("large", ccxt.LargeIcon);
-                        lvFileTree.Nodes.Add("small","Small (24x24)","small").SelectedImageKey = @"small";
-                        lvFileTree.Nodes.Add("large","Large (48x48)","large").SelectedImageKey = @"large";
+                        topNode = lvFileTree.Nodes.Add("small", "Small (24x24)", "small");
+                        topNode.SelectedImageKey = @"small";
+                        topNode.Tag = ccxt.SmallIcon;
+                        topNode = lvFileTree.Nodes.Add("large", "Large (48x48)", "large");
+                        topNode.SelectedImageKey = @"large";
+                        topNode.Tag = ccxt.LargeIcon;
                     }
                     treeView.ExpandAll();
                     _currentContext = ccxt;
@@ -313,7 +321,7 @@ namespace _3DSExplorer
             }
             if (_currentContext != null)
             {
-                menuFileSave.Enabled = (type == 1);
+                menuFileSave.Enabled = (type == 1) || ((type == 3) && ((CIAContext)_currentContext).Header.BannerLength > 0);
                 menuFileSaveImageFile.Enabled = (type == 1);
                 menuFileSaveKeyFile.Enabled = (type == 1) && encrypted;
             }
@@ -504,14 +512,17 @@ namespace _3DSExplorer
                             }
                         }
                     }
-                }
-                else if (tn.ImageKey.Equals("small"))
-                {
-                    ImageBox.ShowDialog(((CIAContext)_currentContext).SmallIcon);
-                }
-                else if (tn.ImageKey.Equals("large"))
-                {
-                    ImageBox.ShowDialog(((CIAContext)_currentContext).LargeIcon);
+                    else if (tn.Tag is System.Drawing.Image)
+                    {
+                        if (tn.ImageKey.Equals("small"))
+                        {
+                            ImageBox.ShowDialog(((CIAContext)_currentContext).SmallIcon);
+                        }
+                        else if (tn.ImageKey.Equals("large"))
+                        {
+                            ImageBox.ShowDialog(((CIAContext)_currentContext).LargeIcon);
+                        }
+                    }
                 }
             }
         }
@@ -556,9 +567,18 @@ namespace _3DSExplorer
 
         private void menuFileSave_Click(object sender, EventArgs e)
         {
-            saveFileDialog.Filter = @"Save Sav Files (*.sav)|*.sav;*.bin|All Files|*.*";
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                File.WriteAllBytes(saveFileDialog.FileName, SRAMTool.CreateSAV((SRAMContext)_currentContext));
+            if (_currentContext is SRAMContext)
+            {
+                saveFileDialog.Filter = @"Save Sav Files (*.sav)|*.sav;*.bin|All Files|*.*";
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    File.WriteAllBytes(saveFileDialog.FileName, SRAMTool.Create((SRAMContext) _currentContext));
+            }
+            else if (_currentContext is CIAContext)
+            {
+                saveFileDialog.Filter = @"Save Cia Files (*.cia)|*.cia|All Files|*.*";
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    File.WriteAllBytes(saveFileDialog.FileName, CIATool.Create(_filePath, (CIAContext)_currentContext));
+            }
         }
 
         private void menuFileSaveImageFile_Click(object sender, EventArgs e)
@@ -610,6 +630,30 @@ namespace _3DSExplorer
 
         #region MENU Help
 
+        private void menuHelpCheckNow_Click(object sender, EventArgs e)
+        {
+            _checkNow = true;
+            bwCheckForUpdates.RunWorkerAsync();
+        }
+
+        private void menuHelpCheckUpdates_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.CheckForUpdatesOnStartup = menuHelpCheckUpdates.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void menuHelpVisitGoogleCode_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start("http://3dsexplorer.googlecode.com/");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(@"This system doesn't support clicking a link...\n\n" + ex.Message);
+            }
+        }
+
         private void menuHelpVisit3DBrew_Click(object sender, EventArgs e)
         {
             try
@@ -651,7 +695,7 @@ namespace _3DSExplorer
                     cxtFile.Close();
         }
 
-        private void cxtFileSaveAs_Click(object sender, EventArgs e)
+        private void cxtFileOpen_Click(object sender, EventArgs e)
         {
             lvFileTree_DoubleClick(null, null);
         }
@@ -680,8 +724,64 @@ namespace _3DSExplorer
                     //TODO: Fix hashes
                 }
             }
+            else if (_currentContext is CIAContext)
+            {
+                var cxt = (CIAContext)_currentContext;
+                openFileDialog.Filter = @"All Files|*.*";
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var iconImage = (System.Drawing.Image)lvFileTree.TreeView.SelectedNode.Tag;
+                    var graphics = System.Drawing.Graphics.FromImage(iconImage);
+                    var newImage = System.Drawing.Image.FromFile(openFileDialog.FileName);
+                    if (newImage == null)
+                    {
+                        MessageBox.Show(@"The file selected is not a valid image!");
+                        return;
+                    }
+                    graphics.DrawImage(newImage, 0, 0, iconImage.Width, iconImage.Height);
+
+                    if (imlFS.Images.ContainsKey("small"))
+                        imlFS.Images.RemoveByKey("small");
+                    if (imlFS.Images.ContainsKey("large"))
+                        imlFS.Images.RemoveByKey("large");
+                    imlFS.Images.Add("small", cxt.SmallIcon);
+                    imlFS.Images.Add("large", cxt.LargeIcon);
+
+                    MessageBox.Show(@"File replaced.");
+                    newImage.Dispose();
+                }
+            }
             else
                 MessageBox.Show(@"This action can't be done!");
+        }
+        #endregion
+
+        #region Check for updates
+        private void bwCheckForUpdates_DoWork(object sender, DoWorkEventArgs e)
+        {
+            _remoteVer = @"<Error: Couldn't parse the version number>";
+            var checkUrl = @"http://3dsexplorer.googlecode.com/svn/trunk/3DSExplorer/Properties/AssemblyInfo.cs";
+            var request = (HttpWebRequest)WebRequest.Create(checkUrl);
+            var reader = new StreamReader(((HttpWebResponse)request.GetResponse()).GetResponseStream());
+            string line;
+            while ((line = reader.ReadLine()) != null)
+                if (line.Contains("AssemblyFileVersion")) //Get the version between the quotation marks
+                {
+                    var start = line.IndexOf('"') + 1;
+                    var len = line.LastIndexOf('"') - start;
+                    _remoteVer = line.Substring(start,len);
+                    break;
+                }
+        }
+
+        private void bwCheckForUpdates_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (!Application.ProductVersion.Equals(_remoteVer))
+                MessageBox.Show("This version is v" + Application.ProductVersion + Environment.NewLine +
+                                "The version on the server is v" + _remoteVer + Environment.NewLine +
+                                "You might want to download a newer version.");
+            else if (_checkNow)
+                MessageBox.Show("v" + Application.ProductVersion + " is the latest version.");
         }
         #endregion
     }

@@ -27,3 +27,4 @@ D:\dev\3DSExplorer\3DSExplorer\bin\3DSExplorer.exe
 D:\dev\3DSExplorer\3DSExplorer\bin\3DSExplorer.pdb
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.exe
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.pdb
+D:\dev\3DSExplorer\3DSExplorer\bin\3DSExplorer.exe.config
