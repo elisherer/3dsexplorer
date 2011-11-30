@@ -106,35 +106,42 @@ namespace _3DSExplorer
 
         public static TMDContext OpenFromStream(FileStream fs, long offset, long tmdLength)
         {
-            var cxt = new TMDContext();
-
-            fs.Seek(offset, SeekOrigin.Begin);
-
-            var supported = true;
-
-            var intBytes = new byte[4];
-            fs.Read(intBytes, 0, 4);
-            cxt.SignatureType = (SignatureType)BitConverter.ToInt32(intBytes, 0);
-            // Read the TMD RSA Type 
-            if (cxt.SignatureType == SignatureType.RSA_2048_SHA256)
-                cxt.Hash = new byte[256];
-            else if (cxt.SignatureType == SignatureType.RSA_4096_SHA256)
-                cxt.Hash = new byte[512];
-            else
-                supported = false;
-            if (supported)
+            try
             {
-                fs.Read(cxt.Hash, 0, cxt.Hash.Length);
-                //Continue reading header
-                cxt.Head = MarshalTool.ReadStructBE<TMDHeader>(fs); //read header
-                cxt.ContentInfoRecords = new TMDContentInfoRecord[64];
-                for (var i = 0; i < cxt.ContentInfoRecords.Length; i++)
-                    cxt.ContentInfoRecords[i] = MarshalTool.ReadStructBE<TMDContentInfoRecord>(fs);
-                cxt.Chunks = new TMDContentChunkRecord[cxt.Head.ContentCount];// new ArrayList();
-                for (var i = 0; i < cxt.Head.ContentCount; i++)
-                    cxt.Chunks[i] = MarshalTool.ReadStructBE<TMDContentChunkRecord>(fs);
+                var cxt = new TMDContext();
+
+                fs.Seek(offset, SeekOrigin.Begin);
+
+                var supported = true;
+
+                var intBytes = new byte[4];
+                fs.Read(intBytes, 0, 4);
+                cxt.SignatureType = (SignatureType) BitConverter.ToInt32(intBytes, 0);
+                // Read the TMD RSA Type 
+                if (cxt.SignatureType == SignatureType.RSA_2048_SHA256)
+                    cxt.Hash = new byte[256];
+                else if (cxt.SignatureType == SignatureType.RSA_4096_SHA256)
+                    cxt.Hash = new byte[512];
+                else
+                    supported = false;
+                if (supported)
+                {
+                    fs.Read(cxt.Hash, 0, cxt.Hash.Length);
+                    //Continue reading header
+                    cxt.Head = MarshalTool.ReadStructBE<TMDHeader>(fs); //read header
+                    cxt.ContentInfoRecords = new TMDContentInfoRecord[64];
+                    for (var i = 0; i < cxt.ContentInfoRecords.Length; i++)
+                        cxt.ContentInfoRecords[i] = MarshalTool.ReadStructBE<TMDContentInfoRecord>(fs);
+                    cxt.Chunks = new TMDContentChunkRecord[cxt.Head.ContentCount]; // new ArrayList();
+                    for (var i = 0; i < cxt.Head.ContentCount; i++)
+                        cxt.Chunks[i] = MarshalTool.ReadStructBE<TMDContentChunkRecord>(fs);
+                }
+                return (supported ? cxt : null);
             }
-            return (supported ? cxt : null);
+            catch
+            {
+                return null;
+            }
         }
 
         public enum TMDView{

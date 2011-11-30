@@ -9,7 +9,7 @@ namespace _3DSExplorer
 {
     public class CIAContext : IContext
     {
-        public CIAHeader header;
+        public CIAHeader Header;
         public long CertificateChainOffset;
         public long TicketOffset;
         public long TMDOffset;
@@ -35,8 +35,23 @@ namespace _3DSExplorer
         public ulong AppLength;
     }
     
+    enum Localization : int
+    {
+        Japanese = 0,
+        English,
+        French,
+        German,
+        Italian,
+        Spanish,
+        Chinese,
+        Korean,
+        Dutch,
+        Portuguese,
+        Russian 
+    }
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct CIAMetaDataEntry
+    public struct CIALocalizedDescription
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x80)]
         public byte[] FirstTitle;
@@ -55,7 +70,7 @@ namespace _3DSExplorer
         public uint Padding0;
         // Entries
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 11)]
-        public CIAMetaDataEntry[] MDEntries;
+        public CIALocalizedDescription[] Descriptions;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -72,37 +87,37 @@ namespace _3DSExplorer
     {
         public static CIAContext Open(string path)
         {
-            CIAContext cxt = new CIAContext();
+            var cxt = new CIAContext();
 
-            FileStream fs = File.OpenRead(path);
+            var fs = File.OpenRead(path);
 
-            byte[] intBytes = new byte[4];
-            cxt.header = MarshalTool.ReadStruct<CIAHeader>(fs); //read header
+            var intBytes = new byte[4];
+            cxt.Header = MarshalTool.ReadStruct<CIAHeader>(fs); //read header
 
-            cxt.CertificateChainOffset = Marshal.SizeOf(cxt.header) + (long)cxt.header.PaddingLength;
-            cxt.TicketOffset = cxt.CertificateChainOffset + cxt.header.CertificateChainLength;
+            cxt.CertificateChainOffset = Marshal.SizeOf(cxt.Header) + (long)cxt.Header.PaddingLength;
+            cxt.TicketOffset = cxt.CertificateChainOffset + cxt.Header.CertificateChainLength;
             if (cxt.TicketOffset % 64 != 0)
                 cxt.TicketOffset += (64 - cxt.TicketOffset % 64);
-            cxt.TMDOffset = cxt.TicketOffset + cxt.header.TicketLength;
+            cxt.TMDOffset = cxt.TicketOffset + cxt.Header.TicketLength;
             if (cxt.TMDOffset % 64 != 0)
                 cxt.TMDOffset += (64 - cxt.TMDOffset % 64);
-            cxt.AppOffset = cxt.TMDOffset + cxt.header.TMDLength; ;
+            cxt.AppOffset = cxt.TMDOffset + cxt.Header.TMDLength; ;
             if (cxt.AppOffset % 64 != 0)
                 cxt.AppOffset += (64 - cxt.AppOffset % 64);
-            cxt.BannerOffset = cxt.AppOffset + (long)cxt.header.AppLength;
+            cxt.BannerOffset = cxt.AppOffset + (long)cxt.Header.AppLength;
             if (cxt.BannerOffset % 64 != 0)
                 cxt.BannerOffset += (64 - cxt.BannerOffset % 64);
 
             cxt.Ticket = TicketTool.OpenFromStream(fs, cxt.TicketOffset);
             cxt.Certificates = new ArrayList();
-            CertTool.OpenCertificatesFromStream(fs, cxt.CertificateChainOffset, cxt.header.CertificateChainLength, cxt.Certificates);
-            cxt.TMD = TMDTool.OpenFromStream(fs, cxt.TMDOffset, cxt.header.TMDLength);
+            CertTool.OpenCertificatesFromStream(fs, cxt.CertificateChainOffset, cxt.Header.CertificateChainLength, cxt.Certificates);
+            cxt.TMD = TMDTool.OpenFromStream(fs, cxt.TMDOffset, cxt.Header.TMDLength);
 
-            if (cxt.header.BannerLength > 0)
+            if (cxt.Header.BannerLength > 0)
             {
                 fs.Seek(cxt.BannerOffset, SeekOrigin.Begin);
                 cxt.BannerHeaderEntries = new ArrayList();
-                CIABannerHeaderEntry bannerHeaderEntry = MarshalTool.ReadStruct<CIABannerHeaderEntry>(fs);
+                var bannerHeaderEntry = MarshalTool.ReadStruct<CIABannerHeaderEntry>(fs);
                 while (bannerHeaderEntry.Type != 0)
                 {
                     cxt.BannerHeaderEntries.Add(bannerHeaderEntry);
@@ -112,8 +127,8 @@ namespace _3DSExplorer
                 cxt.Banner = MarshalTool.ReadStruct<CIABanner>(fs);
                 fs.Seek(cxt.BannerOffset + 0x2400, SeekOrigin.Begin); //Jump to the icons
                 fs.Seek(0x40, SeekOrigin.Current); //skip header
-                cxt.SmallIcon = RawDecoder.CIAIcoDecode(fs, 24, 8);
-                cxt.LargeIcon = RawDecoder.CIAIcoDecode(fs, 48, 8);
+                cxt.SmallIcon = RawDecoder.ReadImageFromStream(fs, 24, 8);
+                cxt.LargeIcon = RawDecoder.ReadImageFromStream(fs, 48, 8);
             }
             
             fs.Close();
@@ -124,13 +139,15 @@ namespace _3DSExplorer
         public static class RawDecoder
         {
             //Decode RGB5A3 Taken from the dolphin project
-            private static int[] lut5to8 = { 0x00,0x08,0x10,0x18,0x20,0x29,0x31,0x39,
+            private static readonly int[] lut5to8 = { 0x00,0x08,0x10,0x18,0x20,0x29,0x31,0x39,
                                                 0x41,0x4A,0x52,0x5A,0x62,0x6A,0x73,0x7B,
                                                 0x83,0x8B,0x94,0x9C,0xA4,0xAC,0xB4,0xBD,
                                                 0xC5,0xCD,0xD5,0xDE,0xE6,0xEE,0xF6,0xFF };
-            private static int[] lut3to8 = { 0x00, 0x24, 0x48, 0x6D, 0x91, 0xB6, 0xDA, 0xFF };
+            private static readonly int[] lut3to8 = { 0x00, 0x24, 0x48, 0x6D, 0x91, 0xB6, 0xDA, 0xFF };
 
-            public static Color Decode5A3(int val)
+            private static readonly byte[] _tempBytes = new byte[2];
+
+            public static Color DecodeRGB5A3(int val)
             {
                 int blue, red, green, alpha = 0xFF;
                 if ((val & 0x8000) > 0) //If Alpha flag is set then it's Full - 0xFF
@@ -141,7 +158,7 @@ namespace _3DSExplorer
                 }
                 else  //Otherwise the alpha channel is the 3 bits after the flag
                 {
-                    //alpha = lut3to8[(val >> 12) & 0x7];    //3 bits
+                    alpha = lut3to8[(val >> 12) & 0x7];    //3 bits
                     red = 0x11 * ((val >> 8) & 0xf);       //4 bits
                     green = 0x11 * ((val >> 4) & 0xf);     //4 bits
                     blue = 0x11 * ((val) & 0xf);           //4 bits
@@ -149,39 +166,76 @@ namespace _3DSExplorer
                 return Color.FromArgb(alpha, red, green, blue);
             }
             
-            public static Color colorFrom2Bytes(byte[] bytes) //Using RGB565
+            public static Color DecodeRGB565(byte[] bytes)
             {
-                int r = (bytes[1] >> 3) & 0x1F;
-                int g = ((bytes[1] & 0x07) << 3);
+                var r = (bytes[1] >> 3) & 0x1F;
+                var g = ((bytes[1] & 0x07) << 3);
                 g += ((bytes[0] & 0xE0) >> 5);
-                int b = bytes[0] & 0x1F;
+                var b = bytes[0] & 0x1F;
                 return Color.FromArgb(lut5to8[r], g * 4, lut5to8[b]);
             }
 
-            private static void fillBitmap(int iconSize, int tileSize, int ax, int ay, Bitmap bmp, FileStream fs)
+            private static void Decode(int iconSize, int tileSize, int ax, int ay, Bitmap bmp, Stream fs)
             {
                 if (tileSize == 0)
                 {
-                    byte[] rgbVal = new byte[2];
-                    fs.Read(rgbVal, 0, 2);
-                    if ((ax == 9) && (ay == 9))
-                    {
-                        bmp.GetPixel(2, 2);
-                    }
-                    bmp.SetPixel(ax, ay, colorFrom2Bytes(rgbVal)/*Decode5A3((rgbVal[1] << 8) + rgbVal[0])*/);
+                    fs.Read(_tempBytes, 0, 2);
+                    bmp.SetPixel(ax, ay, DecodeRGB565(_tempBytes));
                 }
                 else
-                    for (int y = 0; y < iconSize; y += tileSize)
-                        for (int x = 0; x < iconSize; x += tileSize)
-                            fillBitmap(tileSize, tileSize / 2, x + ax, y + ay, bmp, fs);
+                    for (var y = 0; y < iconSize; y += tileSize)
+                        for (var x = 0; x < iconSize; x += tileSize)
+                            Decode(tileSize, tileSize / 2, x + ax, y + ay, bmp, fs);
             }
 
-            public static Bitmap CIAIcoDecode(FileStream fs, int iconSize, int tileSize)
+            public static void EncodeRGB565(byte[] bytes, Color clr)
             {
-                Bitmap bmp = new Bitmap(iconSize, iconSize);
-                fillBitmap(iconSize, tileSize, 0, 0, bmp, fs);
+                //looks like [gggbbbbb|rrrrrggg]
+                bytes[0] = (byte)(clr.B >> 3 );
+                bytes[0] += (byte)((clr.G & 0x1C) << 3);
+                bytes[1] = (byte)((clr.G & 0xE0) >> 5);
+                bytes[1] += (byte)(clr.R & 0xF8);
+            }
+
+            private static void Encode(int iconSize, int tileSize, int ax, int ay, Bitmap bmp, Stream fs)
+            {
+                if (tileSize == 0)
+                {
+                    EncodeRGB565(_tempBytes,bmp.GetPixel(ax, ay));
+                    fs.Write(_tempBytes, 0, 2);
+                }
+                else
+                    for (var y = 0; y < iconSize; y += tileSize)
+                        for (var x = 0; x < iconSize; x += tileSize)
+                            Encode(tileSize, tileSize / 2, x + ax, y + ay, bmp, fs);
+            }
+
+            public static Bitmap ReadImageFromStream(Stream fs, int iconSize, int tileSize)
+            {
+                var bmp = new Bitmap(iconSize, iconSize);
+                Decode(iconSize, tileSize, 0, 0, bmp, fs);
                 return bmp;
             }
+
+            public static void WriteImageToStream(Stream fs, int iconSize, int tileSize, Image source)
+            {
+                var bmp = new Bitmap(source);
+                Encode(iconSize, tileSize, 0, 0, bmp, fs);
+            }
+        }
+
+        public static byte[] Create(string filePath, CIAContext cxt)
+        {
+            var fsrc = File.OpenRead(filePath);
+            var output = new byte[fsrc.Length];
+            var ms = new MemoryStream(output);
+            fsrc.Read(output, 0, (int) (fsrc.Length - 0x1680));
+            ms.Seek(fsrc.Length - 0x1680, SeekOrigin.Begin);
+            RawDecoder.WriteImageToStream(ms, 24, 8, cxt.SmallIcon);
+            RawDecoder.WriteImageToStream(ms, 48, 8, cxt.LargeIcon);
+            ms.Close();
+            fsrc.Close();
+            return output;
         }
 
         public enum CIAView
@@ -197,7 +251,7 @@ namespace _3DSExplorer
             switch (view)
             {
                 case CIAView.CIA:
-                    CIAHeader cia = cxt.header;
+                    var cia = cxt.Header;
                     f.SetGroupHeaders("CIA", "CIA Offsets");
                     f.AddListItem(0, 8, "Padding Length", cia.PaddingLength, 0);
                     f.AddListItem(8, 4, "Certificate Chain Length", cia.CertificateChainLength, 0);
@@ -228,12 +282,12 @@ namespace _3DSExplorer
                     f.AddListItem(0, 4, "Banner Meta-Data Magic (SMDH)", cxt.Banner.Magic, 0);
                     f.AddListItem(4, 4, "Padding 0", cxt.Banner.Padding0, 0);
 
-                    for (int i = 0; i < cxt.Banner.MDEntries.Length; i++)
+                    for (var i = 0; i < cxt.Banner.Descriptions.Length; i++)
                     {
-                        pubString = Encoding.Unicode.GetString(cxt.Banner.MDEntries[i].Publisher);
-                        firString = Encoding.Unicode.GetString(cxt.Banner.MDEntries[i].FirstTitle);
-                        secString = Encoding.Unicode.GetString(cxt.Banner.MDEntries[i].SecondTitle);
-                        f.AddListItem(i.ToString(), "0x200", firString, secString, pubString, 0);
+                        pubString = Encoding.Unicode.GetString(cxt.Banner.Descriptions[i].Publisher);
+                        firString = Encoding.Unicode.GetString(cxt.Banner.Descriptions[i].FirstTitle);
+                        secString = Encoding.Unicode.GetString(cxt.Banner.Descriptions[i].SecondTitle);
+                        f.AddListItem(i.ToString(), ((Localization)i).ToString(), firString, secString, pubString, 0);
                     }
 
                     f.AddListItem(0, 0, "Small Icon", 24, 1);

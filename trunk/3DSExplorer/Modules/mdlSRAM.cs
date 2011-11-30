@@ -729,7 +729,7 @@ namespace _3DSExplorer
             return cxt;
         }
 
-        public static byte[] CreateSAV(SRAMContext cxt)
+        public static byte[] Create(SRAMContext cxt)
         {
             //Recompute the partitions' hash tables
             HashAlgorithm ha = SHA256.Create();

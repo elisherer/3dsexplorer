@@ -22,5 +22,17 @@ namespace _3DSExplorer.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CheckForUpdatesOnStartup {
+            get {
+                return ((bool)(this["CheckForUpdatesOnStartup"]));
+            }
+            set {
+                this["CheckForUpdatesOnStartup"] = value;
+            }
+        }
     }
 }

@@ -35,29 +35,36 @@ namespace _3DSExplorer
     {
         public static void OpenCertificatesFromStream(FileStream fs, long offset, long length, ArrayList list)
         {
-            var intBytes = new byte[4];
-            fs.Seek(offset, SeekOrigin.Begin);
-            //cxt.certs = new ArrayList();
-            while ((fs.Position < offset + length) && (fs.Position < fs.Length))
+            try
             {
-                var tcert = new CertificateEntry();
-                fs.Read(intBytes, 0, 4);
-                tcert.SignatureType = (SignatureType)BitConverter.ToInt32(intBytes, 0);
-                // RSA Type
-                switch (tcert.SignatureType)
+
+                var intBytes = new byte[4];
+                fs.Seek(offset, SeekOrigin.Begin);
+                while ((fs.Position < offset + length) && (fs.Position < fs.Length))
                 {
-                    case SignatureType.RSA_2048_SHA1:
-                    case SignatureType.RSA_2048_SHA256:
-                        tcert.Hash = new byte[256];
-                        break;
-                    case SignatureType.RSA_4096_SHA1:
-                    case SignatureType.RSA_4096_SHA256:
-                        tcert.Hash = new byte[512];
-                        break;
+                    var tcert = new CertificateEntry();
+                    fs.Read(intBytes, 0, 4);
+                    tcert.SignatureType = (SignatureType) BitConverter.ToInt32(intBytes, 0);
+                    // RSA Type
+                    switch (tcert.SignatureType)
+                    {
+                        case SignatureType.RSA_2048_SHA1:
+                        case SignatureType.RSA_2048_SHA256:
+                            tcert.Hash = new byte[256];
+                            break;
+                        case SignatureType.RSA_4096_SHA1:
+                        case SignatureType.RSA_4096_SHA256:
+                            tcert.Hash = new byte[512];
+                            break;
+                    }
+                    fs.Read(tcert.Hash, 0, tcert.Hash.Length);
+                    tcert.Certificate = MarshalTool.ReadStructBE<Certificate>(fs);
+                    list.Add(tcert);
                 }
-                fs.Read(tcert.Hash, 0, tcert.Hash.Length);
-                tcert.Certificate = MarshalTool.ReadStructBE<Certificate>(fs);
-                list.Add(tcert);
+            }
+            catch
+            {
+                list.Clear();
             }
         }
 

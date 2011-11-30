@@ -56,13 +56,20 @@ namespace _3DSExplorer
     {
         public static Ticket OpenFromStream(FileStream fs, long offset)
         {
-            Ticket tik = new Ticket();
-            fs.Seek(offset, SeekOrigin.Begin);
-            tik = MarshalTool.ReadStructBE<Ticket>(fs);
-            //tik.TimeLimitEntries = new TimeLimitEntry[8];
-            //for (int i=0; i<tik.TimeLimitEntries.Length; i++)
-            //  tik.TimeLimitEntries[i] = MarshalTool.ReadStructBE<TimeLimitEntry>(fs);
-            return tik;
+            try
+            {
+                var tik = new Ticket();
+                fs.Seek(offset, SeekOrigin.Begin);
+                tik = MarshalTool.ReadStructBE<Ticket>(fs);
+                //tik.TimeLimitEntries = new TimeLimitEntry[8];
+                //for (int i=0; i<tik.TimeLimitEntries.Length; i++)
+                //  tik.TimeLimitEntries[i] = MarshalTool.ReadStructBE<TimeLimitEntry>(fs);
+                return tik;
+            }
+            catch
+            {
+                return new Ticket();
+            }
         }
 
         public static void View(frmExplorer f, Ticket tik)
