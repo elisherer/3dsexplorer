@@ -3,7 +3,6 @@ using System.IO;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-// ReSharper disable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global
 namespace _3DSExplorer
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -28,69 +27,78 @@ namespace _3DSExplorer
     {
         public Certificate Certificate;
         public SignatureType SignatureType;
-        public byte[] Hash;
+        public byte[] Signature;
     }
 
-    public static class CertTool
+    public class CertificatesContext : IContext
     {
-        public static void OpenCertificatesFromStream(FileStream fs, long offset, long length, ArrayList list)
+        public ArrayList List; //of CertificateEntry
+
+        public bool Open(FileStream fs)
         {
+            List = new ArrayList();
             try
             {
-
                 var intBytes = new byte[4];
-                fs.Seek(offset, SeekOrigin.Begin);
-                while ((fs.Position < offset + length) && (fs.Position < fs.Length))
+                while (fs.Position < fs.Length)
                 {
                     var tcert = new CertificateEntry();
                     fs.Read(intBytes, 0, 4);
-                    tcert.SignatureType = (SignatureType) BitConverter.ToInt32(intBytes, 0);
+                    tcert.SignatureType = (SignatureType)BitConverter.ToInt32(intBytes, 0);
                     // RSA Type
                     switch (tcert.SignatureType)
                     {
                         case SignatureType.RSA_2048_SHA1:
                         case SignatureType.RSA_2048_SHA256:
-                            tcert.Hash = new byte[256];
+                            tcert.Signature = new byte[256];
                             break;
                         case SignatureType.RSA_4096_SHA1:
                         case SignatureType.RSA_4096_SHA256:
-                            tcert.Hash = new byte[512];
+                            tcert.Signature = new byte[512];
                             break;
                     }
-                    fs.Read(tcert.Hash, 0, tcert.Hash.Length);
-                    tcert.Certificate = MarshalTool.ReadStructBE<Certificate>(fs);
-                    list.Add(tcert);
+                    if (tcert.Signature == null)
+                        break; //this is the end of the certificates
+                    fs.Read(tcert.Signature, 0, tcert.Signature.Length);
+                    tcert.Certificate = MarshalUtil.ReadStructBE<Certificate>(fs);
+                    List.Add(tcert);
                 }
             }
             catch
             {
-                list.Clear();
+
             }
+            return true;
         }
 
-        public static void View(frmExplorer f, ArrayList certs, int i)
+        public void Create(FileStream fs, FileStream src)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void View(frmExplorer f, int view, int[] values)
         {
             f.ClearInformation();
-            if (i < 0)
+            if (values[0] < 0)
             {
                 f.SetGroupHeaders("Certificates");
-                f.AddListItem(0, 4, "Certificate Count", (ulong)certs.Count, 0);
+                f.AddListItem(0, 4, "Certificate Count", (ulong)List.Count, 0);
             }
             else
             {
-                var entry = (CertificateEntry)certs[i];
+                var entry = (CertificateEntry)List[values[0]];
                 var cert = entry.Certificate;
                 f.SetGroupHeaders("Certificate");
                 f.AddListItem(0, 4, "Signature Type", (ulong)entry.SignatureType, 0);
                 int off = 4;
                 if (entry.SignatureType == SignatureType.RSA_2048_SHA256 || entry.SignatureType == SignatureType.RSA_2048_SHA1)
                 {
-                    f.AddListItem(off, 0x100, "RSA-2048 signature of the content", entry.Hash, 0);
+                    f.AddListItem(off, 0x100, "RSA-2048 signature of the content", entry.Signature, 0);
                     off += 0x100;
                 }
                 else
                 {
-                    f.AddListItem(off, 0x200, "RSA-4096 signature of the content", entry.Hash, 0);
+                    f.AddListItem(off, 0x200, "RSA-4096 signature of the content", entry.Signature, 0);
                     off += 0x200;
                 }
                 f.AddListItem(off, 60, "Reserved0", cert.Reserved0, 0);
@@ -106,4 +114,3 @@ namespace _3DSExplorer
         }
     }
 }
-// ReSharper enable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global

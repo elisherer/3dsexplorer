@@ -9,7 +9,6 @@ D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.InputBox.resources
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.Properties.Resources.resources
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\TreeListView.MultiColumnTreeView.resources
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\TreeListView.TreeListViewControl.resources
-D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.csproj.GenerateResource.Cache
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.exe
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.pdb
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\ResolveAssemblyReference.cache
@@ -28,3 +27,8 @@ D:\dev\3DSExplorer\3DSExplorer\bin\3DSExplorer.pdb
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.exe
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.pdb
 D:\dev\3DSExplorer\3DSExplorer\bin\3DSExplorer.exe.config
+D:\dev\3DS\3DSExplorer\3DSExplorer\bin\3DSExplorer.exe.config
+D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\GenerateResource-ResGen.read.1.tlog
+D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\ResGen.read.1.tlog
+D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\GenerateResource-ResGen.write.1.tlog
+D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\ResGen.write.1.tlog
