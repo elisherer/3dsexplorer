@@ -1,19 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-// ReSharper disable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global
 namespace _3DSExplorer
 {
-    public class RomContext : IContext
-    {
-        public CCI cci;
-        public CXI[] cxis;
-        public CXIPlaingRegion[] cxiprs;
-        public int currentNcch;
-    }
-
     [StructLayout(LayoutKind.Sequential, Pack = 1)] //, Size = 0x330
     public struct CCI
     {
@@ -261,57 +251,11 @@ namespace _3DSExplorer
         public byte ResourceLimitCategory;
     }
 
-    public static class RomTool
+    public class RomContext : IContext
     {
-        public static RomContext Open(string path)
-        {
-            RomContext cxt = new RomContext();
-
-            FileStream fs = File.OpenRead(path);
-            cxt.cci = MarshalTool.ReadStruct<CCI>(fs);
-
-            // Read the NCCHs
-            cxt.cxis = new CXI[3];
-            cxt.cxiprs = new CXIPlaingRegion[3];
-            byte[] plainRegionBuffer;
-            if (cxt.cci.FirstNCCHSize > 0)
-            {
-                fs.Seek(cxt.cci.FirstNCCHOffset * 0x200, SeekOrigin.Begin);
-                cxt.cxis[0] = MarshalTool.ReadStruct<CXI>(fs);
-                // get Plaing Region
-                fs.Seek((cxt.cxis[0].PlainRegionOffset + cxt.cci.FirstNCCHOffset) * 0x200, SeekOrigin.Begin);
-                plainRegionBuffer = new byte[cxt.cxis[0].PlainRegionSize * 0x200];
-                fs.Read(plainRegionBuffer, 0, plainRegionBuffer.Length);
-                cxt.cxiprs[0] = CXI.getPlainRegionStringsFrom(plainRegionBuffer);
-                // byte[] exh = new byte[2048];
-                // fs.Read(exh, 0, exh.Length);
-                // Array.Reverse(exh);
-                // File.OpenWrite(path.Substring(path.LastIndexOf('\\') + 1) + "-rev.exh").Write(exh, 0, exh.Length);
-
-            }
-            if (cxt.cci.SecondNCCHSize > 0)
-            {
-                fs.Seek(cxt.cci.SecondNCCHOffset * 0x200, SeekOrigin.Begin);
-                cxt.cxis[1] = MarshalTool.ReadStruct<CXI>(fs);
-                // get Plaing Region
-                fs.Seek((cxt.cxis[1].PlainRegionOffset + cxt.cci.SecondNCCHOffset) * 0x200, SeekOrigin.Begin);
-                plainRegionBuffer = new byte[cxt.cxis[1].PlainRegionSize * 0x200];
-                fs.Read(plainRegionBuffer, 0, plainRegionBuffer.Length);
-                cxt.cxiprs[1] = CXI.getPlainRegionStringsFrom(plainRegionBuffer);
-            }
-            if (cxt.cci.ThirdNCCHSize > 0)
-            {
-                fs.Seek(cxt.cci.ThirdNCCHOffset * 0x200, SeekOrigin.Begin);
-                cxt.cxis[2] = MarshalTool.ReadStruct<CXI>(fs);
-                // get Plaing Region
-                fs.Seek((cxt.cxis[2].PlainRegionOffset + cxt.cci.ThirdNCCHOffset) * 0x200, SeekOrigin.Begin);
-                plainRegionBuffer = new byte[cxt.cxis[2].PlainRegionSize * 0x200];
-                fs.Read(plainRegionBuffer, 0, plainRegionBuffer.Length);
-                cxt.cxiprs[2] = CXI.getPlainRegionStringsFrom(plainRegionBuffer);
-            }
-            fs.Close();
-            return cxt;
-        }
+        public CCI cci;
+        public CXI[] cxis;
+        public CXIPlaingRegion[] cxiprs;
 
         public enum RomView
         {
@@ -320,66 +264,117 @@ namespace _3DSExplorer
             NCCHPlainRegion
         };
 
-        public static void View(frmExplorer f, RomContext cxt, RomView view)
+        public bool Open(FileStream fs)
         {
-            int i = cxt.currentNcch;
+            cci = MarshalUtil.ReadStruct<CCI>(fs);
+
+            // Read the NCCHs
+            cxis = new CXI[3];
+            cxiprs = new CXIPlaingRegion[3];
+            byte[] plainRegionBuffer;
+            if (cci.FirstNCCHSize > 0)
+            {
+                fs.Seek(cci.FirstNCCHOffset * 0x200, SeekOrigin.Begin);
+                cxis[0] = MarshalUtil.ReadStruct<CXI>(fs);
+                // get Plaing Region
+                fs.Seek((cxis[0].PlainRegionOffset + cci.FirstNCCHOffset) * 0x200, SeekOrigin.Begin);
+                plainRegionBuffer = new byte[cxis[0].PlainRegionSize * 0x200];
+                fs.Read(plainRegionBuffer, 0, plainRegionBuffer.Length);
+                cxiprs[0] = CXI.getPlainRegionStringsFrom(plainRegionBuffer);
+                // byte[] exh = new byte[2048];
+                // fs.Read(exh, 0, exh.Length);
+                // Array.Reverse(exh);
+                // File.OpenWrite(path.Substring(path.LastIndexOf('\\') + 1) + "-rev.exh").Write(exh, 0, exh.Length);
+
+            }
+            if (cci.SecondNCCHSize > 0)
+            {
+                fs.Seek(cci.SecondNCCHOffset * 0x200, SeekOrigin.Begin);
+                cxis[1] = MarshalUtil.ReadStruct<CXI>(fs);
+                // get Plaing Region
+                fs.Seek((cxis[1].PlainRegionOffset + cci.SecondNCCHOffset) * 0x200, SeekOrigin.Begin);
+                plainRegionBuffer = new byte[cxis[1].PlainRegionSize * 0x200];
+                fs.Read(plainRegionBuffer, 0, plainRegionBuffer.Length);
+                cxiprs[1] = CXI.getPlainRegionStringsFrom(plainRegionBuffer);
+            }
+            if (cci.ThirdNCCHSize > 0)
+            {
+                fs.Seek(cci.ThirdNCCHOffset * 0x200, SeekOrigin.Begin);
+                cxis[2] = MarshalUtil.ReadStruct<CXI>(fs);
+                // get Plaing Region
+                fs.Seek((cxis[2].PlainRegionOffset + cci.ThirdNCCHOffset) * 0x200, SeekOrigin.Begin);
+                plainRegionBuffer = new byte[cxis[2].PlainRegionSize * 0x200];
+                fs.Read(plainRegionBuffer, 0, plainRegionBuffer.Length);
+                cxiprs[2] = CXI.getPlainRegionStringsFrom(plainRegionBuffer);
+            }
+            return true;
+        }
+
+        public void Create(FileStream fs, FileStream src)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void View(frmExplorer f, int view, int[] values)
+        {
+            var i = values != null ? values[0] : -1;
             f.ClearInformation();
-            switch (view)
+            switch ((RomView)view)
             {
                 case RomView.NCSD:
                     f.SetGroupHeaders("Hash", "NCSD");
-                    f.AddListItem(0x000, 0x100, "RSA-2048 signature of the NCSD header [SHA-256]", cxt.cci.NCSDHeaderSignature, 0);
-                    f.AddListItem(0x100, 4, "Magic ID, always 'NCSD'", cxt.cci.MagicID, 1);
-                    f.AddListItem(0x104, 4, "Content size [medias]", cxt.cci.CCISize, 1);
-                    f.AddListItem(0x108, 8, "Title/Program ID", cxt.cci.TitleID, 1);
-                    f.AddListItem(0x120, 4, "Offset to the first NCCH [medias]", cxt.cci.FirstNCCHOffset, 1);
-                    f.AddListItem(0x124, 4, "Size of the first NCCH [medias]", cxt.cci.FirstNCCHSize, 1);
-                    f.AddListItem(0x130, 4, "Offset to the second NCCH [medias]", cxt.cci.SecondNCCHOffset, 1);
-                    f.AddListItem(0x134, 4, "Size of the second NCCH [medias]", cxt.cci.SecondNCCHSize, 1);
-                    f.AddListItem(0x158, 4, "Offset to the third NCCH [medias]", cxt.cci.ThirdNCCHOffset, 1);
-                    f.AddListItem(0x15C, 4, "Size of the third NCCH [medias]", cxt.cci.ThirdNCCHSize, 1);
-                    f.AddListItem(0x188, 8, "NCCH Flags", cxt.cci.NCCHFlags, 1);
-                    f.AddListItem(0x190, 8, "Partition ID of the first NCCH", cxt.cci.FirstNCCHPartitionID, 1);
-                    f.AddListItem(0x1A0, 8, "Partition ID of the second NCCH", cxt.cci.SecondNCCHPartitionID, 1);
-                    f.AddListItem(0x1C8, 8, "Partition ID of the third NCCH", cxt.cci.ThirdNCCHPartitionID, 1);
-                    f.AddListItem(0x200, 4, "Always 0xFFFFFFFF", cxt.cci.PaddingFF, 1);
-                    f.AddListItem(0x300, 4, "Used ROM size [bytes]", cxt.cci.UsedRomSize, 1);
-                    f.AddListItem(0x320, 16, "Unknown", cxt.cci.Unknown, 1);
+                    f.AddListItem(0x000, 0x100, "RSA-2048 signature of the NCSD header [SHA-256]", cci.NCSDHeaderSignature, 0);
+                    f.AddListItem(0x100, 4, "Magic ID, always 'NCSD'", cci.MagicID, 1);
+                    f.AddListItem(0x104, 4, "Content size [medias]", cci.CCISize, 1);
+                    f.AddListItem(0x108, 8, "Title/Program ID", cci.TitleID, 1);
+                    f.AddListItem(0x120, 4, "Offset to the first NCCH [medias]", cci.FirstNCCHOffset, 1);
+                    f.AddListItem(0x124, 4, "Size of the first NCCH [medias]", cci.FirstNCCHSize, 1);
+                    f.AddListItem(0x130, 4, "Offset to the second NCCH [medias]", cci.SecondNCCHOffset, 1);
+                    f.AddListItem(0x134, 4, "Size of the second NCCH [medias]", cci.SecondNCCHSize, 1);
+                    f.AddListItem(0x158, 4, "Offset to the third NCCH [medias]", cci.ThirdNCCHOffset, 1);
+                    f.AddListItem(0x15C, 4, "Size of the third NCCH [medias]", cci.ThirdNCCHSize, 1);
+                    f.AddListItem(0x188, 8, "NCCH Flags", cci.NCCHFlags, 1);
+                    f.AddListItem(0x190, 8, "Partition ID of the first NCCH", cci.FirstNCCHPartitionID, 1);
+                    f.AddListItem(0x1A0, 8, "Partition ID of the second NCCH", cci.SecondNCCHPartitionID, 1);
+                    f.AddListItem(0x1C8, 8, "Partition ID of the third NCCH", cci.ThirdNCCHPartitionID, 1);
+                    f.AddListItem(0x200, 4, "Always 0xFFFFFFFF", cci.PaddingFF, 1);
+                    f.AddListItem(0x300, 4, "Used ROM size [bytes]", cci.UsedRomSize, 1);
+                    f.AddListItem(0x320, 16, "Unknown", cci.Unknown, 1);
                     break;
                 case RomView.NCCH:
                     f.SetGroupHeaders("Hash", "NCCH");
-                    f.AddListItem(0x000, 0x100, "RSA-2048 signature of the NCCH header [SHA-256]", cxt.cxis[i].NCCHHeaderSignature, 0);
-                    f.AddListItem(0x100, 4, "Magic ID, always 'NCCH'", cxt.cxis[i].MagicID, 1);
-                    f.AddListItem(0x104, 4, "Content size [medias]", cxt.cxis[i].CXISize, 1);
+                    f.AddListItem(0x000, 0x100, "RSA-2048 signature of the NCCH header [SHA-256]", cxis[i].NCCHHeaderSignature, 0);
+                    f.AddListItem(0x100, 4, "Magic ID, always 'NCCH'", cxis[i].MagicID, 1);
+                    f.AddListItem(0x104, 4, "Content size [medias]", cxis[i].CXISize, 1);
 
-                    f.AddListItem(0x108, 8, "Partition ID", cxt.cxis[i].PartitionID, 1);
-                    f.AddListItem(0x110, 2, "Maker Code" + " (=" + MakerResolver.Resolve(cxt.cxis[i].MakerCode) + ")", cxt.cxis[i].MakerCode, 1);
-                    f.AddListItem(0x112, 2, "Version", cxt.cxis[i].Version, 1);
-                    f.AddListItem(0x118, 8, "Program ID", cxt.cxis[i].ProgramID, 1);
-                    f.AddListItem(0x120, 1, "Temp Flag", cxt.cxis[i].TempFlag, 1);
-                    f.AddListItem(0x150, 0x10, "Product Code " + " (=" + GameTitleResolver.Resolve(cxt.cxis[i].ProductCode) + ")", cxt.cxis[i].ProductCode, 1);
-                    f.AddListItem(0x160, 0x20, "Extended Header Hash", cxt.cxis[i].ExtendedHeaderHash, 1);
-                    f.AddListItem(0x180, 4, "Extended header size", cxt.cxis[i].ExtendedHeaderSize, 1);
-                    f.AddListItem(0x188, 8, "Flags", cxt.cxis[i].Flags, 1);
-                    f.AddListItem(0x190, 4, "Plain region offset [medias]", cxt.cxis[i].PlainRegionOffset, 1);
-                    f.AddListItem(0x194, 4, "Plain region size [medias]", cxt.cxis[i].PlainRegionSize, 1);
-                    f.AddListItem(0x1A0, 4, "ExeFS offset [medias]", cxt.cxis[i].ExeFSOffset, 1);
-                    f.AddListItem(0x1A4, 4, "ExeFS size [medias]", cxt.cxis[i].ExeFSSize, 1);
-                    f.AddListItem(0x1A8, 4, "ExeFS hash region size [medias]", cxt.cxis[i].ExeFSHashRegionSize, 1);
-                    f.AddListItem(0x1B0, 4, "RomFS offset [medias]", cxt.cxis[i].RomFSOffset, 1);
-                    f.AddListItem(0x1B4, 4, "RomFS size [medias]", cxt.cxis[i].RomFSSize, 1);
-                    f.AddListItem(0x1B8, 4, "RomFS hash region size [medias]", cxt.cxis[i].RomFSHashRegionSize, 1);
-                    f.AddListItem(0x1C0, 0x20, "ExeFS superblock hash", cxt.cxis[i].ExeFSSuperBlockhash, 1);
-                    f.AddListItem(0x1E0, 0x20, "RomFS superblock hash", cxt.cxis[i].RomFSSuperBlockhash, 1);
+                    f.AddListItem(0x108, 8, "Partition ID", cxis[i].PartitionID, 1);
+                    f.AddListItem(0x110, 2, "Maker Code" + " (=" + MakerResolver.Resolve(cxis[i].MakerCode) + ")", cxis[i].MakerCode, 1);
+                    f.AddListItem(0x112, 2, "Version", cxis[i].Version, 1);
+                    f.AddListItem(0x118, 8, "Program ID", cxis[i].ProgramID, 1);
+                    f.AddListItem(0x120, 1, "Temp Flag", cxis[i].TempFlag, 1);
+                    f.AddListItem(0x150, 0x10, "Product Code " + " (=" + GameTitleResolver.Resolve(cxis[i].ProductCode) + ")", cxis[i].ProductCode, 1);
+                    f.AddListItem(0x160, 0x20, "Extended Header Hash", cxis[i].ExtendedHeaderHash, 1);
+                    f.AddListItem(0x180, 4, "Extended header size", cxis[i].ExtendedHeaderSize, 1);
+                    f.AddListItem(0x188, 8, "Flags", cxis[i].Flags, 1);
+                    f.AddListItem(0x190, 4, "Plain region offset [medias]", cxis[i].PlainRegionOffset, 1);
+                    f.AddListItem(0x194, 4, "Plain region size [medias]", cxis[i].PlainRegionSize, 1);
+                    f.AddListItem(0x1A0, 4, "ExeFS offset [medias]", cxis[i].ExeFSOffset, 1);
+                    f.AddListItem(0x1A4, 4, "ExeFS size [medias]", cxis[i].ExeFSSize, 1);
+                    f.AddListItem(0x1A8, 4, "ExeFS hash region size [medias]", cxis[i].ExeFSHashRegionSize, 1);
+                    f.AddListItem(0x1B0, 4, "RomFS offset [medias]", cxis[i].RomFSOffset, 1);
+                    f.AddListItem(0x1B4, 4, "RomFS size [medias]", cxis[i].RomFSSize, 1);
+                    f.AddListItem(0x1B8, 4, "RomFS hash region size [medias]", cxis[i].RomFSHashRegionSize, 1);
+                    f.AddListItem(0x1C0, 0x20, "ExeFS superblock hash", cxis[i].ExeFSSuperBlockhash, 1);
+                    f.AddListItem(0x1E0, 0x20, "RomFS superblock hash", cxis[i].RomFSSuperBlockhash, 1);
                     break;
                 case RomView.NCCHPlainRegion:
                     f.SetGroupHeaders("Plain Regions");
-                    for (int j = 0; j < cxt.cxiprs[i].PlainRegionStrings.Length; j++)
-                        f.AddListItem(0, 4, cxt.cxiprs[i].PlainRegionStrings[j], (ulong)cxt.cxiprs[i].PlainRegionStrings[j].Length, 0);
+                    for (int j = 0; j < cxiprs[i].PlainRegionStrings.Length; j++)
+                        f.AddListItem(0, 4, cxiprs[i].PlainRegionStrings[j], (ulong)cxiprs[i].PlainRegionStrings[j].Length, 0);
                     break;
             }
             f.AutoAlignColumns();
         }
     }
+
 }
-// ReSharper enable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global

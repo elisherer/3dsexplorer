@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Windows.Forms;
+using DSDecmp.Formats.Nitro;
 
 namespace _3DSExplorer
 {

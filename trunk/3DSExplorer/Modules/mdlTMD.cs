@@ -3,19 +3,8 @@ using System.IO;
 using System.Collections;
 using System.Runtime.InteropServices;
 
-// ReSharper disable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global
 namespace _3DSExplorer
 {
-    public class TMDContext : IContext
-    {
-        public TMDHeader Head;
-        public SignatureType SignatureType;
-        public TMDContentInfoRecord[] ContentInfoRecords;
-        public TMDContentChunkRecord[] Chunks;
-        public byte[] Hash;
-        public ArrayList Certificates; //of CertificateEntry
-    }
-
     public enum SignatureType
     {
         RSA_2048_SHA256 = 0x04000100,
@@ -73,8 +62,71 @@ namespace _3DSExplorer
         public byte[] ContentHash; //SHA-256
     }
 
-    public class TMDTool
+    public class TMDContext : IContext
     {
+        public TMDHeader Head;
+        public SignatureType SignatureType;
+        public TMDContentInfoRecord[] ContentInfoRecords;
+        public TMDContentChunkRecord[] Chunks;
+        public byte[] Hash;
+        public CertificatesContext CertificatesContext;
+
+        public enum TMDView
+        {
+            TMD,
+            ContentInfoRecord,
+            ContentChunkRecord
+        };
+
+        public bool Open(FileStream fs)
+        {
+            try
+            {
+                var intBytes = new byte[4];
+                fs.Read(intBytes, 0, 4);
+                SignatureType = (SignatureType)BitConverter.ToInt32(intBytes, 0);
+                // Read the TMD RSA Type 
+                if (SignatureType == SignatureType.RSA_2048_SHA256)
+                    Hash = new byte[256];
+                else if (SignatureType == SignatureType.RSA_4096_SHA256)
+                    Hash = new byte[512];
+                else
+                    return false;
+                fs.Read(Hash, 0, Hash.Length);
+                //Continue reading header
+                Head = MarshalUtil.ReadStructBE<TMDHeader>(fs); //read header
+                ContentInfoRecords = new TMDContentInfoRecord[64];
+                for (var i = 0; i < ContentInfoRecords.Length; i++)
+                    ContentInfoRecords[i] = MarshalUtil.ReadStructBE<TMDContentInfoRecord>(fs);
+                Chunks = new TMDContentChunkRecord[Head.ContentCount]; // new ArrayList();
+                for (var i = 0; i < Head.ContentCount; i++)
+                    Chunks[i] = MarshalUtil.ReadStructBE<TMDContentChunkRecord>(fs);
+                //Check if certificates are next
+                fs.Read(intBytes, 0, 4);
+                switch ((SignatureType)BitConverter.ToInt32(intBytes, 0))
+                {
+                    case SignatureType.RSA_2048_SHA1:
+                    case SignatureType.RSA_2048_SHA256:
+                    case SignatureType.RSA_4096_SHA1:
+                    case SignatureType.RSA_4096_SHA256:
+                        fs.Seek(-4, SeekOrigin.Current); //go back
+                        CertificatesContext = new CertificatesContext();
+                        CertificatesContext.Open(fs);
+                        break;
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void Create(FileStream fs, FileStream src)
+        {
+            throw new NotImplementedException();
+        }
+
         private static string TypeToString(ushort type)
         {
             string ret = "";
@@ -91,127 +143,65 @@ namespace _3DSExplorer
             return ret;
         }
 
-        public static TMDContext Open(string path)
-        {
-            var fs = File.OpenRead(path);
-            var cxt = OpenFromStream(fs, 0, fs.Length);
-            if (cxt != null)
-            {
-                cxt.Certificates = new ArrayList();
-                CertTool.OpenCertificatesFromStream(fs, fs.Position, fs.Length, cxt.Certificates);
-            }
-            fs.Close();
-            return cxt;
-        }
-
-        public static TMDContext OpenFromStream(FileStream fs, long offset, long tmdLength)
-        {
-            try
-            {
-                var cxt = new TMDContext();
-
-                fs.Seek(offset, SeekOrigin.Begin);
-
-                var supported = true;
-
-                var intBytes = new byte[4];
-                fs.Read(intBytes, 0, 4);
-                cxt.SignatureType = (SignatureType) BitConverter.ToInt32(intBytes, 0);
-                // Read the TMD RSA Type 
-                if (cxt.SignatureType == SignatureType.RSA_2048_SHA256)
-                    cxt.Hash = new byte[256];
-                else if (cxt.SignatureType == SignatureType.RSA_4096_SHA256)
-                    cxt.Hash = new byte[512];
-                else
-                    supported = false;
-                if (supported)
-                {
-                    fs.Read(cxt.Hash, 0, cxt.Hash.Length);
-                    //Continue reading header
-                    cxt.Head = MarshalTool.ReadStructBE<TMDHeader>(fs); //read header
-                    cxt.ContentInfoRecords = new TMDContentInfoRecord[64];
-                    for (var i = 0; i < cxt.ContentInfoRecords.Length; i++)
-                        cxt.ContentInfoRecords[i] = MarshalTool.ReadStructBE<TMDContentInfoRecord>(fs);
-                    cxt.Chunks = new TMDContentChunkRecord[cxt.Head.ContentCount]; // new ArrayList();
-                    for (var i = 0; i < cxt.Head.ContentCount; i++)
-                        cxt.Chunks[i] = MarshalTool.ReadStructBE<TMDContentChunkRecord>(fs);
-                }
-                return (supported ? cxt : null);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public enum TMDView{
-            TMD,
-            ContentInfoRecord,
-            ContentChunkRecord
-        };
-
-        public static void View(frmExplorer f, TMDContext cxt, TMDView view)
+        public void View(frmExplorer f, int view, int[] values)
         {
             f.ClearInformation();
-            switch (view)
+            switch ((TMDView)view)
             {
                 case TMDView.TMD:
-                    TMDHeader head = cxt.Head;
                     f.SetGroupHeaders("TMD");
-                    f.AddListItem(0, 4, "Signature Type", (ulong)cxt.SignatureType, 0);
+                    f.AddListItem(0, 4, "Signature Type", (ulong)SignatureType, 0);
                     int off = 4;
-                    if (cxt.SignatureType == SignatureType.RSA_2048_SHA256 || cxt.SignatureType == SignatureType.RSA_2048_SHA1)
+                    if (SignatureType == SignatureType.RSA_2048_SHA256 || SignatureType == SignatureType.RSA_2048_SHA1)
                     {
-                        f.AddListItem(off, 0x100, "RSA-2048 signature of the TMD", cxt.Hash, 0);
+                        f.AddListItem(off, 0x100, "RSA-2048 signature of the TMD", Hash, 0);
                         off += 0x100;
                     }
                     else
                     {
-                        f.AddListItem(off, 0x200, "RSA-4096 signature of the TMD", cxt.Hash, 0);
+                        f.AddListItem(off, 0x200, "RSA-4096 signature of the TMD", Hash, 0);
                         off += 0x200;
                     }
-                    f.AddListItem(off, 60, "Reserved0", head.Reserved0, 0);
-                    f.AddListItem(off + 60, 64, "Issuer", head.Issuer, 0);
-                    f.AddListItem(off + 124, 4, "Version", head.Version, 0);
-                    f.AddListItem(off + 128, 1, "Car Crl Version", head.CarCrlVersion, 0);
-                    f.AddListItem(off + 129, 1, "Signer Version", head.SignerVersion, 0);
-                    f.AddListItem(off + 130, 1, "Reserved1", head.Reserved1, 0);
-                    f.AddListItem(off + 131, 8, "System Version", head.SystemVersion, 0);
-                    f.AddListItem(off + 139, 8, "Title ID", head.TitleID, 0);
-                    f.AddListItem(off + 147, 4, "Title Type", head.TitleType, 0);
-                    f.AddListItem(off + 151, 2, "Group ID", head.GroupID, 0);
-                    f.AddListItem(off + 153, 62, "Reserved2", head.Reserved2, 0);
-                    f.AddListItem(off + 215, 4, "Access Rights", head.AccessRights, 0);
-                    f.AddListItem(off + 219, 2, "Title Version", head.TitleVersion, 0);
-                    f.AddListItem(off + 221, 2, "Content Count", head.ContentCount, 0);
-                    f.AddListItem(off + 223, 2, "Boot Content", head.BootContent, 0);
-                    f.AddListItem(off + 225, 2, "Padding", head.Padding0, 0);
-                    f.AddListItem(off + 227, 32, "Content Info Records Hash", head.ContentInfoRecordsHash, 0);
+                    f.AddListItem(off, 60, "Reserved0", Head.Reserved0, 0);
+                    f.AddListItem(off + 60, 64, "Issuer", Head.Issuer, 0);
+                    f.AddListItem(off + 124, 4, "Version", Head.Version, 0);
+                    f.AddListItem(off + 128, 1, "Car Crl Version", Head.CarCrlVersion, 0);
+                    f.AddListItem(off + 129, 1, "Signer Version", Head.SignerVersion, 0);
+                    f.AddListItem(off + 130, 1, "Reserved1", Head.Reserved1, 0);
+                    f.AddListItem(off + 131, 8, "System Version", Head.SystemVersion, 0);
+                    f.AddListItem(off + 139, 8, "Title ID", Head.TitleID, 0);
+                    f.AddListItem(off + 147, 4, "Title Type", Head.TitleType, 0);
+                    f.AddListItem(off + 151, 2, "Group ID", Head.GroupID, 0);
+                    f.AddListItem(off + 153, 62, "Reserved2", Head.Reserved2, 0);
+                    f.AddListItem(off + 215, 4, "Access Rights", Head.AccessRights, 0);
+                    f.AddListItem(off + 219, 2, "Title Version", Head.TitleVersion, 0);
+                    f.AddListItem(off + 221, 2, "Content Count", Head.ContentCount, 0);
+                    f.AddListItem(off + 223, 2, "Boot Content", Head.BootContent, 0);
+                    f.AddListItem(off + 225, 2, "Padding", Head.Padding0, 0);
+                    f.AddListItem(off + 227, 32, "Content Info Records Hash", Head.ContentInfoRecordsHash, 0);
                     break;
                 case TMDView.ContentInfoRecord:
                     f.SetGroupHeaders("TMD Content Records");
                     for (var i = 0; i < 64; i++)
                     {
-                        f.AddListItem(i * 36, 2, "Content Command Count", cxt.ContentInfoRecords[i].ContentCommandCount, 0);
-                        f.AddListItem(i * 36 + 2, 2, "Content Index Offset", cxt.ContentInfoRecords[i].ContentIndexOffset, 0);
-                        f.AddListItem(i * 36 + 4, 32, "Next Content Hash", cxt.ContentInfoRecords[i].NextContentHash, 0);
+                        f.AddListItem(i * 36, 2, "Content Command Count", ContentInfoRecords[i].ContentCommandCount, 0);
+                        f.AddListItem(i * 36 + 2, 2, "Content Index Offset", ContentInfoRecords[i].ContentIndexOffset, 0);
+                        f.AddListItem(i * 36 + 4, 32, "Next Content Hash", ContentInfoRecords[i].NextContentHash, 0);
                     }
                     break;
                 case TMDView.ContentChunkRecord:
                     f.SetGroupHeaders("TMD Content Chunks");
-                    for (var i = 0; i < cxt.Chunks.Length; i++)
+                    for (var i = 0; i < Chunks.Length; i++)
                     {
-                        f.AddListItem(i, 4, "Content ID", cxt.Chunks[i].ContentID, 0);
-                        f.AddListItem(0, 2, "Content Index", cxt.Chunks[i].ContentIndex, 0);
-                        f.AddListItem(0, 2, "Content Type (=" + TypeToString(cxt.Chunks[i].ContentType) + ")", cxt.Chunks[i].ContentType, 0);
-                        f.AddListItem(0, 8, "Content Size", cxt.Chunks[i].ContentSize, 0);
-                        f.AddListItem(0, 32, "Content Hash", cxt.Chunks[i].ContentHash, 0);
+                        f.AddListItem(i, 4, "Content ID", Chunks[i].ContentID, 0);
+                        f.AddListItem(0, 2, "Content Index", Chunks[i].ContentIndex, 0);
+                        f.AddListItem(0, 2, "Content Type (=" + TypeToString(Chunks[i].ContentType) + ")", Chunks[i].ContentType, 0);
+                        f.AddListItem(0, 8, "Content Size", Chunks[i].ContentSize, 0);
+                        f.AddListItem(0, 32, "Content Hash", Chunks[i].ContentHash, 0);
                     }
                     break;
             }
             f.AutoAlignColumns();
         }
-
     }
 }
-// ReSharper enable MemberCanBePrivate.Global, FieldCanBeMadeReadOnly.Global, UnusedMember.Global, NotAccessedField.Global, ClassNeverInstantiated.Global

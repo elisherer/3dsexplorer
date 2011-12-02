@@ -5,7 +5,16 @@ using System.Runtime.InteropServices;
 
 namespace _3DSExplorer
 {
-    static class MarshalTool
+    public enum Sizes
+    {
+        SHA256 = 0x20,
+        SHA512 = 0x40,
+        SHA1 = 0x10,
+        MD5 = 0x10,
+        CRC16 = 0x02
+    }
+
+    static class MarshalUtil
     {
 /*
         public static T ByteArrayToStructure<T>(byte[] bytes) where T : struct
@@ -16,7 +25,6 @@ namespace _3DSExplorer
             return temp;
         }
 */
-
         public static byte[] StructureToByteArray<T>(T structure) where T : struct
         {
             var size = Marshal.SizeOf(structure);

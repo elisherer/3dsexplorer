@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace _3DSExplorer
 {
-    public static class Util
+    public static class StringUtil
     {
         public static string ByteArrayToString(byte[] array)
         {
@@ -58,9 +58,7 @@ namespace _3DSExplorer
             }
             catch (Exception ex)
             {
-// ReSharper disable LocalizableElement
-                MessageBox.Show("Can't parse key string!\n" + ex.Message);
-// ReSharper restore LocalizableElement
+                MessageBox.Show(@"Can't parse key string!\n" + ex.Message);
                 return null;
             }
             return retArray;

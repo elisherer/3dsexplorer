@@ -32,6 +32,7 @@
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,7 +42,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -71,20 +72,39 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Aes128Ctr.cs" />
+    <Compile Include="Crypt\Aes128Ctr.cs" />
+    <Compile Include="DSDecmp\Exceptions\InputTooLargeException.cs" />
+    <Compile Include="DSDecmp\Exceptions\NotEnoughDataException.cs" />
+    <Compile Include="DSDecmp\Exceptions\StreamTooShortException.cs" />
+    <Compile Include="DSDecmp\Exceptions\TooMuchInputException.cs" />
+    <Compile Include="DSDecmp\Formats\CompositeFormat.cs" />
+    <Compile Include="DSDecmp\Formats\CompressionFormat.cs" />
+    <Compile Include="DSDecmp\Formats\LZOvl.cs" />
+    <Compile Include="DSDecmp\Formats\Nitro\CompositeFormats.cs" />
+    <Compile Include="DSDecmp\Formats\Nitro\Huffman.cs" />
+    <Compile Include="DSDecmp\Formats\Nitro\LZ10.cs" />
+    <Compile Include="DSDecmp\Formats\Nitro\LZ11.cs" />
+    <Compile Include="DSDecmp\Formats\Nitro\NitroCFormat.cs" />
+    <Compile Include="DSDecmp\Formats\Nitro\RLE.cs" />
+    <Compile Include="DSDecmp\Utils\IOUtils.cs" />
+    <Compile Include="DSDecmp\Utils\LZUtil.cs" />
+    <Compile Include="DSDecmp\Utils\SimpleReversePrioQueue.cs" />
     <Compile Include="frmImageBox.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmImageBox.Designer.cs">
       <DependentUpon>frmImageBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="Crypt\LZSS.cs" />
+    <Compile Include="Modules\IContext.cs" />
+    <Compile Include="Modules\mdlBanner.cs" />
     <Compile Include="Modules\mdlCertificate.cs" />
     <Compile Include="Modules\mdlCIA.cs" />
     <Compile Include="Modules\mdlRom.cs" />
     <Compile Include="Modules\mdlSRAM.cs" />
     <Compile Include="Modules\mdlTicket.cs" />
     <Compile Include="Modules\mdlTMD.cs" />
-    <Compile Include="CRC16.cs" />
+    <Compile Include="Crypt\CRC16.cs" />
     <Compile Include="frmXORTool.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -97,7 +117,8 @@
     <Compile Include="frmExplorer.Designer.cs">
       <DependentUpon>frmExplorer.cs</DependentUpon>
     </Compile>
-    <Compile Include="GameTitleResolver.cs" />
+    <Compile Include="Modules\ModuleHelper.cs" />
+    <Compile Include="Utils\GameTitleResolver.cs" />
     <Compile Include="frmHashTool.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -110,10 +131,12 @@
     <Compile Include="frmInputBox.Designer.cs">
       <DependentUpon>frmInputBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="MakerResolver.cs" />
-    <Compile Include="MarshalTool.cs" />
+    <Compile Include="Utils\ImageUtil.cs" />
+    <Compile Include="Utils\MakerResolver.cs" />
+    <Compile Include="Utils\MarshalUtil.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\WaveUtil.cs" />
     <EmbeddedResource Include="frmXORTool.resx">
       <DependentUpon>frmXORTool.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -162,6 +185,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Crypt\StreamExtensions.cs" />
     <Compile Include="TreeListView\IColumnsProvider.cs" />
     <Compile Include="TreeListView\MultiColumnTreeView.cs">
       <SubType>Component</SubType>
@@ -175,7 +199,7 @@
     <Compile Include="TreeListView\TreeListView.Designer.cs">
       <DependentUpon>TreeListView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Util.cs" />
+    <Compile Include="Utils\StringUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />
@@ -224,6 +248,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NewFolder1\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
