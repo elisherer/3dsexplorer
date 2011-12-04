@@ -140,7 +140,7 @@ namespace _3DSExplorer
             GraphicsImage = MarshalUtil.ReadStruct<CGFXIMAG>(ms);
             ms.Seek(imagPos + GraphicsImage.Length, SeekOrigin.Begin);
             
-            BannerImage = ImageUtil.ReadImageFromStream(ms, 256, 128, ImageUtil.PixelFormat.RGB565);
+            BannerImage = ImageUtil.ReadImageFromStream(ms, 256, 128, ImageUtil.PixelFormat.RGBA4);
 
             //-- Wave reading --
             fs.Seek(Header.CWAVOffset, SeekOrigin.Begin);

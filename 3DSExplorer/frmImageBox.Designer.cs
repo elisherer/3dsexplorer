@@ -34,6 +34,7 @@
             this.toolStripSeparator0 = new System.Windows.Forms.ToolStripSeparator();
             this.btnCopy = new System.Windows.Forms.ToolStripButton();
             this.btnZoomIn = new System.Windows.Forms.ToolStripButton();
+            this.lblColor = new System.Windows.Forms.ToolStripLabel();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.toolBar.SuspendLayout();
             this.SuspendLayout();
@@ -47,6 +48,7 @@
             this.pictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox.TabIndex = 0;
             this.pictureBox.TabStop = false;
+            this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
             // 
             // toolBar
             // 
@@ -54,10 +56,11 @@
             this.btnSave,
             this.toolStripSeparator0,
             this.btnCopy,
-            this.btnZoomIn});
+            this.btnZoomIn,
+            this.lblColor});
             this.toolBar.Location = new System.Drawing.Point(0, 0);
             this.toolBar.Name = "toolBar";
-            this.toolBar.Size = new System.Drawing.Size(183, 25);
+            this.toolBar.Size = new System.Drawing.Size(268, 25);
             this.toolBar.TabIndex = 1;
             this.toolBar.Text = "toolStrip1";
             // 
@@ -96,12 +99,18 @@
             this.btnZoomIn.Text = "Zoom In";
             this.btnZoomIn.Click += new System.EventHandler(this.btnZoomIn_Click);
             // 
+            // lblColor
+            // 
+            this.lblColor.Name = "lblColor";
+            this.lblColor.Size = new System.Drawing.Size(87, 22);
+            this.lblColor.Text = "RGBA(0,0,0,0)";
+            // 
             // ImageBox
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(183, 158);
+            this.ClientSize = new System.Drawing.Size(268, 209);
             this.Controls.Add(this.toolBar);
             this.Controls.Add(this.pictureBox);
             this.MaximizeBox = false;
@@ -127,5 +136,6 @@
         private System.Windows.Forms.ToolStripButton btnCopy;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator0;
         private System.Windows.Forms.ToolStripButton btnZoomIn;
+        private System.Windows.Forms.ToolStripLabel lblColor;
     }
 }
