@@ -6,6 +6,8 @@ namespace _3DSExplorer
 {
     public partial class ImageBox : Form
     {
+        private Bitmap _bmp;
+
         private ImageBox()
         {
             InitializeComponent();
@@ -14,6 +16,7 @@ namespace _3DSExplorer
         private void SetImage(Image image)
         {
             pictureBox.Image = image;
+            _bmp = new Bitmap(image);
             pictureBox.Size = new Size(image.Width + 2,image.Height + 2);
         }
 
@@ -43,6 +46,12 @@ namespace _3DSExplorer
             btnZoomIn.Checked = !btnZoomIn.Checked;
             pictureBox.Width = pictureBox.Image.Width * (btnZoomIn.Checked ? 2 : 1);
             pictureBox.Height = pictureBox.Image.Height * (btnZoomIn.Checked ? 2 : 1);
+        }
+
+        private void pictureBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            var clr = _bmp.GetPixel(e.X, e.Y);
+            lblColor.Text = string.Format("RGBA({0},{1},{2},{3})", clr.R, clr.G, clr.B, clr.A);
         }
     }
 }
