@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Drawing;
+using System.Windows.Forms;
 using _3DSExplorer.Utils;
 
 namespace _3DSExplorer
@@ -53,6 +54,7 @@ namespace _3DSExplorer
 
     public class CIAContext : IContext
     {
+        private string errorMessage = string.Empty;
         public CIAHeader Header;
         public long CertificateChainOffset;
         public long TicketOffset;
@@ -93,7 +95,7 @@ namespace _3DSExplorer
             Russian
         }
 
-        public bool Open(FileStream fs)
+        public bool Open(Stream fs)
         {
             var intBytes = new byte[4];
             Header = MarshalUtil.ReadStruct<CIAHeader>(fs); //read header
@@ -114,13 +116,25 @@ namespace _3DSExplorer
 
             fs.Seek(TicketOffset, SeekOrigin.Begin);
             TicketContext = new TicketContext();
-            TicketContext.Open(fs);
+            if (!TicketContext.Open(fs))
+            {
+                errorMessage = TicketContext.GetErrorMessage();
+                return false;
+            }
             fs.Seek(CertificateChainOffset, SeekOrigin.Begin);
             CertificatesContext = new CertificatesContext();
-            CertificatesContext.Open(fs);
+            if (!CertificatesContext.Open(fs))
+            {
+                errorMessage = CertificatesContext.GetErrorMessage();
+                return false;
+            }
             fs.Seek(TMDOffset, SeekOrigin.Begin);
             TMDContext = new TMDContext();
-            TMDContext.Open(fs);
+            if (!TMDContext.Open(fs))
+            {
+                errorMessage = TMDContext.GetErrorMessage();
+                return false;
+            }
 
             if (Header.BannerLength > 0)
             {
@@ -140,6 +154,11 @@ namespace _3DSExplorer
                 LargeIcon = ImageUtil.ReadImageFromStream(fs, 48, 48, ImageUtil.PixelFormat.RGB565);
             }
             return true;
+        }
+
+        public string GetErrorMessage()
+        {
+            return errorMessage;
         }
 
         public void Create(FileStream fs, FileStream src)
@@ -203,6 +222,39 @@ namespace _3DSExplorer
                     break;
             }
             f.AutoAlignColumns();
+        }
+
+        public bool CanCreate()
+        {
+            return Header.BannerLength > 0;
+        }
+
+        public TreeNode GetExplorerTopNode()
+        {
+            var tNode = new TreeNode("CIA") { Tag = TreeViewContextTag.Create(this, (int)CIAView.CIA) };
+            if (CertificatesContext != null && CertificatesContext.List.Count > 0)
+                tNode.Nodes.Add(CertificatesContext.GetExplorerTopNode());
+            if ((uint) TicketContext.Ticket.SignatureType != 0)
+                tNode.Nodes.Add(TicketContext.GetExplorerTopNode());
+            if (TMDContext != null)
+                tNode.Nodes.Add(TMDContext.GetExplorerTopNode());
+            if (Header.BannerLength > 0)
+            {
+                var bNode = new TreeNode("Banner") {Tag = TreeViewContextTag.Create(this, (int) CIAView.Banner)};
+                bNode.Nodes.Add("Meta-Data").Tag = TreeViewContextTag.Create(this,(int)CIAView.BannerMetaData);
+                tNode.Nodes.Add(bNode);
+            }
+            return tNode;
+        }
+
+        public TreeNode GetFileSystemTopNode()
+        {
+            var topNode = new TreeNode("CIA", 1, 1);
+            var iNode = new TreeNode("ICN", 1, 1);
+            iNode.Nodes.Add(new TreeNode(TreeListView.TreeListViewControl.CreateMultiColumnNodeText("Small Icon","24x24")) {Tag = SmallIcon});
+            iNode.Nodes.Add(new TreeNode(TreeListView.TreeListViewControl.CreateMultiColumnNodeText("Large Icon", "48x48")) { Tag = LargeIcon });
+            topNode.Nodes.Add(iNode);
+            return topNode;
         }
     }
 

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace _3DSExplorer
 {
@@ -64,6 +65,7 @@ namespace _3DSExplorer
 
     public class TMDContext : IContext
     {
+        private string errorMessage = string.Empty;
         public TMDHeader Head;
         public SignatureType SignatureType;
         public TMDContentInfoRecord[] ContentInfoRecords;
@@ -78,7 +80,7 @@ namespace _3DSExplorer
             ContentChunkRecord
         };
 
-        public bool Open(FileStream fs)
+        public bool Open(Stream fs)
         {
             try
             {
@@ -91,7 +93,10 @@ namespace _3DSExplorer
                 else if (SignatureType == SignatureType.RSA_4096_SHA256)
                     Hash = new byte[512];
                 else
+                {
+                    errorMessage = "This kind of TMD is unsupported.";
                     return false;
+                }
                 fs.Read(Hash, 0, Hash.Length);
                 //Continue reading header
                 Head = MarshalUtil.ReadStructBE<TMDHeader>(fs); //read header
@@ -111,15 +116,25 @@ namespace _3DSExplorer
                     case SignatureType.RSA_4096_SHA256:
                         fs.Seek(-4, SeekOrigin.Current); //go back
                         CertificatesContext = new CertificatesContext();
-                        CertificatesContext.Open(fs);
+                        if (!CertificatesContext.Open(fs))
+                        {
+                            errorMessage = CertificatesContext.GetErrorMessage();
+                            return false;
+                        }
                         break;
                 }
                 return true;
             }
             catch
             {
+                errorMessage = "Error opening the TMD file. may be corrupt.";
                 return false;
             }
+        }
+
+        public string GetErrorMessage()
+        {
+            return errorMessage;
         }
 
         public void Create(FileStream fs, FileStream src)
@@ -202,6 +217,26 @@ namespace _3DSExplorer
                     break;
             }
             f.AutoAlignColumns();
+        }
+
+        public bool CanCreate()
+        {
+            return false;
+        }
+
+        public TreeNode GetExplorerTopNode()
+        {
+            var tNode = new TreeNode("TMD") { Tag = TreeViewContextTag.Create(this, (int)TMDView.TMD) };
+            tNode.Nodes.Add("Content Info Records").Tag = TreeViewContextTag.Create(this,(int)TMDView.ContentInfoRecord);
+            tNode.Nodes.Add("Content Chunk Records").Tag = TreeViewContextTag.Create(this,(int)TMDView.ContentChunkRecord);
+            if (CertificatesContext != null)
+                tNode.Nodes.Add(CertificatesContext.GetExplorerTopNode());
+            return tNode;
+        }
+
+        public TreeNode GetFileSystemTopNode()
+        {
+            return null;
         }
     }
 }

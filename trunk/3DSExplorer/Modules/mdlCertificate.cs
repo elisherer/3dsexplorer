@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace _3DSExplorer
 {
@@ -32,9 +33,10 @@ namespace _3DSExplorer
 
     public class CertificatesContext : IContext
     {
+        private string errorMessage = string.Empty;
         public ArrayList List; //of CertificateEntry
 
-        public bool Open(FileStream fs)
+        public bool Open(Stream fs)
         {
             List = new ArrayList();
             try
@@ -69,6 +71,11 @@ namespace _3DSExplorer
 
             }
             return true;
+        }
+
+        public string GetErrorMessage()
+        {
+            return errorMessage;
         }
 
         public void Create(FileStream fs, FileStream src)
@@ -111,6 +118,24 @@ namespace _3DSExplorer
                 f.AddListItem(off + 556, 52, "Padding", cert.Padding, 0);
             }
             f.AutoAlignColumns();
+        }
+
+        public bool CanCreate()
+        {
+            return false;
+        }
+
+        public TreeNode GetExplorerTopNode()
+        {
+            var tNode = new TreeNode("Certificates") { Tag = TreeViewContextTag.Create(this, 0, new[] { -1 }) };
+            for (var i = 0; i < List.Count; i++)
+                tNode.Nodes.Add(new TreeNode("Certificate " + i) { Tag = TreeViewContextTag.Create(this, 0, new[] { i }) });
+            return tNode;
+        }
+
+        public TreeNode GetFileSystemTopNode()
+        {
+            return null;
         }
     }
 }

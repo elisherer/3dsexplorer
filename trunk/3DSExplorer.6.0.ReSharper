@@ -85,6 +85,11 @@
       <Abbreviation Text="ETC" />
       <Abbreviation Text="LA" />
       <Abbreviation Text="HILO" />
+      <Abbreviation Text="CGFX" />
+      <Abbreviation Text="CXI" />
+      <Abbreviation Text="PCM" />
+      <Abbreviation Text="ADPCM" />
+      <Abbreviation Text="MM" />
     </Naming2>
   </CodeStyleSettings>
   <Daemon.SolutionSettings>

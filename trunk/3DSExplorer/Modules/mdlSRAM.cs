@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Windows.Forms;
 
 namespace _3DSExplorer
 {
@@ -224,6 +225,7 @@ namespace _3DSExplorer
 
     public class SRAMContext : IContext
     {
+        private string errorMessage = string.Empty;
         public class Partition
         {
             public ulong OffsetInImage;
@@ -275,7 +277,6 @@ namespace _3DSExplorer
         public uint[] FilesMap;
         public uint[] FoldersMap;
         public SRAMBlockMapEntry[] BlockMap;
-        public string errorMessage;
 
         public enum SRAMView
         {
@@ -284,7 +285,7 @@ namespace _3DSExplorer
             Tables
         };
 
-        public bool Open(FileStream fs)
+        public bool Open(Stream fs)
         {
             Encrypted = IsEncrypted(fs);
             
@@ -434,7 +435,7 @@ namespace _3DSExplorer
 
                 if (p == 0)
                 {
-                    long saveOffset = ims.Position;
+                    var saveOffset = ims.Position;
                     Save = MarshalUtil.ReadStruct<SAVE>(ims);
                     //add SAVE information (if exists) (suppose to...)
                     if (IsSaveMagic(Save.Magic)) //read 
@@ -494,6 +495,11 @@ namespace _3DSExplorer
             ims.Close();
             ms.Close();
             return true;
+        }
+
+        public string GetErrorMessage()
+        {
+            return errorMessage;
         }
 
         public void Create(FileStream fs, FileStream src)
@@ -764,6 +770,49 @@ namespace _3DSExplorer
                     break;
             }
             f.AutoAlignColumns();
+        }
+
+        public bool CanCreate()
+        {
+            return true;
+        }
+
+        public TreeNode GetExplorerTopNode()
+        {
+            var tNode = new TreeNode("Save Flash " + (Encrypted ? "(Encrypted)" : "")) { Tag = TreeViewContextTag.Create(this, (int)SRAMView.Image) };
+            var sNode = new TreeNode("SAVE Partition") { Tag = TreeViewContextTag.Create(this, (int)SRAMView.Partition, new[] { 0 })};
+            sNode.Nodes.Add("Maps").Tag = TreeViewContextTag.Create(this,(int)SRAMView.Tables);
+            tNode.Nodes.Add(sNode);
+            if (IsData)
+                tNode.Nodes.Add("DATA Partition").Tag = TreeViewContextTag.Create(this,(int)SRAMView.Partition, new[] { 1 } );
+            return tNode;
+        }
+
+        public TreeNode GetFileSystemTopNode()
+        {
+            var tNode = new TreeNode("SRAM", 1, 1);
+            var folders = new TreeNode[Folders.Length];
+            //add root folder
+            folders[0] = tNode.Nodes.Add("root","ROOT",1,1);
+            //add folders
+            if (Folders.Length > 1)
+                for (var i = 1; i < Folders.Length; i++)
+                {
+                    folders[i] = folders[Folders[i].ParentFolderIndex - 1].Nodes.Add( StringUtil.CharArrayToString(Folders[i].FolderName));
+                    folders[i].ImageIndex = 1;
+                    folders[i].SelectedImageIndex = 1;
+                }
+            //add files
+            if (Files.Length > 0)
+            {
+                for (var i = 0; i < Files.Length; i++)
+                    folders[Files[i].ParentFolderIndex - 1].Nodes.Add(
+                        TreeListView.TreeListViewControl.CreateMultiColumnNodeText(
+                        StringUtil.CharArrayToString(Files[i].Filename),
+                        Files[i].FileSize.ToString(),
+                        StringUtil.ToHexString(6,(ulong)FileBase + 0x200 * Files[i].BlockOffset))).Tag = Files[i];
+            }
+            return tNode;
         }
 
         #region private stuff

@@ -11,14 +11,7 @@ namespace _3DSExplorer
     {
         private IContext _currentContext;
         private string _filePath, _remoteVer;
-        private bool _checkNow = false;
-
-        private class TreeViewContextTag
-        {
-            public IContext Context;
-            public int View;
-            public int[] Values;
-        }
+        private bool _checkNow;
 
         public frmExplorer()
         {
@@ -106,214 +99,39 @@ namespace _3DSExplorer
         {
             _filePath = path;
             var fs = File.OpenRead(_filePath);
-
             var type = ModuleHelper.GetModuleType(_filePath, fs);
-
-            treeView.Nodes.Clear();
-            lvFileTree.Nodes.Clear();
-            fs.Seek(0, SeekOrigin.Begin);
-            TreeNode tNode;
-            switch (type)
+            var tempContext = ModuleHelper.CreateByType(type);
+            if (tempContext == null)
             {
-                case ModuleType.Rom:
-                    var rcxt = new RomContext();
-                    if (!rcxt.Open(fs))
-                    {
-                        MessageBox.Show(@"Error reading file.");
-                        break;
-                    }
-                    LoadText(_filePath);
-                    //Build Tree
-                    tNode = treeView.Nodes.Add("Rom");
-                    tNode.Tag = new TreeViewContextTag { Context = rcxt, View = (int)RomContext.RomView.NCSD};
-                    for (int i = 0; i < rcxt.cxis.Length; i++) //ADD CXIs
-                        if (rcxt.cxis[i].CXISize > 0)
-                        {
-                            tNode.Nodes.Add("NCCH " + i + " (" +
-                                                (new String(rcxt.cxis[i].ProductCode)).Substring(0, 10) + ")").Tag = new TreeViewContextTag { Context = rcxt, View = (int)RomContext.RomView.NCCH , Values = new[] {i}};
-                            if (rcxt.cxis[i].PlainRegionSize > 0) //Add PlainRegions
-                                tNode.Nodes[tNode.Nodes.Count - 1].Nodes.Add("PlainRegion").Tag = new TreeViewContextTag { Context = rcxt, View = (int)RomContext.RomView.NCCHPlainRegion, Values = new[]{i}};
-                        }
-                    for (var i = 0; i < 2; i++)
-                    {
-                        if (rcxt.cxis[i].ExeFSSize > 0)
-                        {
-                            tNode = lvFileTree.Nodes.Add("ExeFS" + i + ".bin");
-                            lvFileTree.AddSubItem(tNode, (rcxt.cxis[i].ExeFSSize * 0x200).ToString());
-                            lvFileTree.AddSubItem(tNode, StringUtil.ToHexString(6, rcxt.cxis[i].ExeFSOffset * 0x200));
-                            tNode.ImageIndex = 0;
-                            tNode.Tag = rcxt.cxis[i];
-                        }
-                        if (rcxt.cxis[i].RomFSSize <= 0) continue;
-                        tNode = lvFileTree.Nodes.Add("RomFS" + i + ".bin");
-                        lvFileTree.AddSubItem(tNode, (rcxt.cxis[i].RomFSSize * 0x200).ToString());
-                        lvFileTree.AddSubItem(tNode, StringUtil.ToHexString(6, rcxt.cxis[i].RomFSOffset * 0x200));
-                        tNode.ImageIndex = 0;
-                        tNode.Tag = rcxt.cxis[i];
-                    }
-                    treeView.ExpandAll();
-                    _currentContext = rcxt;
-                    treeView.SelectedNode = treeView.Nodes[0];
-                    break;
-                case ModuleType.SRAM_Decrypted: //Save
-                case ModuleType.SRAM: //Save
-                    var scxt = new SRAMContext();
-                    if (!scxt.Open(fs))
-                    {
-                        MessageBox.Show(@"Error: " + scxt.errorMessage);
-                        break;
-                    }    
-                    LoadText(_filePath);
-                    //Build Tree
-                    tNode = treeView.Nodes.Add("Save Flash " + (scxt.Encrypted ? "(Encrypted)" : ""));
-                    tNode.Tag = new TreeViewContextTag { Context = scxt, View = (int)SRAMContext.SRAMView.Image };
-                    var sNode = tNode.Nodes.Add("SAVE Partition");
-                    sNode.Tag = new TreeViewContextTag { Context = scxt, View = (int)SRAMContext.SRAMView.Partition, Values = new[] {0}};
-                    sNode.Nodes.Add("Maps").Tag = new TreeViewContextTag { Context = scxt, View = (int)SRAMContext.SRAMView.Tables};
-                    if (scxt.IsData)
-                        tNode.Nodes.Add("DATA Partition").Tag = new TreeViewContextTag { Context = scxt, View = (int)SRAMContext.SRAMView.Partition, Values = new[] { 1 } };
-                    lvFileTree.Nodes.Clear();
-                    var folders = new TreeNode[scxt.Folders.Length];
-                    //add root folder
-                    folders[0] = lvFileTree.Nodes.Add("ROOT");
-                    folders[0].ImageIndex = 1;
-                    folders[0].SelectedImageIndex = 1;
-                    //add folders
-                    if (scxt.Folders.Length > 1)
-                        for (int i = 1; i < scxt.Folders.Length; i++)
-                        {
-                            folders[i] =
-                                folders[scxt.Folders[i].ParentFolderIndex - 1].Nodes.Add(
-                                    StringUtil.CharArrayToString(scxt.Folders[i].FolderName));
-                            folders[i].ImageIndex = 1;
-                            folders[i].SelectedImageIndex = 1;
-                        }
-                    //add files
-                    if (scxt.Files.Length > 0)
-                    {
-                        for (var i = 0; i < scxt.Files.Length; i++)
-                        {
-                            var lvItem =
-                                folders[scxt.Files[i].ParentFolderIndex - 1].Nodes.Add(
-                                    StringUtil.CharArrayToString(scxt.Files[i].Filename));
-                            lvFileTree.AddSubItem(lvItem, scxt.Files[i].FileSize.ToString());
-                            lvFileTree.AddSubItem(lvItem,
-                                                    StringUtil.ToHexString(6,
-                                                                            (ulong)
-                                                                            (scxt.FileBase +
-                                                                            0x200*scxt.Files[i].BlockOffset)));
-                            lvItem.ImageIndex = 0;
-                            lvItem.Tag = scxt.Files[i];
-                        }
-                    }
-                    folders[0].ExpandAll();
-                    treeView.ExpandAll();
-                    _currentContext = scxt;
-                    treeView.SelectedNode = treeView.Nodes[0];
-                    break;
-                case ModuleType.TMD:
-                    var tcxt = new TMDContext();
-                    if (!tcxt.Open(fs))
-                    {
-                        MessageBox.Show(@"This kind of TMD is unsupported.");
-                        break;
-                    }                    
-                    LoadText(_filePath);
-                    //Build Tree
-                    tNode = treeView.Nodes.Add("TMD");
-                    tNode.Tag = new TreeViewContextTag { Context = tcxt, View = (int)TMDContext.TMDView.TMD };
-                    tNode.Nodes.Add("Content Info Records").Tag = new TreeViewContextTag { Context = tcxt, View = (int)TMDContext.TMDView.ContentInfoRecord };
-                    tNode.Nodes.Add("Content Chunk Records").Tag = new TreeViewContextTag { Context = tcxt, View = (int)TMDContext.TMDView.ContentChunkRecord };
-                    if (tcxt.CertificatesContext != null && tcxt.CertificatesContext.List.Count > 0)
-                    {
-                        tNode = treeView.TopNode.Nodes.Add("Certificates");
-                        tNode.Tag = new TreeViewContextTag { Context = tcxt.CertificatesContext, Values = new[] { -1 } };
-                        for (var i = 0; i < tcxt.CertificatesContext.List.Count; i++)
-                            tNode.Nodes.Add("Certificate " + i).Tag = new TreeViewContextTag { Context = tcxt.CertificatesContext, Values = new[] { i } };
-                    }
-                    treeView.ExpandAll();
-                    _currentContext = tcxt;
-                    treeView.SelectedNode = treeView.Nodes[0];
-                    break;
-                case ModuleType.CIA:
-                    var ccxt = new CIAContext();
-                    if (!ccxt.Open(fs))
-                    {
-                        MessageBox.Show(@"Error reading file.");
-                        break;
-                    }
-                    LoadText(_filePath);
-                    //Build Tree
-                    treeView.Nodes.Add("CIA").Tag = new TreeViewContextTag {Context = ccxt, View = (int)CIAContext.CIAView.CIA};
-                    if (ccxt.CertificatesContext.List.Count > 0)
-                    {
-                        tNode = treeView.TopNode.Nodes.Add("Certificates");
-                        tNode.Tag = new TreeViewContextTag { Context = ccxt.CertificatesContext, Values = new[] { -1 } };
-                        for (var i = 0; i < ccxt.CertificatesContext.List.Count; i++)
-                            tNode.Nodes.Add("Certificate " + i).Tag = new TreeViewContextTag { Context = ccxt.CertificatesContext, Values = new[] {i}};
-                    }
-                    if ((uint) ccxt.TicketContext.Ticket.SignatureType != 0)
-                        treeView.TopNode.Nodes.Add("Ticket").Tag = new TreeViewContextTag { Context = ccxt.TicketContext };;
-                    if (ccxt.TMDContext != null)
-                    {
-                        tNode = treeView.TopNode.Nodes.Add("TMD");
-                        tNode.Tag = new TreeViewContextTag { Context = ccxt.TMDContext, View = (int)TMDContext.TMDView.TMD };
-                        tNode.Nodes.Add("Content Info Records").Tag = new TreeViewContextTag { Context = ccxt.TMDContext, View = (int)TMDContext.TMDView.ContentInfoRecord };
-                        tNode.Nodes.Add("Content Chunk Records").Tag = new TreeViewContextTag { Context = ccxt.TMDContext, View = (int)TMDContext.TMDView.ContentChunkRecord };
-                    }
-                    if (ccxt.Header.BannerLength > 0)
-                    {
-                        tNode = treeView.TopNode.Nodes.Add("Banner");
-                        tNode.Tag = new TreeViewContextTag { Context = ccxt, View = (int)CIAContext.CIAView.Banner };
-                        tNode.Nodes.Add("Meta-Data").Tag = new TreeViewContextTag { Context = ccxt, View = (int)CIAContext.CIAView.BannerMetaData }; ;
-                        if (imlFS.Images.ContainsKey("small"))
-                            imlFS.Images.RemoveByKey("small");
-                        if (imlFS.Images.ContainsKey("large"))
-                            imlFS.Images.RemoveByKey("large");
-                        imlFS.Images.Add("small", ccxt.SmallIcon);
-                        imlFS.Images.Add("large", ccxt.LargeIcon);
-                        tNode = lvFileTree.Nodes.Add("small", "Small (24x24)", "small");
-                        tNode.SelectedImageKey = @"small";
-                        tNode.Tag = ccxt.SmallIcon;
-                        tNode = lvFileTree.Nodes.Add("large", "Large (48x48)", "large");
-                        tNode.SelectedImageKey = @"large";
-                        tNode.Tag = ccxt.LargeIcon;
-                    }
-                    treeView.ExpandAll();
-                    _currentContext = ccxt;
-                    treeView.SelectedNode = treeView.Nodes[0];
-                    break;
-                case ModuleType.Banner:
-                    var bcxt = new BannerContext();
-                    if (!bcxt.Open(fs))
-                    {
-                        MessageBox.Show(@"Error reading file.");
-                        break;
-                    }
-                    LoadText(_filePath);
-                    //Build Tree
-                    tNode = treeView.Nodes.Add("CBMD");
-                    tNode.Tag = new TreeViewContextTag { Context = bcxt, View = (int)BannerContext.BannerView.Banner };
-                    tNode.Nodes.Add("CGFX").Tag = new TreeViewContextTag { Context = bcxt, View = (int)BannerContext.BannerView.CGFX };
-                    tNode.Nodes.Add("CWAV").Tag = new TreeViewContextTag { Context = bcxt, View = (int)BannerContext.BannerView.CWAV };
-
-                    if (imlFS.Images.ContainsKey("banner"))
-                        imlFS.Images.RemoveByKey("banner");
-                    imlFS.Images.Add("banner", bcxt.BannerImage);
-                    tNode = lvFileTree.Nodes.Add("banner", "Banner (256x128)", "banner");
-                    tNode.SelectedImageKey = @"banner";
-                    tNode.Tag = bcxt.BannerImage;
-                        
-                    treeView.ExpandAll();
-                    _currentContext = bcxt;
-                    treeView.SelectedNode = treeView.Nodes[0];
-                    
-                    break;
-                default: MessageBox.Show(@"This file is unsupported!"); break;
+                MessageBox.Show(@"This file is unsupported!");
+                fs.Close();
+                return;
+            }
+            fs.Seek(0, SeekOrigin.Begin);
+            if (!tempContext.Open(fs))
+            {
+                MessageBox.Show(@"Error: " + tempContext.GetErrorMessage());
+                fs.Close();
+                return;
             }
             fs.Close();
-            if (_currentContext == null) return;
-            menuFileSave.Enabled = (type == ModuleType.SRAM) || (type == ModuleType.SRAM_Decrypted) || ((type == ModuleType.CIA) && ((CIAContext)_currentContext).Header.BannerLength > 0);
+
+            //Start the open process
+            LoadText(_filePath);
+            treeView.Nodes.Clear();
+            var nodes = tempContext.GetExplorerTopNode();
+            treeView.Nodes.Add(nodes);
+            treeView.ExpandAll();
+            lvFileTree.Nodes.Clear();
+            nodes = tempContext.GetFileSystemTopNode();
+            if (nodes != null)
+                lvFileTree.Nodes.Add(nodes);
+            lvFileTree.ExpandAll();
+
+            _currentContext = tempContext;
+            treeView.SelectedNode = treeView.Nodes[0];
+
+            menuFileSave.Enabled = _currentContext.CanCreate();
             menuFileSaveImageFile.Enabled = (type == ModuleType.SRAM) || (type == ModuleType.SRAM_Decrypted);
             menuFileSaveKeyFile.Enabled = type == ModuleType.SRAM;
         }
@@ -410,6 +228,10 @@ namespace _3DSExplorer
                     {
                         ImageBox.ShowDialog((System.Drawing.Image)tn.Tag);
                     }
+                    else if (tn.Tag is CWAVContext)
+                    {
+                        CWAVContext.Play((CWAVContext)tn.Tag);
+                    }
                 }
             }
         }
@@ -448,7 +270,7 @@ namespace _3DSExplorer
         private void menuFileOpen_Click(object sender, EventArgs e)
         {
             //Todo: get strings from the modules
-            openFileDialog.Filter = @"All Supported (3ds,cci,bin,sav,tmd,cia,bnr)|*.3ds;*.cci;*.bin;*.sav;*.tmd;*.cia;*.bnr|3DS Rom Files (*.3ds,*.cci)|*.3ds;*.cci|Save Binary Files (*.bin,*.sav)|*.bin;*.sav|Title Metadata (*.tmd)|*.tmd|CTR Importable Archives (*.cia)|*.cia|CTR Banners (*.bnr)|*.bnr|All Files|*.*";
+            openFileDialog.Filter = @"All Supported (3ds,cci,bin,sav,tmd,cia,bnr,bcwav,cgfx)|*.3ds;*.cci;*.bin;*.sav;*.tmd;*.cia;*.bnr;*.bcwav;*.cwav;*.cgfx|3DS Rom Files (*.3ds,*.cci)|*.3ds;*.cci|Save Binary Files (*.bin,*.sav)|*.bin;*.sav|Title Metadata (*.tmd)|*.tmd|CTR Importable Archives (*.cia)|*.cia|CTR Banners (*.bnr)|*.bnr|CTR Waves (*.b/cwav)|*.bcwav;*.cwav|CTR Graphics (*.cgfx)|*.cgfx|All Files|*.*";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
                 OpenFile(openFileDialog.FileName);
         }
