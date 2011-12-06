@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewGroup listViewGroup15 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup20 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup21 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.lstInfo = new System.Windows.Forms.ListView();
@@ -102,28 +102,28 @@
             this.chHexValue});
             this.lstInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstInfo.FullRowSelect = true;
-            listViewGroup15.Header = "";
-            listViewGroup15.Name = "lvg0";
-            listViewGroup16.Header = "";
-            listViewGroup16.Name = "lvg1";
-            listViewGroup17.Header = "";
-            listViewGroup17.Name = "lvg2";
-            listViewGroup18.Header = "";
-            listViewGroup18.Name = "lvg3";
-            listViewGroup19.Header = "";
-            listViewGroup19.Name = "lvg4";
-            listViewGroup20.Header = "";
-            listViewGroup20.Name = "lvg5";
-            listViewGroup21.Header = "";
-            listViewGroup21.Name = "lvg6";
+            listViewGroup8.Header = "";
+            listViewGroup8.Name = "lvg0";
+            listViewGroup9.Header = "";
+            listViewGroup9.Name = "lvg1";
+            listViewGroup10.Header = "";
+            listViewGroup10.Name = "lvg2";
+            listViewGroup11.Header = "";
+            listViewGroup11.Name = "lvg3";
+            listViewGroup12.Header = "";
+            listViewGroup12.Name = "lvg4";
+            listViewGroup13.Header = "";
+            listViewGroup13.Name = "lvg5";
+            listViewGroup14.Header = "";
+            listViewGroup14.Name = "lvg6";
             this.lstInfo.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup15,
-            listViewGroup16,
-            listViewGroup17,
-            listViewGroup18,
-            listViewGroup19,
-            listViewGroup20,
-            listViewGroup21});
+            listViewGroup8,
+            listViewGroup9,
+            listViewGroup10,
+            listViewGroup11,
+            listViewGroup12,
+            listViewGroup13,
+            listViewGroup14});
             this.lstInfo.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lstInfo.HideSelection = false;
             this.lstInfo.Location = new System.Drawing.Point(0, 0);
@@ -266,7 +266,7 @@
             // cName
             // 
             this.cName.Text = "Name";
-            this.cName.Width = 130;
+            this.cName.Width = 150;
             // 
             // cSize
             // 
@@ -276,7 +276,6 @@
             // cOffset
             // 
             this.cOffset.Text = "Offset";
-            this.cOffset.Width = 65;
             // 
             // cxtFile
             // 

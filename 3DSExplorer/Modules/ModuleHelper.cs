@@ -7,6 +7,8 @@ namespace _3DSExplorer
         Unknown = -1,
         Banner = 0,
         CIA,
+        CGFX,
+        CWAV,
         Rom,
         SRAM_Decrypted,
         SRAM,
@@ -15,6 +17,29 @@ namespace _3DSExplorer
 
     public static class ModuleHelper
     {
+
+        public static IContext CreateByType(ModuleType type)
+        {
+            switch (type)
+            {
+                case ModuleType.Banner:
+                    return new BannerContext();
+                    case ModuleType.CGFX:
+                    return new CGFXContext();
+                    case ModuleType.CIA:
+                    return new CIAContext();
+                    case ModuleType.CWAV:
+                    return new CWAVContext();
+                    case ModuleType.Rom:
+                    return new RomContext();
+                    case ModuleType.SRAM_Decrypted:
+                    case ModuleType.SRAM:
+                    return new SRAMContext();
+                    case ModuleType.TMD:
+                    return new TMDContext();
+            }
+            return null;
+        }
 
         public static ModuleType GetModuleType(string filePath, FileStream fs)
         {
@@ -43,6 +68,13 @@ namespace _3DSExplorer
                 case ".bnr":
                     type = ModuleType.Banner;
                     break;
+                case ".cgfx":
+                    type = ModuleType.CGFX;
+                    break;
+                case ".cwav":
+                case ".bcwav":
+                    type = ModuleType.CWAV;
+                    break;
                 default:
                     fs.Seek(0, SeekOrigin.Begin);
                     fs.Read(magic, 0, 4);
@@ -52,6 +84,10 @@ namespace _3DSExplorer
                         type = ModuleType.CIA;
                     else if (magic[0] == 'C' && magic[1] == 'B' && magic[2] == 'M' && magic[3] == 'D')
                         type = ModuleType.Banner;
+                    else if (magic[0] == 'C' && magic[1] == 'G' && magic[2] == 'F' && magic[3] == 'X')
+                        type = ModuleType.CGFX;
+                    else if (magic[0] == 'C' && magic[1] == 'W' && magic[2] == 'A' && magic[3] == 'V')
+                        type = ModuleType.CWAV;
                     else if (fs.Length >= 0x104) // > 256+4
                     {
                         //CCI CHECK

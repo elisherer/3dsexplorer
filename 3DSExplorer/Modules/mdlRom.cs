@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace _3DSExplorer
 {
@@ -253,6 +254,7 @@ namespace _3DSExplorer
 
     public class RomContext : IContext
     {
+        private string errorMessage = string.Empty;
         public CCI cci;
         public CXI[] cxis;
         public CXIPlaingRegion[] cxiprs;
@@ -264,7 +266,7 @@ namespace _3DSExplorer
             NCCHPlainRegion
         };
 
-        public bool Open(FileStream fs)
+        public bool Open(Stream fs)
         {
             cci = MarshalUtil.ReadStruct<CCI>(fs);
 
@@ -308,6 +310,11 @@ namespace _3DSExplorer
                 cxiprs[2] = CXI.getPlainRegionStringsFrom(plainRegionBuffer);
             }
             return true;
+        }
+
+        public string GetErrorMessage()
+        {
+            return errorMessage;
         }
 
         public void Create(FileStream fs, FileStream src)
@@ -374,6 +381,48 @@ namespace _3DSExplorer
                     break;
             }
             f.AutoAlignColumns();
+        }
+
+        public bool CanCreate()
+        {
+            return false;
+        }
+
+        public TreeNode GetExplorerTopNode()
+        {
+            var tNode = new TreeNode("Rom") { Tag = TreeViewContextTag.Create(this, (int)RomView.NCSD) };
+            for (var i = 0; i < cxis.Length; i++) //ADD CXIs
+                if (cxis[i].CXISize > 0)
+                {
+                    tNode.Nodes.Add("NCCH " + i + " (" + (new String(cxis[i].ProductCode)).Substring(0, 10) + ")").Tag = TreeViewContextTag.Create(this,(int)RomView.NCCH,new[] { i } );
+                    if (cxis[i].PlainRegionSize > 0) //Add PlainRegions
+                        tNode.Nodes[tNode.Nodes.Count - 1].Nodes.Add("PlainRegion").Tag = TreeViewContextTag.Create(this,(int)RomView.NCCHPlainRegion,new[] { i });
+                }
+            return tNode;
+        }
+
+        public TreeNode GetFileSystemTopNode()
+        {
+            var tNode = new TreeNode("Rom", 1, 1);
+            for (var i = 0; i < 2; i++)
+            {
+                if (cxis[i].ExeFSSize > 0)
+                    tNode.Nodes.Add(new TreeNode(
+                        TreeListView.TreeListViewControl.CreateMultiColumnNodeText(
+                            "ExeFS" + i + ".bin",
+                            (cxis[i].ExeFSSize*0x200).ToString(),
+                            StringUtil.ToHexString(6, cxis[i].ExeFSOffset*0x200)
+                            )) {Tag = cxis[i]});
+                
+                if (cxis[i].RomFSSize <= 0) continue;
+                tNode.Nodes.Add(new TreeNode(
+                        TreeListView.TreeListViewControl.CreateMultiColumnNodeText(
+                            "RomFS" + i + ".bin",
+                            (cxis[i].RomFSSize * 0x200).ToString(),
+                            StringUtil.ToHexString(6, cxis[i].RomFSOffset * 0x200)
+                            )) { Tag = cxis[i] });
+            }
+            return tNode;
         }
     }
 
