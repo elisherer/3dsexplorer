@@ -392,7 +392,7 @@ namespace _3DSExplorer
 
         private void menuHelpAbout_Click(object sender, EventArgs e)
         {
-
+            (new frmAbout()).ShowDialog();
         }
 
         #endregion

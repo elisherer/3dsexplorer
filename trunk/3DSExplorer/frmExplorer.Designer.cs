@@ -81,9 +81,11 @@
             this.menuHelpSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.bwCheckForUpdates = new System.ComponentModel.BackgroundWorker();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerLeft)).BeginInit();
             this.splitContainerLeft.Panel1.SuspendLayout();
             this.splitContainerLeft.Panel2.SuspendLayout();
             this.splitContainerLeft.SuspendLayout();
@@ -484,11 +486,10 @@
             // 
             // menuHelpAbout
             // 
-            this.menuHelpAbout.Enabled = false;
             this.menuHelpAbout.Image = global::_3DSExplorer.Properties.Resources.information;
             this.menuHelpAbout.Name = "menuHelpAbout";
             this.menuHelpAbout.Size = new System.Drawing.Size(235, 22);
-            this.menuHelpAbout.Text = "by elisherer";
+            this.menuHelpAbout.Text = "About...";
             this.menuHelpAbout.Click += new System.EventHandler(this.menuHelpAbout_Click);
             // 
             // bwCheckForUpdates
@@ -512,9 +513,11 @@
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.frmExplorer_DragEnter);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
             this.splitContainerLeft.Panel1.ResumeLayout(false);
             this.splitContainerLeft.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainerLeft)).EndInit();
             this.splitContainerLeft.ResumeLayout(false);
             this.cxtFile.ResumeLayout(false);
             this.menuStrip.ResumeLayout(false);
