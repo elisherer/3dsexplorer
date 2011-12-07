@@ -341,6 +341,7 @@ namespace _3DSExplorer
                 if (foundKey == null)
                 {
                     ms.Close();
+#if DEBUG
                     foundKey = MakeKey(Image);
                     File.WriteAllBytes("_img.bin", Image);
                     XorByteArray(Image, foundKey, 0);
@@ -350,6 +351,10 @@ namespace _3DSExplorer
                                    "Tried to create a key and saved the binaries to " + Environment.NewLine +
                                    Environment.NewLine +
                                    "_img, _dec & _key";
+#else
+                    errorMessage = "Can't find key in binary file. (corrupted or for fw:2.2.0-4+)";
+
+#endif
                     return false;
                 }
                 XorByteArray(Image, foundKey, 0);
@@ -816,10 +821,10 @@ namespace _3DSExplorer
         }
 
         #region private stuff
-
+        /*
         [DllImport("msvcrt.dll")]
         private static extern int memcmp(byte[] b1, byte[] b2, long count);
-
+        */
         private struct HashEntry
         {
             public byte[] Hash;
@@ -881,6 +886,14 @@ namespace _3DSExplorer
             }
         }
 
+        private static bool BufferSame(byte[] array1, byte[] array2, int length)
+        {
+            for (var i = 0; i < length; i++)
+                if (array1[i] != array2[i])
+                    return false;
+            return true;
+        }
+
         private static byte[] FindKey2(byte[] input)
         {
             var ms = new MemoryStream(input);
@@ -929,7 +942,7 @@ namespace _3DSExplorer
                 saveOffset += 0xC00;
             //copy from SAVE
             var xSave = new byte[] { 00, 00, 04, 00, 0x20, 00, 00, 00, 00, 00, 00, 00 };
-            for (int i = 0x04; i < 0x10; i++)
+            for (var i = 0x04; i < 0x10; i++)
                 keyArray[i] = (byte)(input[saveOffset + i] ^ xSave[i - 0x04]);
 
             return keyArray;
@@ -938,7 +951,7 @@ namespace _3DSExplorer
         private static byte[] FindKey(byte[] input)
         {
             var md5 = new MD5CryptoServiceProvider();
-            int count = 0, recIdx = 0, recCount = 0;
+            var count = 0;
             var found = false;
 
             var ffHash = new byte[] { 0xde, 0x03, 0xfe, 0x65, 0xa6, 0x76, 0x5c, 0xaa, 0x8c, 0x91, 0x34, 0x3a, 0xcc, 0x62, 0xcf, 0xfc };
@@ -949,12 +962,12 @@ namespace _3DSExplorer
             {
                 var hash = md5.ComputeHash(input, i * 0x200, 0x200);
 
-                if (memcmp(hash, ffHash, 16) == 0) //skip ff blocks...
+                if (BufferSame(hash, ffHash, 16)) //skip ff blocks...
                     continue;
 
                 // see if we already came up with that hash
                 for (var j = 0; j < count; j++)
-                    if (memcmp(hashList[j].Hash, hash, 16) == 0)
+                    if (BufferSame(hashList[j].Hash, hash, 16))
                     {
                         hashList[j].Count++;
                         found = true;
@@ -969,23 +982,21 @@ namespace _3DSExplorer
                 hashList[count].BlockIndex = i;
                 count++;
             }
-            // find the most common hash
-            for (var i = 0; i < count; i++)
-                if (hashList[i].Count > recCount)
-                {
-                    recCount = hashList[i].Count;
-                    recIdx = i;
-                }
-
-            if (recCount == 0)
-                return null;
-
-            //final DISA check
-            var foundOffset = hashList[recIdx].BlockIndex * 0x200;
-            if (((input[0x100] ^ input[foundOffset + 0x100]) != 'D') ||
-                ((input[0x101] ^ input[foundOffset + 0x101]) != 'I') ||
-                ((input[0x102] ^ input[foundOffset + 0x102]) != 'S') ||
-                ((input[0x103] ^ input[foundOffset + 0x103]) != 'A'))
+            //Sort by count, Decending
+            Array.Sort(hashList, (entry1, entry2) => entry2.Count - entry1.Count);
+            
+            //Check the keys one by one
+            var foundOffset = 0;
+            for (var i=0 ; i<hashList.Count() && !found; i++)
+            {
+                foundOffset = hashList[i].BlockIndex * 0x200;
+                if (((input[0x100] ^ input[foundOffset + 0x100]) == 'D') &&
+                    ((input[0x101] ^ input[foundOffset + 0x101]) == 'I') &&
+                    ((input[0x102] ^ input[foundOffset + 0x102]) == 'S') &&
+                    ((input[0x103] ^ input[foundOffset + 0x103]) == 'A'))
+                     found = true;
+            }
+            if (!found)    
                 return null; //That's not it
 
             var outbuf = new byte[0x200];

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Media;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -69,7 +68,7 @@ namespace _3DSExplorer
             DataBlob = MarshalUtil.ReadStruct<DATABlobHeader>(fs);
             WaveData = new byte[DataBlob.Length - Marshal.SizeOf(DataBlob)];
             fs.Read(WaveData, 0, WaveData.Length);
-
+            /* BUG
             var wf = new WaveFormat
                         {
                             cbSize = 0,
@@ -80,7 +79,7 @@ namespace _3DSExplorer
                             wBitsPerSample = 16,
                             wFormatTag = 1
                         };
-            //BUG MicrosoftWaveData = WinMM.WriteWAVFile(wf, WaveData);
+            MicrosoftWaveData = WinMM.WriteWAVFile(wf, WaveData);*/
             return true;
         }
 
