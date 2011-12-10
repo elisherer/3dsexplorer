@@ -338,6 +338,11 @@ namespace _3DSExplorer
             openForm<frmHashTool>();
         }
 
+        private void menuTools3DVideo_Click(object sender, EventArgs e)
+        {
+            openForm<frm3DVideo>();
+        }
+
         #endregion
 
         #region MENU Help
@@ -502,6 +507,8 @@ namespace _3DSExplorer
                 MessageBox.Show("v" + Application.ProductVersion + " is the latest version.");
         }
         #endregion
+
+
     }
 
 }
