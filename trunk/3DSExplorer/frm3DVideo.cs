@@ -249,6 +249,7 @@ namespace _3DSExplorer
                             "-i \"" + _processedFile + "\"",         // In file
                             "-s 800x240",           // Output size
                             "-r " + numFps.Value,   // Frame rate
+                            "-t 00:09:59.50",       // Limit 10 minutes
                             "-vcodec mjpeg",        // Video codec = mjpeg
                             "-q " + tbQuality.Value,// Quality scale
                             "-vf crop=400:240:" + position, // Video filter
@@ -281,6 +282,7 @@ namespace _3DSExplorer
                             "-i \"" + _processedFile +"\"",         // In file
                             "-s 800x240",           // Output size
                             "-r " + numFps.Value,   // Frame rate
+                            "-t 00:09:59.50",       // Limit 10 minutes
                             "-vcodec mjpeg",        // Video codec = mjpeg
                             "-q " + tbQuality.Value,// Quality scale
                             "-vf crop=400:240:" + position, //top-bottom or side-by-side
