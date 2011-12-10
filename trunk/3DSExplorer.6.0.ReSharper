@@ -90,6 +90,7 @@
       <Abbreviation Text="PCM" />
       <Abbreviation Text="ADPCM" />
       <Abbreviation Text="MM" />
+      <Abbreviation Text="URL" />
     </Naming2>
   </CodeStyleSettings>
   <Daemon.SolutionSettings>
