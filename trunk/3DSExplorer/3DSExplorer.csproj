@@ -237,6 +237,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />
+    <None Include="Resources\cog.png" />
     <None Include="Resources\ico_eye_right_32.png" />
     <None Include="Resources\ico_eye_left_32.png" />
     <None Include="Resources\ico_3d_glasses_32.png" />

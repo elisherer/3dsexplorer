@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frm3DVideo));
             this.grpSource = new System.Windows.Forms.GroupBox();
+            this.picThumb = new System.Windows.Forms.PictureBox();
             this.chk3D = new System.Windows.Forms.CheckBox();
             this.cmbOrientation = new System.Windows.Forms.ComboBox();
             this.lblOrientation = new System.Windows.Forms.Label();
@@ -40,6 +41,8 @@
             this.radSourceYoutube = new System.Windows.Forms.RadioButton();
             this.radSourceFile = new System.Windows.Forms.RadioButton();
             this.grpDestination = new System.Windows.Forms.GroupBox();
+            this.numFps = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
             this.chkDeleteTempFiles = new System.Windows.Forms.CheckBox();
             this.lblQuality = new System.Windows.Forms.Label();
             this.tbQuality = new System.Windows.Forms.TrackBar();
@@ -54,18 +57,12 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.lblStatus = new System.Windows.Forms.Label();
             this.openFfmpegDialog = new System.Windows.Forms.OpenFileDialog();
-            this.menuStrip = new System.Windows.Forms.MenuStrip();
-            this.btnSetLocation = new System.Windows.Forms.ToolStripMenuItem();
-            this.txtFFmpeg = new System.Windows.Forms.ToolStripTextBox();
-            this.picThumb = new System.Windows.Forms.PictureBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.numFps = new System.Windows.Forms.NumericUpDown();
+            this.btnSet = new System.Windows.Forms.Button();
             this.grpSource.SuspendLayout();
-            this.grpDestination.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).BeginInit();
-            this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picThumb)).BeginInit();
+            this.grpDestination.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numFps)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).BeginInit();
             this.SuspendLayout();
             // 
             // grpSource
@@ -80,12 +77,21 @@
             this.grpSource.Controls.Add(this.txtSourceFile);
             this.grpSource.Controls.Add(this.radSourceYoutube);
             this.grpSource.Controls.Add(this.radSourceFile);
-            this.grpSource.Location = new System.Drawing.Point(12, 31);
+            this.grpSource.Location = new System.Drawing.Point(12, 8);
             this.grpSource.Name = "grpSource";
             this.grpSource.Size = new System.Drawing.Size(582, 135);
             this.grpSource.TabIndex = 0;
             this.grpSource.TabStop = false;
             this.grpSource.Text = "Source:";
+            // 
+            // picThumb
+            // 
+            this.picThumb.Location = new System.Drawing.Point(413, 19);
+            this.picThumb.Name = "picThumb";
+            this.picThumb.Size = new System.Drawing.Size(153, 101);
+            this.picThumb.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picThumb.TabIndex = 7;
+            this.picThumb.TabStop = false;
             // 
             // chk3D
             // 
@@ -196,16 +202,49 @@
             this.grpDestination.Controls.Add(this.btnDestinationBrowse);
             this.grpDestination.Controls.Add(this.txtQuality);
             this.grpDestination.Controls.Add(this.txtOutputFile);
-            this.grpDestination.Location = new System.Drawing.Point(12, 172);
+            this.grpDestination.Location = new System.Drawing.Point(12, 149);
             this.grpDestination.Name = "grpDestination";
             this.grpDestination.Size = new System.Drawing.Size(582, 131);
             this.grpDestination.TabIndex = 1;
             this.grpDestination.TabStop = false;
             this.grpDestination.Text = "Destination:";
             // 
+            // numFps
+            // 
+            this.numFps.Increment = new decimal(new int[] {
+            15,
+            0,
+            0,
+            0});
+            this.numFps.Location = new System.Drawing.Point(103, 73);
+            this.numFps.Maximum = new decimal(new int[] {
+            60,
+            0,
+            0,
+            0});
+            this.numFps.Name = "numFps";
+            this.numFps.Size = new System.Drawing.Size(59, 20);
+            this.numFps.TabIndex = 11;
+            this.numFps.Value = new decimal(new int[] {
+            24,
+            0,
+            0,
+            0});
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(14, 75);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(30, 13);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "FPS:";
+            // 
             // chkDeleteTempFiles
             // 
             this.chkDeleteTempFiles.AutoSize = true;
+            this.chkDeleteTempFiles.Checked = true;
+            this.chkDeleteTempFiles.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkDeleteTempFiles.Location = new System.Drawing.Point(16, 100);
             this.chkDeleteTempFiles.Name = "chkDeleteTempFiles";
             this.chkDeleteTempFiles.Size = new System.Drawing.Size(206, 17);
@@ -284,16 +323,16 @@
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(12, 309);
+            this.progressBar.Location = new System.Drawing.Point(12, 286);
             this.progressBar.Name = "progressBar";
             this.progressBar.Size = new System.Drawing.Size(582, 20);
             this.progressBar.TabIndex = 2;
             // 
             // btnGo
             // 
-            this.btnGo.Location = new System.Drawing.Point(510, 343);
+            this.btnGo.Location = new System.Drawing.Point(510, 320);
             this.btnGo.Name = "btnGo";
-            this.btnGo.Size = new System.Drawing.Size(84, 24);
+            this.btnGo.Size = new System.Drawing.Size(84, 26);
             this.btnGo.TabIndex = 3;
             this.btnGo.Text = "Go";
             this.btnGo.UseVisualStyleBackColor = true;
@@ -302,9 +341,9 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(12, 343);
+            this.btnCancel.Location = new System.Drawing.Point(12, 320);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(84, 24);
+            this.btnCancel.Size = new System.Drawing.Size(84, 26);
             this.btnCancel.TabIndex = 4;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -312,9 +351,9 @@
             // 
             // lblStatus
             // 
-            this.lblStatus.Location = new System.Drawing.Point(102, 343);
+            this.lblStatus.Location = new System.Drawing.Point(134, 320);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(402, 24);
+            this.lblStatus.Size = new System.Drawing.Size(370, 26);
             this.lblStatus.TabIndex = 5;
             this.lblStatus.Text = "Status:";
             this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -324,70 +363,16 @@
             this.openFfmpegDialog.Filter = "ffmpeg.exe|ffmpeg.exe";
             this.openFfmpegDialog.Title = "Find ffmpeg.exe";
             // 
-            // menuStrip
+            // btnSet
             // 
-            this.menuStrip.BackgroundImage = global::_3DSExplorer.Properties.Resources.menuBack;
-            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnSetLocation,
-            this.txtFFmpeg});
-            this.menuStrip.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(607, 26);
-            this.menuStrip.TabIndex = 6;
-            this.menuStrip.Text = "menuStrip";
-            // 
-            // btnSetLocation
-            // 
-            this.btnSetLocation.Name = "btnSetLocation";
-            this.btnSetLocation.Size = new System.Drawing.Size(151, 22);
-            this.btnSetLocation.Text = "Set ffmpeg.exe location";
-            this.btnSetLocation.Click += new System.EventHandler(this.btnSetLocation_Click);
-            // 
-            // txtFFmpeg
-            // 
-            this.txtFFmpeg.Name = "txtFFmpeg";
-            this.txtFFmpeg.ReadOnly = true;
-            this.txtFFmpeg.Size = new System.Drawing.Size(400, 22);
-            // 
-            // picThumb
-            // 
-            this.picThumb.Location = new System.Drawing.Point(413, 19);
-            this.picThumb.Name = "picThumb";
-            this.picThumb.Size = new System.Drawing.Size(153, 101);
-            this.picThumb.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picThumb.TabIndex = 7;
-            this.picThumb.TabStop = false;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 75);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(30, 13);
-            this.label1.TabIndex = 10;
-            this.label1.Text = "FPS:";
-            // 
-            // numFps
-            // 
-            this.numFps.Increment = new decimal(new int[] {
-            15,
-            0,
-            0,
-            0});
-            this.numFps.Location = new System.Drawing.Point(103, 73);
-            this.numFps.Maximum = new decimal(new int[] {
-            60,
-            0,
-            0,
-            0});
-            this.numFps.Name = "numFps";
-            this.numFps.Size = new System.Drawing.Size(59, 20);
-            this.numFps.TabIndex = 11;
-            this.numFps.Value = new decimal(new int[] {
-            24,
-            0,
-            0,
-            0});
+            this.btnSet.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.btnSet.Image = global::_3DSExplorer.Properties.Resources.cog;
+            this.btnSet.Location = new System.Drawing.Point(102, 320);
+            this.btnSet.Name = "btnSet";
+            this.btnSet.Size = new System.Drawing.Size(26, 26);
+            this.btnSet.TabIndex = 7;
+            this.btnSet.UseVisualStyleBackColor = false;
+            this.btnSet.Click += new System.EventHandler(this.btnSetLocation_Click);
             // 
             // frm3DVideo
             // 
@@ -395,31 +380,27 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(607, 380);
+            this.ClientSize = new System.Drawing.Size(607, 358);
+            this.Controls.Add(this.btnSet);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnGo);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.grpDestination);
             this.Controls.Add(this.grpSource);
-            this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MainMenuStrip = this.menuStrip;
             this.MaximizeBox = false;
             this.Name = "frm3DVideo";
             this.Text = "Create 3D Videos";
             this.Activated += new System.EventHandler(this.frm3DVideo_Activated);
             this.grpSource.ResumeLayout(false);
             this.grpSource.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picThumb)).EndInit();
             this.grpDestination.ResumeLayout(false);
             this.grpDestination.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).EndInit();
-            this.menuStrip.ResumeLayout(false);
-            this.menuStrip.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picThumb)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numFps)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -449,12 +430,10 @@
         private System.Windows.Forms.TrackBar tbQuality;
         private System.Windows.Forms.TextBox txtQuality;
         private System.Windows.Forms.CheckBox chkDeleteTempFiles;
-        private System.Windows.Forms.MenuStrip menuStrip;
-        private System.Windows.Forms.ToolStripMenuItem btnSetLocation;
         private System.Windows.Forms.OpenFileDialog openFfmpegDialog;
-        private System.Windows.Forms.ToolStripTextBox txtFFmpeg;
         private System.Windows.Forms.PictureBox picThumb;
         private System.Windows.Forms.NumericUpDown numFps;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button btnSet;
     }
 }
