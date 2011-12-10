@@ -191,6 +191,11 @@ namespace _3DSExplorer
             progressBar.Maximum = 300;          
             if (radSourceYoutube.Checked)
             {
+                if (txtYoutube.Text == string.Empty)
+                {
+                    MessageBox.Show("Please enter a youtube video id.");
+                    return;
+                }
                 progressBar.Maximum += 100;
                 ChangeStatus("Status: Downloading from youtube");
                 _youTubeSavePath = Path.GetDirectoryName(Application.ExecutablePath) + "\\youtube.flv";
@@ -199,12 +204,12 @@ namespace _3DSExplorer
             }
             var error = false;
             var errorMessage = string.Empty;
-            if (string.IsNullOrEmpty(txtSourceFile.Text))
+            if (txtSourceFile.Text == string.Empty)
             {
                 errorMessage = "You need to enter a source file first";
                 error = true;
             }
-            if (string.IsNullOrEmpty(txtOutputFile.Text))
+            if (txtOutputFile.Text == string.Empty)
             {
                 errorMessage += Environment.NewLine + "You need to enter an output location first";
                 error = true;

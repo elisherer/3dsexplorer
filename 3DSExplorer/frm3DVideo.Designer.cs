@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frm3DVideo));
             this.grpSource = new System.Windows.Forms.GroupBox();
             this.picThumb = new System.Windows.Forms.PictureBox();
@@ -58,6 +59,9 @@
             this.lblStatus = new System.Windows.Forms.Label();
             this.openFfmpegDialog = new System.Windows.Forms.OpenFileDialog();
             this.btnSet = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.grpSource.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picThumb)).BeginInit();
             this.grpDestination.SuspendLayout();
@@ -148,6 +152,7 @@
             this.txtYoutube.Name = "txtYoutube";
             this.txtYoutube.Size = new System.Drawing.Size(114, 20);
             this.txtYoutube.TabIndex = 4;
+            this.toolTip.SetToolTip(this.txtYoutube, "You can paste a full youtube link here for auto-parsing");
             this.txtYoutube.Visible = false;
             this.txtYoutube.TextChanged += new System.EventHandler(this.txtYoutube_TextChanged);
             // 
@@ -195,6 +200,8 @@
             // 
             // grpDestination
             // 
+            this.grpDestination.Controls.Add(this.label3);
+            this.grpDestination.Controls.Add(this.label2);
             this.grpDestination.Controls.Add(this.numFps);
             this.grpDestination.Controls.Add(this.label1);
             this.grpDestination.Controls.Add(this.chkDeleteTempFiles);
@@ -266,14 +273,14 @@
             // tbQuality
             // 
             this.tbQuality.AutoSize = false;
-            this.tbQuality.Location = new System.Drawing.Point(134, 46);
+            this.tbQuality.Location = new System.Drawing.Point(190, 46);
             this.tbQuality.Maximum = 31;
             this.tbQuality.Minimum = 1;
             this.tbQuality.Name = "tbQuality";
             this.tbQuality.Size = new System.Drawing.Size(200, 29);
             this.tbQuality.TabIndex = 7;
             this.tbQuality.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.tbQuality.Value = 1;
+            this.tbQuality.Value = 5;
             this.tbQuality.Scroll += new System.EventHandler(this.tbQuality_Scroll);
             // 
             // lblOutputFile
@@ -287,7 +294,7 @@
             // 
             // btnDestinationBrowse
             // 
-            this.btnDestinationBrowse.Location = new System.Drawing.Point(340, 19);
+            this.btnDestinationBrowse.Location = new System.Drawing.Point(381, 19);
             this.btnDestinationBrowse.Name = "btnDestinationBrowse";
             this.btnDestinationBrowse.Size = new System.Drawing.Size(50, 21);
             this.btnDestinationBrowse.TabIndex = 4;
@@ -302,7 +309,7 @@
             this.txtQuality.ReadOnly = true;
             this.txtQuality.Size = new System.Drawing.Size(25, 20);
             this.txtQuality.TabIndex = 4;
-            this.txtQuality.Text = "1";
+            this.txtQuality.Text = "5";
             this.txtQuality.TextChanged += new System.EventHandler(this.txtYoutube_TextChanged);
             // 
             // txtOutputFile
@@ -310,7 +317,7 @@
             this.txtOutputFile.Location = new System.Drawing.Point(103, 20);
             this.txtOutputFile.Name = "txtOutputFile";
             this.txtOutputFile.ReadOnly = true;
-            this.txtOutputFile.Size = new System.Drawing.Size(231, 20);
+            this.txtOutputFile.Size = new System.Drawing.Size(272, 20);
             this.txtOutputFile.TabIndex = 3;
             // 
             // openFileDialog
@@ -376,6 +383,24 @@
             this.btnSet.UseVisualStyleBackColor = false;
             this.btnSet.Click += new System.EventHandler(this.btnSetLocation_Click);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(156, 51);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(28, 13);
+            this.label2.TabIndex = 12;
+            this.label2.Text = "Best";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(396, 51);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(35, 13);
+            this.label3.TabIndex = 13;
+            this.label3.Text = "Worst";
+            // 
             // frm3DVideo
             // 
             this.AcceptButton = this.btnGo;
@@ -437,5 +462,8 @@
         private System.Windows.Forms.NumericUpDown numFps;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnSet;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ToolTip toolTip;
     }
 }
