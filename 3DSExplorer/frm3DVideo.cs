@@ -73,12 +73,11 @@ namespace _3DSExplorer
         private void CheckFFMpeg()
         {
             var ffmpegPath = Settings.Default.FFMpegPath;
-            txtFFmpeg.Text = ffmpegPath;
             if (!File.Exists(ffmpegPath))
             {
                 ChangeForm(false);
                 ChangeStatus("Status: ffmpeg doesn't exist.");
-                txtFFmpeg.BackColor = Color.LightCoral;
+                btnSet.BackColor = Color.LightCoral;
                 return;
             }
             var fs = File.OpenRead(ffmpegPath);
@@ -88,13 +87,13 @@ namespace _3DSExplorer
             {
                 ChangeForm(false);
                 ChangeStatus("Status: ffmpeg file isn't a valid exe file.");
-                txtFFmpeg.BackColor = Color.LightCoral;
+                btnSet.BackColor = Color.LightCoral;
                 return;
             }
             ChangeForm(true);
-            _ffmpeg = new FfmpegWrapper(txtFFmpeg.Text, FfmpegProgressChanged, FfmpegProcessFinished);
+            _ffmpeg = new FfmpegWrapper(ffmpegPath, FfmpegProgressChanged, FfmpegProcessFinished);
             ChangeStatus("Status: ffmpeg ready.");
-            txtFFmpeg.BackColor = SystemColors.ButtonFace;
+            btnSet.BackColor = SystemColors.ButtonFace;
         }
 
         private void ChangeFormMethod(bool state)
@@ -235,13 +234,13 @@ namespace _3DSExplorer
                     position = "0:0";
                     break;
                 case 1:
-                    position = "240:0";
+                    position = "400:0";
                     break;
                 case 2:
                     position = "0:0";
                     break;
                 default: //3
-                    position = "0:240";
+                    position = "0:400";
                     break;
             }
             ChangeStatus("Status: Start making the left video.");
@@ -265,13 +264,13 @@ namespace _3DSExplorer
             switch (_selectedPosition)
             {
                 case 0:
-                    position = "240:0";
+                    position = "400:0";
                     break;
                 case 1:
                     position = "0:0";
                     break;
                 case 2:
-                    position = "0:240";
+                    position = "0:400";
                     break;
                 default: //3
                     position = "0:0";

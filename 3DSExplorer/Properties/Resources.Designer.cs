@@ -60,6 +60,13 @@ namespace _3DSExplorer.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap cog {
+            get {
+                object obj = ResourceManager.GetObject("cog", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap cube_3 {
             get {
                 object obj = ResourceManager.GetObject("cube_3", resourceCulture);

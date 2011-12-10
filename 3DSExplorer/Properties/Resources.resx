@@ -181,4 +181,7 @@
   <data name="YouTubeClientKey" xml:space="preserve">
     <value>AI39si4FSd5486fMVgG-3eHt1w8O5yY6VocFw70j1ITFNLwoiLj_oS9LOD3Lt1I3CGleu1CA3-_MZ0tWZCXX8AmJMMFsWO6GhQ</value>
   </data>
+  <data name="cog" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\cog.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
