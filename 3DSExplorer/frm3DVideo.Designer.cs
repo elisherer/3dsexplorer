@@ -347,7 +347,7 @@
             // 
             this.txtFFmpeg.Name = "txtFFmpeg";
             this.txtFFmpeg.ReadOnly = true;
-            this.txtFFmpeg.Size = new System.Drawing.Size(250, 22);
+            this.txtFFmpeg.Size = new System.Drawing.Size(400, 22);
             // 
             // picThumb
             // 
