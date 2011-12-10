@@ -78,6 +78,7 @@ namespace _3DSExplorer
             {
                 ChangeForm(false);
                 ChangeStatus("Status: ffmpeg doesn't exist.");
+                txtFFmpeg.BackColor = Color.LightCoral;
                 return;
             }
             var fs = File.OpenRead(ffmpegPath);
@@ -87,11 +88,13 @@ namespace _3DSExplorer
             {
                 ChangeForm(false);
                 ChangeStatus("Status: ffmpeg file isn't a valid exe file.");
+                txtFFmpeg.BackColor = Color.LightCoral;
                 return;
             }
             ChangeForm(true);
             _ffmpeg = new FfmpegWrapper(txtFFmpeg.Text, FfmpegProgressChanged, FfmpegProcessFinished);
             ChangeStatus("Status: ffmpeg ready.");
+            txtFFmpeg.BackColor = SystemColors.ButtonFace;
         }
 
         private void ChangeFormMethod(bool state)
