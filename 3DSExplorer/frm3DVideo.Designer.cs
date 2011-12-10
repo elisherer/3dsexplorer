@@ -79,26 +79,28 @@
             this.grpSource.Controls.Add(this.radSourceFile);
             this.grpSource.Location = new System.Drawing.Point(12, 8);
             this.grpSource.Name = "grpSource";
-            this.grpSource.Size = new System.Drawing.Size(582, 135);
+            this.grpSource.Size = new System.Drawing.Size(556, 135);
             this.grpSource.TabIndex = 0;
             this.grpSource.TabStop = false;
             this.grpSource.Text = "Source:";
             // 
             // picThumb
             // 
-            this.picThumb.Location = new System.Drawing.Point(413, 19);
+            this.picThumb.BackColor = System.Drawing.Color.White;
+            this.picThumb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.picThumb.Location = new System.Drawing.Point(407, 19);
             this.picThumb.Name = "picThumb";
-            this.picThumb.Size = new System.Drawing.Size(153, 101);
+            this.picThumb.Size = new System.Drawing.Size(134, 101);
             this.picThumb.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picThumb.TabIndex = 7;
             this.picThumb.TabStop = false;
+            this.picThumb.Visible = false;
             // 
             // chk3D
             // 
             this.chk3D.AutoSize = true;
             this.chk3D.Checked = true;
             this.chk3D.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chk3D.Enabled = false;
             this.chk3D.Location = new System.Drawing.Point(16, 82);
             this.chk3D.Name = "chk3D";
             this.chk3D.Size = new System.Drawing.Size(40, 17);
@@ -204,7 +206,7 @@
             this.grpDestination.Controls.Add(this.txtOutputFile);
             this.grpDestination.Location = new System.Drawing.Point(12, 149);
             this.grpDestination.Name = "grpDestination";
-            this.grpDestination.Size = new System.Drawing.Size(582, 131);
+            this.grpDestination.Size = new System.Drawing.Size(556, 131);
             this.grpDestination.TabIndex = 1;
             this.grpDestination.TabStop = false;
             this.grpDestination.Text = "Destination:";
@@ -325,12 +327,12 @@
             // 
             this.progressBar.Location = new System.Drawing.Point(12, 286);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(582, 20);
+            this.progressBar.Size = new System.Drawing.Size(556, 20);
             this.progressBar.TabIndex = 2;
             // 
             // btnGo
             // 
-            this.btnGo.Location = new System.Drawing.Point(510, 320);
+            this.btnGo.Location = new System.Drawing.Point(484, 320);
             this.btnGo.Name = "btnGo";
             this.btnGo.Size = new System.Drawing.Size(84, 26);
             this.btnGo.TabIndex = 3;
@@ -353,7 +355,7 @@
             // 
             this.lblStatus.Location = new System.Drawing.Point(134, 320);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(370, 26);
+            this.lblStatus.Size = new System.Drawing.Size(344, 26);
             this.lblStatus.TabIndex = 5;
             this.lblStatus.Text = "Status:";
             this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -380,7 +382,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(607, 358);
+            this.ClientSize = new System.Drawing.Size(581, 358);
             this.Controls.Add(this.btnSet);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.btnCancel);
@@ -391,7 +393,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "frm3DVideo";
-            this.Text = "Create 3D Videos";
+            this.Text = "Create 3D Videos (Based on spinal\'s idea)";
             this.Activated += new System.EventHandler(this.frm3DVideo_Activated);
             this.grpSource.ResumeLayout(false);
             this.grpSource.PerformLayout();

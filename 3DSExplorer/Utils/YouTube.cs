@@ -98,8 +98,15 @@ namespace _3DSExplorer
 
         public void DownloadThumbnail(string videoId)
         {
-            var thumbImage = string.Format("http://i1.ytimg.com/vi/{0}/0.jpg", videoId);
-            _webClient.DownloadDataAsync(new Uri(thumbImage));
+            try
+            {
+                var thumbImage = string.Format("http://i1.ytimg.com/vi/{0}/0.jpg", videoId);
+                _webClient.DownloadDataAsync(new Uri(thumbImage));
+            }
+            catch
+            {
+                _imageReady(null);
+            }
         }
     }
 }

@@ -29,7 +29,8 @@ namespace _3DSExplorer
         {
             Left = 0,
             Right = 100,
-            Combination = 200
+            Combination = 200,
+            Video2D
         }
 
         public frm3DVideo()
@@ -109,7 +110,7 @@ namespace _3DSExplorer
 
         private void CheckForYouTubeString(string text)
         {
-            if (!radSourceYoutube.Checked || string.IsNullOrEmpty(text)) return;
+            if (string.IsNullOrEmpty(text)) return;
             if (!text.ToLower().StartsWith("http://") || !text.ToLower().Contains("youtu")) return;
             var youtube = new Uri(text);
             var videoId = HttpUtility.ParseQueryString(youtube.Query)["v"];
@@ -221,9 +222,18 @@ namespace _3DSExplorer
         private void ConvertFrom(string inFile)
         {
             _processedFile = inFile;
-            _state = ConvertionState.Left;
-            MakeLeft();
+            if (chk3D.Checked)
+            {
+                _state = ConvertionState.Left;
+                MakeLeft();
+            }
+            else
+            {
+                _state = ConvertionState.Video2D;
+                Make2D();
+            }
         }
+    
 
         private void MakeLeft()
         {
@@ -244,6 +254,7 @@ namespace _3DSExplorer
                     break;
             }
             ChangeStatus("Status: Start making the left video.");
+            Application.DoEvents();
             _ffmpeg.Convert("-y",                   // Overwrite
                             "-i \"" + _processedFile + "\"",         // In file
                             "-s 800x240",           // Output size
@@ -257,6 +268,24 @@ namespace _3DSExplorer
                             "-ab 96k",              // Audio bit rate
                             "-ac 2",                // Audio channels
                             "\"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\left.avi\"");
+        }
+
+        private void Make2D()
+        {
+            ChangeStatus("Status: Start making 2D video.");
+            Application.DoEvents();
+            _ffmpeg.Convert("-y",                   // Overwrite
+                            "-i \"" + _processedFile + "\"",         // In file
+                            "-s 400x240",           // Output size
+                            "-r " + numFps.Value,   // Frame rate
+                            "-t 00:09:59.50",       // Limit 10 minutes
+                            "-vcodec mjpeg",        // Video codec = mjpeg
+                            "-q " + tbQuality.Value,// Quality scale
+                            "-acodec adpcm_ima_wav",// Audio codec = adpcm_ima_wav
+                            "-ar 44100",            // Audio sample rate
+                            "-ab 96k",              // Audio bit rate
+                            "-ac 2",                // Audio channels
+                            "\"" + txtOutputFile.Text + "\"");
         }
         private void MakeRight()
         {
@@ -277,6 +306,7 @@ namespace _3DSExplorer
                     break;
             }
             ChangeStatus("Status: Start making the right video.");
+            Application.DoEvents();
             _ffmpeg.Convert("-y",                   // Overwrite
                             "-i \"" + _processedFile +"\"",         // In file
                             "-s 800x240",           // Output size
@@ -291,7 +321,8 @@ namespace _3DSExplorer
         private void CombineLeftAndRight()
         {
             //ffmpeg -y -i "left.avi" -i "right.avi" -vcodec copy -acodec adpcm_ima_wav -ac 2 -vcodec copy -map 0:0 -map 0:1 -map 1:0 "LGG_0001.AVI"
-            ChangeStatus("Status: Start making the left video.");
+            ChangeStatus("Status: Start combining.");
+            Application.DoEvents();
             _ffmpeg.Convert("-y",                   // Overwrite
                             "-i \"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\left.avi\"", // left file
                             "-i \"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\right.avi\"", // right file
@@ -310,7 +341,7 @@ namespace _3DSExplorer
             if (radSourceYoutube.Checked)
                 startValue += 100;
             progressBar.Value = startValue + value/max;
-            ChangeStatus(string.Format("Status: Naking {0} ({1}/{2})", _state, value, max));
+            ChangeStatus(string.Format("Status: Making {0} ({1}/{2})", _state, value, max));
         }
 
         private void FfmpegProcessFinished(string error)
@@ -339,6 +370,11 @@ namespace _3DSExplorer
                         File.Delete(Path.GetDirectoryName(Application.ExecutablePath) + "\\right.avi");
                         File.Delete(Path.GetDirectoryName(Application.ExecutablePath) + "\\youtube.flv");
                     }
+                    ChangeStatus("Status: Video file saved successfuly.");
+                    progressBar.Value = 0;
+                    break;
+                case ConvertionState.Video2D:
+                    ChangeForm(true);
                     ChangeStatus("Status: Video file saved successfuly.");
                     progressBar.Value = 0;
                     break;
