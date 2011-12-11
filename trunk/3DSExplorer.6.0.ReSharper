@@ -91,6 +91,7 @@
       <Abbreviation Text="ADPCM" />
       <Abbreviation Text="MM" />
       <Abbreviation Text="URL" />
+      <Abbreviation Text="MPF" />
     </Naming2>
   </CodeStyleSettings>
   <Daemon.SolutionSettings>

@@ -124,6 +124,7 @@
     <Compile Include="Modules\mdlCGFX.cs" />
     <Compile Include="Modules\mdlCIA.cs" />
     <Compile Include="Modules\mdlCWAV.cs" />
+    <Compile Include="Modules\mdlMPO.cs" />
     <Compile Include="Modules\mdlRom.cs" />
     <Compile Include="Modules\mdlSRAM.cs" />
     <Compile Include="Modules\mdlTicket.cs" />
@@ -142,6 +143,7 @@
       <DependentUpon>frmExplorer.cs</DependentUpon>
     </Compile>
     <Compile Include="Modules\ModuleHelper.cs" />
+    <Compile Include="Utils\Anaglyph.cs" />
     <Compile Include="Utils\FfmpegWrapper.cs" />
     <Compile Include="Utils\GameTitleResolver.cs" />
     <Compile Include="frmHashTool.cs">

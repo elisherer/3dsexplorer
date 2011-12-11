@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyFileVersion("0.9.6.0")] //for faster update status
+[assembly: AssemblyFileVersion("1.0.0.0")] //for faster update status
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information

@@ -9,6 +9,7 @@ namespace _3DSExplorer
         CIA,
         CGFX,
         CWAV,
+        MPO,
         Rom,
         SRAM_Decrypted,
         SRAM,
@@ -17,6 +18,18 @@ namespace _3DSExplorer
 
     public static class ModuleHelper
     {
+        public const string OpenString = 
+            @"All Supported (3ds,cci,bin,sav,tmd,cia,mpo,bnr,bcwav,cgfx)|" +
+                "*.3ds;*.cci;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx|" +
+            "3DS Rom Files (*.3ds,*.cci)|*.3ds;*.cci|"+
+            "Save Binary Files (*.bin,*.sav)|*.bin;*.sav|"+
+            "Title Metadata (*.tmd)|*.tmd|"+
+            "MPO (3D Images) Files (*.mpo)|*.mpo|"+
+            "CTR Importable Archives (*.cia)|*.cia|"+
+            "CTR Banners (*.bnr)|*.bnr|"+
+            "CTR Waves (*.b/cwav)|*.bcwav;*.cwav|"+
+            "CTR Graphics (*.cgfx)|*.cgfx|"+
+            "All Files|*.*";
 
         public static IContext CreateByType(ModuleType type)
         {
@@ -24,18 +37,20 @@ namespace _3DSExplorer
             {
                 case ModuleType.Banner:
                     return new BannerContext();
-                    case ModuleType.CGFX:
+                case ModuleType.CGFX:
                     return new CGFXContext();
-                    case ModuleType.CIA:
+                case ModuleType.CIA:
                     return new CIAContext();
-                    case ModuleType.CWAV:
+                case ModuleType.CWAV:
                     return new CWAVContext();
-                    case ModuleType.Rom:
+                case ModuleType.MPO:
+                    return new MPOContext();
+                case ModuleType.Rom:
                     return new RomContext();
-                    case ModuleType.SRAM_Decrypted:
-                    case ModuleType.SRAM:
+                case ModuleType.SRAM_Decrypted:
+                case ModuleType.SRAM:
                     return new SRAMContext();
-                    case ModuleType.TMD:
+                case ModuleType.TMD:
                     return new TMDContext();
             }
             return null;
@@ -65,6 +80,9 @@ namespace _3DSExplorer
                 case ".cia":
                     type = ModuleType.CIA;
                     break;
+                case ".mpo":
+                    type = ModuleType.MPO;
+                    break;
                 case ".bnr":
                     type = ModuleType.Banner;
                     break;
@@ -82,6 +100,8 @@ namespace _3DSExplorer
                         type = ModuleType.TMD;
                     else if (magic[0] == 0x20 && magic[1] == 0x20 && magic[2] == 0 && magic[3] == 0)
                         type = ModuleType.CIA;
+                    else if (magic[0] == 0xFF && magic[1] == 0xD8 && magic[2] == 0xFF && magic[3] == 0xE1)
+                        type = ModuleType.MPO;
                     else if (magic[0] == 'C' && magic[1] == 'B' && magic[2] == 'M' && magic[3] == 'D')
                         type = ModuleType.Banner;
                     else if (magic[0] == 'C' && magic[1] == 'G' && magic[2] == 'F' && magic[3] == 'X')
