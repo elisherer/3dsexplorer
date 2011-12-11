@@ -270,7 +270,7 @@ namespace _3DSExplorer
         private void menuFileOpen_Click(object sender, EventArgs e)
         {
             //Todo: get strings from the modules
-            openFileDialog.Filter = @"All Supported (3ds,cci,bin,sav,tmd,cia,bnr,bcwav,cgfx)|*.3ds;*.cci;*.bin;*.sav;*.tmd;*.cia;*.bnr;*.bcwav;*.cwav;*.cgfx|3DS Rom Files (*.3ds,*.cci)|*.3ds;*.cci|Save Binary Files (*.bin,*.sav)|*.bin;*.sav|Title Metadata (*.tmd)|*.tmd|CTR Importable Archives (*.cia)|*.cia|CTR Banners (*.bnr)|*.bnr|CTR Waves (*.b/cwav)|*.bcwav;*.cwav|CTR Graphics (*.cgfx)|*.cgfx|All Files|*.*";
+            openFileDialog.Filter = ModuleHelper.OpenString;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
                 OpenFile(openFileDialog.FileName);
         }
