@@ -1,24 +1,22 @@
 ﻿using System;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using _3DSExplorer.Utils;
 
 namespace _3DSExplorer
 {
     public class MPOContext : IContext
     {
+        /*
         private const int T_INT32 = 0; //4 byte
         private const int T_RAT64 = 1; //8 byte
         private const int T_STRING = 2; // string
         private const int T_INT16 = 3; // 2 byte
         private const int T_BYTEARR = 4; // byte array
         private const int T_DATA = 5; // byte array
-
+        */
         public enum MPOView
         {
             MPO,
@@ -72,8 +70,8 @@ namespace _3DSExplorer
         {
             try
             {
-                byte[] intSizeArr = new byte[4];
-                byte[] shortSizeArr = new byte[2];
+                var intSizeArr = new byte[4];
+                var shortSizeArr = new byte[2];
                 short shortSize;
                 int intSize;
                 long length;
@@ -127,7 +125,7 @@ namespace _3DSExplorer
                     return false;
                 }
 
-                int fromSOO = 0;
+                var fromSOO = 0;
                 //READ THE MP Header Endianess
                 length = fs.Read(intSizeArr, 0, 4);
                 if (length != 4)
@@ -136,7 +134,7 @@ namespace _3DSExplorer
                     return false;
                 }
                 fromSOO += 4;
-                int endianess = 0;
+                var endianess = 0;
                 if (intSizeArr[0] == 0x49 && intSizeArr[1] == 0x49 && intSizeArr[2] == 0x2A && intSizeArr[3] == 0x00)
                     endianess = 1; // LE
                 else if (intSizeArr[0] == 0x4D && intSizeArr[1] == 0x4D && intSizeArr[2] == 0x00 && intSizeArr[3] == 0x2A)
@@ -180,7 +178,7 @@ namespace _3DSExplorer
 
                 // Go to the start of the next file (skip junk)
                 //int space = 1;
-                bool found = false;
+                var found = false;
                 while (!found)
                 {
                     if (fs.ReadByte() == 0xFF)
@@ -226,7 +224,7 @@ namespace _3DSExplorer
                 g.Dispose();
 
                 //make anaglyph
-                AnaglyphImage = Anaglyph.makeAnaglyph(LeftImage, RightImage, (new Anaglyph()).HalfColorAnaglyph, Parallax);
+                AnaglyphImage = Anaglyph.MakeAnaglyph(LeftImage, RightImage, (new Anaglyph()).HalfColorAnaglyph, Parallax);
 
                 return true;
             }

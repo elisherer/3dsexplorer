@@ -125,8 +125,8 @@
     <Compile Include="Modules\mdlCIA.cs" />
     <Compile Include="Modules\mdlCWAV.cs" />
     <Compile Include="Modules\mdlMPO.cs" />
-    <Compile Include="Modules\mdlRom.cs" />
-    <Compile Include="Modules\mdlSRAM.cs" />
+    <Compile Include="Modules\mdlCCI.cs" />
+    <Compile Include="Modules\mdlSaveFlash.cs" />
     <Compile Include="Modules\mdlTicket.cs" />
     <Compile Include="Modules\mdlTMD.cs" />
     <Compile Include="Crypt\CRC16.cs" />
@@ -145,7 +145,7 @@
     <Compile Include="Modules\ModuleHelper.cs" />
     <Compile Include="Utils\Anaglyph.cs" />
     <Compile Include="Utils\FfmpegWrapper.cs" />
-    <Compile Include="Utils\GameTitleResolver.cs" />
+    <Compile Include="Utils\TitleInfo.cs" />
     <Compile Include="frmHashTool.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -159,7 +159,6 @@
       <DependentUpon>frmInputBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Utils\ImageUtil.cs" />
-    <Compile Include="Utils\MakerResolver.cs" />
     <Compile Include="Utils\MarshalUtil.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

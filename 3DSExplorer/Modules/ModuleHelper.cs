@@ -10,9 +10,9 @@ namespace _3DSExplorer
         CGFX,
         CWAV,
         MPO,
-        Rom,
-        SRAM_Decrypted,
-        SRAM,
+        CCI,
+        SaveFlash_Decrypted,
+        SaveFlash,
         TMD //Contains certificates & ticket so they can't be recognized
     }
 
@@ -21,8 +21,8 @@ namespace _3DSExplorer
         public const string OpenString = 
             @"All Supported (3ds,cci,bin,sav,tmd,cia,mpo,bnr,bcwav,cgfx)|" +
                 "*.3ds;*.cci;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx|" +
-            "3DS Rom Files (*.3ds,*.cci)|*.3ds;*.cci|"+
-            "Save Binary Files (*.bin,*.sav)|*.bin;*.sav|"+
+            "3DS CCI Files (*.3ds,*.cci)|*.3ds;*.cci|"+
+            "Save Flash Files (*.bin,*.sav)|*.bin;*.sav|"+
             "Title Metadata (*.tmd)|*.tmd|"+
             "MPO (3D Images) Files (*.mpo)|*.mpo|"+
             "CTR Importable Archives (*.cia)|*.cia|"+
@@ -45,11 +45,11 @@ namespace _3DSExplorer
                     return new CWAVContext();
                 case ModuleType.MPO:
                     return new MPOContext();
-                case ModuleType.Rom:
-                    return new RomContext();
-                case ModuleType.SRAM_Decrypted:
-                case ModuleType.SRAM:
-                    return new SRAMContext();
+                case ModuleType.CCI:
+                    return new CCIContext();
+                case ModuleType.SaveFlash_Decrypted:
+                case ModuleType.SaveFlash:
+                    return new SaveFlashContext();
                 case ModuleType.TMD:
                     return new TMDContext();
             }
@@ -68,11 +68,11 @@ namespace _3DSExplorer
             {
                 case ".cci":
                 case ".3ds":
-                    type = ModuleType.Rom;
+                    type = ModuleType.CCI;
                     break;
                 case ".bin":
                 case ".sav":
-                    type = ModuleType.SRAM_Decrypted;
+                    type = ModuleType.SaveFlash_Decrypted;
                     break;
                 case ".tmd":
                     type = ModuleType.TMD;
@@ -114,7 +114,7 @@ namespace _3DSExplorer
                         fs.Seek(0x100, SeekOrigin.Current);
                         fs.Read(magic, 0, 4);
                         if (magic[0] == 'N' && magic[1] == 'C' && magic[2] == 'S' && magic[3] == 'D')
-                            type = ModuleType.Rom;
+                            type = ModuleType.CCI;
                         else if (fs.Length >= 0x10000) // > 64kb
                         {
                             //SAVE Check
@@ -124,23 +124,15 @@ namespace _3DSExplorer
                             fs.Read(magic, 0, 2);
                             var calcCheck = CRC16.GetCRC(crcCheck);
                             if (magic[0] == calcCheck[0] && magic[1] == calcCheck[1]) //crc is ok then save
-                                type = ModuleType.SRAM_Decrypted; //SAVE
+                                type = ModuleType.SaveFlash_Decrypted; //SAVE
                         }
                     }
                     break;
             }
-            if (type == ModuleType.SRAM_Decrypted)
+            if (type == ModuleType.SaveFlash_Decrypted)
             {
-                //check if encrypted
-                fs.Seek(0x1000, SeekOrigin.Begin); //Start of information
-                while ((fs.Length - fs.Position > 0x200) & !SRAMContext.IsSaveMagic(magic))
-                {
-                    fs.Read(magic, 0, 4);
-                    fs.Seek(0x200 - 4, SeekOrigin.Current);
-                }
-                if (fs.Length - fs.Position <= 0x200)
-                    type = ModuleType.SRAM;
-
+                if (SaveFlashContext.IsEncrypted(fs))
+                    type = ModuleType.SaveFlash;
             }
             return type;
         }
