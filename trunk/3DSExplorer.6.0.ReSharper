@@ -92,6 +92,8 @@
       <Abbreviation Text="MM" />
       <Abbreviation Text="URL" />
       <Abbreviation Text="MPF" />
+      <Abbreviation Text="FF" />
+      <Abbreviation Text="MPO" />
     </Naming2>
   </CodeStyleSettings>
   <Daemon.SolutionSettings>

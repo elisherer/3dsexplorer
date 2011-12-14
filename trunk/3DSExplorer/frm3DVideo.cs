@@ -25,6 +25,8 @@ namespace _3DSExplorer
         private ChangeFormDelegate ChangeForm;
         private ChangeStatusDelegate ChangeStatus;
 
+        private const int TimeLimit = 599; // 00:09:59
+
         enum ConvertionState
         {
             Left = 0,
@@ -260,11 +262,10 @@ namespace _3DSExplorer
             }
             ChangeStatus("Status: Start making the left video.");
             Application.DoEvents();
-            _ffmpeg.Convert("-y",                   // Overwrite
+            _ffmpeg.Convert(0,"-y",                   // Overwrite
                             "-i \"" + _processedFile + "\"",         // In file
                             "-s 800x240",           // Output size
                             "-r " + numFps.Value,   // Frame rate
-                            "-t 00:09:59.50",       // Limit 10 minutes
                             "-vcodec mjpeg",        // Video codec = mjpeg
                             "-q " + tbQuality.Value,// Quality scale
                             "-vf crop=400:240:" + position, // Video filter
@@ -272,26 +273,11 @@ namespace _3DSExplorer
                             "-ar 44100",            // Audio sample rate
                             "-ab 96k",              // Audio bit rate
                             "-ac 2",                // Audio channels
+                            "-threads 2",           // Make it go faster by using 2 cores
                             "\"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\left.avi\"");
         }
 
-        private void Make2D()
-        {
-            ChangeStatus("Status: Start making 2D video.");
-            Application.DoEvents();
-            _ffmpeg.Convert("-y",                   // Overwrite
-                            "-i \"" + _processedFile + "\"",         // In file
-                            "-s 400x240",           // Output size
-                            "-r " + numFps.Value,   // Frame rate
-                            "-t 00:09:59.50",       // Limit 10 minutes
-                            "-vcodec mjpeg",        // Video codec = mjpeg
-                            "-q " + tbQuality.Value,// Quality scale
-                            "-acodec adpcm_ima_wav",// Audio codec = adpcm_ima_wav
-                            "-ar 44100",            // Audio sample rate
-                            "-ab 96k",              // Audio bit rate
-                            "-ac 2",                // Audio channels
-                            "\"" + txtOutputFile.Text + "\"");
-        }
+
         private void MakeRight()
         {
             var position = string.Empty;
@@ -312,7 +298,7 @@ namespace _3DSExplorer
             }
             ChangeStatus("Status: Start making the right video.");
             Application.DoEvents();
-            _ffmpeg.Convert("-y",                   // Overwrite
+            _ffmpeg.Convert(0,"-y",                   // Overwrite
                             "-i \"" + _processedFile +"\"",         // In file
                             "-s 800x240",           // Output size
                             "-r " + numFps.Value,   // Frame rate
@@ -321,20 +307,42 @@ namespace _3DSExplorer
                             "-q " + tbQuality.Value,// Quality scale
                             "-vf crop=400:240:" + position, //top-bottom or side-by-side
                             "-an",                  // No Audio
+                            "-threads 2",           // Make it go faster by using 2 cores
                             "\"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\right.avi\"");
         }
+        
+        private void Make2D()
+        {
+            ChangeStatus("Status: Start making 2D video.");
+            Application.DoEvents();
+            _ffmpeg.Convert(TimeLimit,"-y",         // Overwrite
+                            "-i \"" + _processedFile + "\"",// In file
+                            "-s 400x240",           // Output size
+                            "-r " + numFps.Value,   // Frame rate
+                            "-t 00:09:59.50",       // Limit 10 minutes
+                            "-vcodec mjpeg",        // Video codec = mjpeg
+                            "-q " + tbQuality.Value,// Quality scale
+                            "-acodec adpcm_ima_wav",// Audio codec = adpcm_ima_wav
+                            "-ar 44100",            // Audio sample rate
+                            "-ab 96k",              // Audio bit rate
+                            "-ac 2",                // Audio channels
+                            "-threads 2",           // Make it go faster by using 2 cores
+                            "\"" + txtOutputFile.Text + "\"");
+        }
+
         private void CombineLeftAndRight()
         {
             //ffmpeg -y -i "left.avi" -i "right.avi" -vcodec copy -acodec adpcm_ima_wav -ac 2 -vcodec copy -map 0:0 -map 0:1 -map 1:0 "LGG_0001.AVI"
             ChangeStatus("Status: Start combining.");
             Application.DoEvents();
-            _ffmpeg.Convert("-y",                   // Overwrite
+            _ffmpeg.Convert(TimeLimit, "-y",        // Overwrite
                             "-i \"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\left.avi\"", // left file
                             "-i \"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\right.avi\"", // right file
                             "-vcodec copy",         // Video codec = <copy>
                             "-acodec adpcm_ima_wav",// Audio codec = adpcm_ima_wav
                             "-ac 2",                // Audio channels
                             "-vcodec copy",         // Video codec = <copy> (TODO: is this needed?)
+                            "-threads 2",           // Make it go faster by using 2 cores
                             "-map 0:0",             // Mappings for audio & video
                             "-map 0:1",
                             "-map 1:0",

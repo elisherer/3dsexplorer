@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Drawing.Imaging;
 
@@ -25,63 +22,63 @@ namespace _3DSExplorer
         public float[][][] HalfColorAnaglyph;
         public float[][][] OptimizedAnaglyph;
 
-        public PropertyItem PublicProp;
+        public PropertyItem PublicProp = null;
 
         public Anaglyph()
         {
-            methMagic = new float[] { 0.299f, 0.587f, 0.114f };
-            methOptim = new float[] { 0, 0.7f, 0.3f };
+            methMagic = new[] { 0.299f, 0.587f, 0.114f };
+            methOptim = new[] { 0, 0.7f, 0.3f };
 
-            methMagicZeroZero = new float[][] { 
-                new float[] {methMagic[0], 0, 0, 0, 0},
-                new float[] {methMagic[1], 0, 0, 0, 0},
-                new float[] {methMagic[2], 0, 0, 0, 0},
-                new float[] {0, 0, 0, 1, 0},
-                new float[] {0, 0, 0, 0, 1}
+            methMagicZeroZero = new[] { 
+                new[] {methMagic[0], 0, 0, 0, 0},
+                new[] {methMagic[1], 0, 0, 0, 0},
+                new[] {methMagic[2], 0, 0, 0, 0},
+                new[] {0f, 0, 0, 1, 0},
+                new[] {0f, 0, 0, 0, 1}
             };
-            methZeroZeroMagic = new float[][] { 
-                new float[] {0, 0, methMagic[0], 0, 0},
-                new float[] {0, 0, methMagic[1], 0, 0},
-                new float[] {0, 0, methMagic[2], 0, 0},
-                new float[] {0, 0, 0, 1, 0},
-                new float[] {0, 0, 0, 0, 1}
+            methZeroZeroMagic = new[] { 
+                new[] {0f, 0, methMagic[0], 0, 0},
+                new[] {0f, 0, methMagic[1], 0, 0},
+                new[] {0f, 0, methMagic[2], 0, 0},
+                new[] {0f, 0, 0, 1, 0},
+                new[] {0f, 0, 0, 0, 1}
             };
-            methZeroMagicMagic = new float[][] { 
-                new float[] {0,methMagic[0],methMagic[0], 0, 0},
-                new float[] {0,methMagic[1],methMagic[1], 0, 0},
-                new float[] {0,methMagic[2],methMagic[2], 0, 0},
-                new float[] {0, 0, 0, 1, 0},
-                new float[] {0, 0, 0, 0, 1}
+            methZeroMagicMagic = new[] { 
+                new[] {0f,methMagic[0],methMagic[0], 0, 0},
+                new[] {0f,methMagic[1],methMagic[1], 0, 0},
+                new[] {0f,methMagic[2],methMagic[2], 0, 0},
+                new[] {0f, 0, 0, 1, 0},
+                new[] {0f, 0, 0, 0, 1}
             };
-            methIdentZeroZero = new float[][] { 
-                new float[] {1, 0, 0, 0, 0},
-                new float[] {0, 0, 0, 0, 0},
-                new float[] {0, 0, 0, 0, 0},
-                new float[] {0, 0, 0, 1, 0},
-                new float[] {0, 0, 0, 0, 1}
+            methIdentZeroZero = new[] { 
+                new[] {1f, 0, 0, 0, 0},
+                new[] {0f, 0, 0, 0, 0},
+                new[] {0f, 0, 0, 0, 0},
+                new[] {0f, 0, 0, 1, 0},
+                new[] {0f, 0, 0, 0, 1}
             };
-            methZeroIdentIdent = new float[][] { 
-                new float[] {0, 0, 0, 0, 0},
-                new float[] {0, 1, 0, 0, 0},
-                new float[] {0, 0, 1, 0, 0},
-                new float[] {0, 0, 0, 1, 0},
-                new float[] {0, 0, 0, 0, 1}
+            methZeroIdentIdent = new[] { 
+                new[] {0f, 0, 0, 0, 0},
+                new[] {0f, 1, 0, 0, 0},
+                new[] {0f, 0, 1, 0, 0},
+                new[] {0f, 0, 0, 1, 0},
+                new[] {0f, 0, 0, 0, 1}
             };
-            methOptimZeroZero = new float[][] { 
-                new float[] {methOptim[0], 0, 0, 0, 0},
-                new float[] {methOptim[1], 0, 0, 0, 0},
-                new float[] {methOptim[2], 0, 0, 0, 0},
-                new float[] {0, 0, 0, 1, 0},
-                new float[] {0, 0, 0, 0, 1}
+            methOptimZeroZero = new[] { 
+                new[] {methOptim[0], 0, 0, 0, 0},
+                new[] {methOptim[1], 0, 0, 0, 0},
+                new[] {methOptim[2], 0, 0, 0, 0},
+                new[] {0f, 0, 0, 1, 0},
+                new[] {0f, 0, 0, 0, 1}
             };
-            TrueAnaglyph = new float[][][] { methMagicZeroZero, methZeroZeroMagic };
-            GrayAnaglyph = new float[][][] { methMagicZeroZero, methZeroMagicMagic };
-            ColorAnaglyph = new float[][][] { methIdentZeroZero, methZeroIdentIdent };
-            HalfColorAnaglyph = new float[][][] { methMagicZeroZero, methZeroIdentIdent };
-            OptimizedAnaglyph = new float[][][] { methOptimZeroZero, methZeroIdentIdent };
+            TrueAnaglyph = new[] { methMagicZeroZero, methZeroZeroMagic };
+            GrayAnaglyph = new[] { methMagicZeroZero, methZeroMagicMagic };
+            ColorAnaglyph = new[] { methIdentZeroZero, methZeroIdentIdent };
+            HalfColorAnaglyph = new[] { methMagicZeroZero, methZeroIdentIdent };
+            OptimizedAnaglyph = new[] { methOptimZeroZero, methZeroIdentIdent };
         }
 
-        public static Image makeAnaglyph(Image imageLeft, Image imageRight, float[][][] method, int parallax)
+        public static Image MakeAnaglyph(Image imageLeft, Image imageRight, float[][][] method, int parallax)
         {
             int outputWidth = Math.Max(imageLeft.Width, imageRight.Width),
                 outputHeight = Math.Max(imageLeft.Height, imageRight.Height);

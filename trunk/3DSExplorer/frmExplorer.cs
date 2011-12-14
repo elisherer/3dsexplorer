@@ -132,8 +132,8 @@ namespace _3DSExplorer
             treeView.SelectedNode = treeView.Nodes[0];
 
             menuFileSave.Enabled = _currentContext.CanCreate();
-            menuFileSaveImageFile.Enabled = (type == ModuleType.SRAM) || (type == ModuleType.SRAM_Decrypted);
-            menuFileSaveKeyFile.Enabled = type == ModuleType.SRAM;
+            menuFileSaveImageFile.Enabled = (type == ModuleType.SaveFlash) || (type == ModuleType.SaveFlash_Decrypted);
+            menuFileSaveKeyFile.Enabled = type == ModuleType.SaveFlash;
         }
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
@@ -153,7 +153,7 @@ namespace _3DSExplorer
                     if (tn.Tag is FileSystemFileEntry)
                     {
                         var entry = (FileSystemFileEntry)tn.Tag;
-                        var cxt = (SRAMContext)_currentContext;
+                        var cxt = (SaveFlashContext)_currentContext;
                         saveFileDialog.FileName = StringUtil.CharArrayToString(entry.Filename);
                         if (saveFileDialog.ShowDialog() == DialogResult.OK)
                         {
@@ -169,7 +169,7 @@ namespace _3DSExplorer
                     else if (tn.Tag is CXI)
                     {
                         var cxi = (CXI)tn.Tag;
-                        var cxt = (RomContext)_currentContext;
+                        var cxt = (CCIContext)_currentContext;
                         saveFileDialog.FileName = lvFileTree.GetMainText(tn);
                         if (saveFileDialog.ShowDialog() == DialogResult.OK)
                         {
@@ -186,19 +186,8 @@ namespace _3DSExplorer
                                     var infs = File.OpenRead(_filePath);
                                     var isExeFS = tn.Text.StartsWith("Exe");
 
-                                    long offset = isExeFS ? cxi.ExeFSOffset : cxi.RomFSOffset;
-                                    switch (tn.Text[5])
-                                    {
-                                        case '0':
-                                            offset += cxt.cci.FirstNCCHOffset;
-                                            break;
-                                        case '1':
-                                            offset += cxt.cci.SecondNCCHOffset;
-                                            break;
-                                        default:
-                                            offset += cxt.cci.ThirdNCCHOffset;
-                                            break;
-                                    }
+                                    long offset = (tn.Text[5] == '0' ? cxt.cci.FirstNCCHOffset : tn.Text[5] == '1' ? cxt.cci.SecondNCCHOffset : cxt.cci.ThirdNCCHOffset);
+                                    offset += isExeFS ? cxi.ExeFSOffset : cxi.RomFSOffset;
                                     offset *= 0x200; //media units
 
                                     infs.Seek(offset, SeekOrigin.Begin);
@@ -279,8 +268,8 @@ namespace _3DSExplorer
         {
             
             //TODO: add these strings to the modules
-            if (_currentContext is SRAMContext)
-                saveFileDialog.Filter = @"SRAM Files (*.sav)|*.sav;*.bin|All Files|*.*";
+            if (_currentContext is SaveFlashContext)
+                saveFileDialog.Filter = @"SaveFlash Files (*.sav)|*.sav;*.bin|All Files|*.*";
             else if (_currentContext is CIAContext)
                 saveFileDialog.Filter = @"CTR Importable Archives (*.cia)|*.cia|All Files|*.*";
 
@@ -295,7 +284,7 @@ namespace _3DSExplorer
 
         private void menuFileSaveImageFile_Click(object sender, EventArgs e)
         {
-            var cxt = (SRAMContext)_currentContext;
+            var cxt = (SaveFlashContext)_currentContext;
             saveFileDialog.Filter = @"Image Files (*.bin)|*.bin";
             saveFileDialog.FileName = _filePath.Substring(_filePath.LastIndexOf('\\') + 1).Replace('.', '_') + ".bin";
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -304,7 +293,7 @@ namespace _3DSExplorer
 
         private void menuFileSaveKeyFile_Click(object sender, EventArgs e)
         {
-            var cxt = (SRAMContext)_currentContext;
+            var cxt = (SaveFlashContext)_currentContext;
             saveFileDialog.Filter = @"Key file (*.key)|*.key|All Files|*.*";
             saveFileDialog.FileName = _filePath.Substring(_filePath.LastIndexOf('\\') + 1).Replace('.', '_') + ".key";
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -419,9 +408,9 @@ namespace _3DSExplorer
 
         private void cxtFileReplaceWith_Click(object sender, EventArgs e)
         {
-            if (_currentContext is SRAMContext)
+            if (_currentContext is SaveFlashContext)
             {
-                var cxt = (SRAMContext)_currentContext;
+                var cxt = (SaveFlashContext)_currentContext;
                 openFileDialog.Filter = @"All Files|*.*";
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
