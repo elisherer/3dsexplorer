@@ -9,6 +9,7 @@
   * `C__T_R__us`
   * `CoaTeR`
   * `ConTractoR`
+  * `ConTRast`
   * `ConTributoR`
   * `ConTRol`
   * `ConTouR`
