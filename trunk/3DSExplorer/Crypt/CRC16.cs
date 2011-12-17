@@ -2,7 +2,6 @@
 
 namespace _3DSExplorer
 {
-    // ReSharper disable ClassNeverInstantiated.Global, UnusedMember.Local
     public class CRC16
     {
         private const ushort InitalValue = 0xFFFF;
@@ -37,5 +36,5 @@ namespace _3DSExplorer
             return (byte)(crcBytes[0] ^ crcBytes[1]);
         }
     }
-    // ReSharper restore ClassNeverInstantiated.Global, UnusedMember.Local
+
 }

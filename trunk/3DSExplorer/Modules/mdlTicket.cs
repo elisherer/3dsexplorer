@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace _3DSExplorer
+namespace _3DSExplorer.Modules
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct TimeLimitEntry
@@ -79,7 +79,7 @@ namespace _3DSExplorer
             throw new NotImplementedException();
         }
 
-        public void View(frmExplorer f, int view, int[] values)
+        public void View(frmExplorer f, int view, object[] values)
         {
             f.ClearInformation();
             f.SetGroupHeaders("Ticket", "Ticket Time Limits");
@@ -111,6 +111,11 @@ namespace _3DSExplorer
         public bool CanCreate()
         {
             return false;
+        }
+
+        public void Activate(string filePath, int type, object[] values)
+        {
+            throw new NotImplementedException();
         }
 
         public TreeNode GetExplorerTopNode()

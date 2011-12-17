@@ -2,11 +2,34 @@
 using System.IO;
 using System.Linq;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace _3DSExplorer
+namespace _3DSExplorer.Modules
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct IFD
+    {
+        public ushort Tag;
+        public ushort Type;
+        public uint CountValue;
+        public uint ValueOffset;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct NintendoNote
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
+        public char[] Magic;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x26)]
+        public byte[] Unknown;
+
+        public ushort Parallax;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x14)]
+        public byte[] Unknown2;
+    }
+
     public class MPOContext : IContext
     {
         /*
@@ -30,6 +53,10 @@ namespace _3DSExplorer
         private byte[] LeftImageBytes, RightImageBytes;
         private Image LeftImage, RightImage, AnaglyphImage, RightLaxxedImage, LeftLaxxedImage;
         private int Parallax;
+
+        private IFD[] _ifds;
+        private byte[] _firstIFDData;
+        private NintendoNote _nintendoNote;
 
         private static int ByteArrToIntBE(byte[] byteArrayIn)
         {
@@ -59,9 +86,11 @@ namespace _3DSExplorer
             return (fourBytes[0] == 'M' && fourBytes[1] == 'P' && fourBytes[2] == 'F' && fourBytes[3] == 0x00);
         }
 
-        private static int ExtractParallax(byte b0, byte b1)
+        private static int ExtractParallax(ushort parallax)
         {
-            int temp = (b1 - 0xC0) << 8;
+            var b0 = (byte)(parallax >> 8);
+            var b1 = (byte)(parallax & 0xff);
+            var temp = (b1 - 0xC0) << 8;
             temp += b0;
             return -(int)Math.Round(Math.Pow(2, (double)temp / 128 + 2));
         }
@@ -207,12 +236,25 @@ namespace _3DSExplorer
                         nintendo = Encoding.UTF8.GetString(propItem.Value).Equals("Nintendo\0");
                     else if ((propItem.Id == 0x927C) && nintendo) // MakerNote
                     {
-                        var offset = propItem.Value[9] + 6 + 66;
-                        Parallax = ExtractParallax(propItem.Value[offset], propItem.Value[offset + 1]);
+                        var memStream = new MemoryStream(propItem.Value);
+                        var ifdCount = (ushort)(memStream.ReadByte() << 8);
+                        ifdCount += (byte)memStream.ReadByte();
+                        _ifds = new IFD[ifdCount];
+                        for (var i=0;i<_ifds.Length;i++)
+                            _ifds[i] = MarshalUtil.ReadStructBE<IFD>(memStream) ;
+                        //read the zero
+                        //ifdCount = (ushort)(memStream.ReadByte() << 8);
+                        //ifdCount += (byte)memStream.ReadByte();
+                        //jump over the first ifd
+                        memStream.Seek(4, SeekOrigin.Current);
+                        _firstIFDData = new byte[_ifds[0].CountValue];
+                        memStream.Read(_firstIFDData, 0, _firstIFDData.Length);
+                        _nintendoNote = MarshalUtil.ReadStructBE<NintendoNote>(memStream);
+                        memStream.Close();
+                        Parallax = ExtractParallax(_nintendoNote.Parallax);
                         break;
                     }
                 }
-
                 //make images for animation
                 LeftLaxxedImage = new Bitmap(LeftImage.Width + Parallax, LeftImage.Height);
                 RightLaxxedImage = new Bitmap(RightImage.Width + Parallax, RightImage.Height);
@@ -250,7 +292,7 @@ namespace _3DSExplorer
             throw new NotImplementedException();
         }
 
-        public void View(frmExplorer f, int view, int[] values)
+        public void View(frmExplorer f, int view, object[] values)
         {
             f.ClearInformation();
             switch ((MPOView)view)
@@ -259,7 +301,7 @@ namespace _3DSExplorer
                     break;
                 case MPOView.Image:
                     
-                    var propItems = values[0] == 0 ? LeftImage.PropertyItems : RightImage.PropertyItems;
+                    var propItems = (int)values[0] == 0 ? LeftImage.PropertyItems : RightImage.PropertyItems;
 
                     string tempString;
                     foreach (var propItem in propItems)
@@ -392,12 +434,19 @@ namespace _3DSExplorer
                 case MPOView.MPOExtensions:
                     break;
                 case MPOView.MakerNote:
-                    propItems = values[0] == 0 ? LeftImage.PropertyItems : RightImage.PropertyItems;
-                    foreach (var propItem in propItems.Where(propItem => propItem.Id == 0x927C))
-                    {
-                        f.AddListItem(propItem.Id, propItem.Value.Length, "MakerNote", propItem.Value, 0);
-                        break;
-                    }
+                    f.SetGroupHeaders("IFD","Nintendo MarkerNote","Extracted Data");
+                    f.AddListItem(0, 2, "IFD Count", (uint)_ifds.Length, 0);
+                    for (var i = 0; i < _ifds.Length;i++ )
+                        f.AddListItem((2+i*12).ToString(), "12", "IFD", "Tag = " + _ifds[i].Tag.ToString("X4"), string.Format("Type={0}, Count/Value={1}, Value/Offset={2}", _ifds[i].Type, _ifds[i].CountValue, _ifds[i].ValueOffset), 0);
+
+                    
+                    f.AddListItem(0, _firstIFDData.Length, "First IFD data", _firstIFDData, 1);
+                    f.AddListItem(0, 4, "Magic", _nintendoNote.Magic, 1);
+                    f.AddListItem(0, 0x26, "Unknown 0", _nintendoNote.Unknown, 1);
+                    f.AddListItem(0, 2, "Encoded Parallax", _nintendoNote.Parallax, 1);
+                    f.AddListItem(0, 0x14, "Unknown 1", _nintendoNote.Unknown2, 1);
+
+                    f.AddListItem("", "4", "Parallax", Parallax.ToString(), "",2);
                     break;
             }
             f.AutoAlignColumns();
@@ -408,16 +457,29 @@ namespace _3DSExplorer
             return false;
         }
 
+        public void Activate(string filePath, int type, object[] values)
+        {
+            switch (type)
+            {
+                case 0:
+                    ImageBox.ShowDialog((Image)values[0]);
+                    break;
+                case 1:
+                    MessageBox.Show("Not implemented yet.");//TODO: make switch images
+                    break;
+            }
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var topNode = new TreeNode("MPO") { Tag = TreeViewContextTag.Create(this, (int)MPOView.MPO) };
-            var sub = new TreeNode("Left Image") {Tag = TreeViewContextTag.Create(this, (int) MPOView.Image, new[] {0})};
-            sub.Nodes.Add(new TreeNode("MPO Extensions") { Tag = TreeViewContextTag.Create(this, (int)MPOView.MPOExtensions, new[] { 0 }) });
-            sub.Nodes.Add(new TreeNode("Maker Note") { Tag = TreeViewContextTag.Create(this, (int)MPOView.MakerNote, new[] { 0 }) });
+            var sub = new TreeNode("Left Image") {Tag = TreeViewContextTag.Create(this, (int) MPOView.Image, new object[] {0})};
+            sub.Nodes.Add(new TreeNode("MPO Extensions") { Tag = TreeViewContextTag.Create(this, (int)MPOView.MPOExtensions, new object[] { 0 }) });
+            sub.Nodes.Add(new TreeNode("Maker Note") { Tag = TreeViewContextTag.Create(this, (int)MPOView.MakerNote, new object[] { 0 }) });
             topNode.Nodes.Add(sub);
-            sub = new TreeNode("Right Image") { Tag = TreeViewContextTag.Create(this, (int)MPOView.Image, new[] { 1 }) };
-            sub.Nodes.Add(new TreeNode("MPO Extensions") { Tag = TreeViewContextTag.Create(this, (int)MPOView.MPOExtensions, new[] { 1 }) });
-            sub.Nodes.Add(new TreeNode("Maker Note") { Tag = TreeViewContextTag.Create(this, (int)MPOView.MakerNote, new[] { 1 }) });
+            sub = new TreeNode("Right Image") { Tag = TreeViewContextTag.Create(this, (int)MPOView.Image, new object[] { 1 }) };
+            sub.Nodes.Add(new TreeNode("MPO Extensions") { Tag = TreeViewContextTag.Create(this, (int)MPOView.MPOExtensions, new object[] { 1 }) });
+            sub.Nodes.Add(new TreeNode("Maker Note") { Tag = TreeViewContextTag.Create(this, (int)MPOView.MakerNote, new object[] { 1 }) });
             topNode.Nodes.Add(sub);
 
             return topNode;
@@ -426,9 +488,9 @@ namespace _3DSExplorer
         public TreeNode GetFileSystemTopNode()
         {
             var topNode = new TreeNode("MPO", 1, 1);
-            topNode.Nodes.Add(new TreeNode("Left") { Tag = LeftImage });
-            topNode.Nodes.Add(new TreeNode("Right") { Tag = RightImage });
-            topNode.Nodes.Add(new TreeNode("Anaglyph") { Tag = AnaglyphImage });
+            topNode.Nodes.Add(new TreeNode("Left") { Tag = new[] { TreeViewContextTag.Create(this, 0, "Show...", new object[] { LeftImage }), TreeViewContextTag.Create(this, 1, "Replace...", new object[] { LeftImage }) } });
+            topNode.Nodes.Add(new TreeNode("Right") { Tag = new[] { TreeViewContextTag.Create(this, 0, "Show...", new object[] { RightImage }), TreeViewContextTag.Create(this, 1, "Replace...", new object[] { RightImage }) } });
+            topNode.Nodes.Add(new TreeNode("Anaglyph") { Tag = new[] { TreeViewContextTag.Create(this, 0, "Show...", new object[] { AnaglyphImage }) } }); 
             return topNode;
         }
     }

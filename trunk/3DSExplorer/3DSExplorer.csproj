@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Crypt\Aes128Ctr.cs" />
+    <Compile Include="Crypt\Crc32.cs" />
     <Compile Include="DSDecmp\Exceptions\InputTooLargeException.cs" />
     <Compile Include="DSDecmp\Exceptions\NotEnoughDataException.cs" />
     <Compile Include="DSDecmp\Exceptions\StreamTooShortException.cs" />
@@ -111,6 +112,12 @@
     <Compile Include="frmAbout.Designer.cs">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmCheckSum.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCheckSum.Designer.cs">
+      <DependentUpon>frmCheckSum.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmImageBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -118,12 +125,14 @@
       <DependentUpon>frmImageBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Crypt\LZSS.cs" />
+    <Compile Include="Modules\mdlICN.cs" />
     <Compile Include="Modules\IContext.cs" />
     <Compile Include="Modules\mdlBanner.cs" />
     <Compile Include="Modules\mdlCertificate.cs" />
     <Compile Include="Modules\mdlCGFX.cs" />
     <Compile Include="Modules\mdlCIA.cs" />
     <Compile Include="Modules\mdlCWAV.cs" />
+    <Compile Include="Modules\mdlCXI.cs" />
     <Compile Include="Modules\mdlMPO.cs" />
     <Compile Include="Modules\mdlCCI.cs" />
     <Compile Include="Modules\mdlSaveFlash.cs" />
@@ -171,6 +180,9 @@
     <EmbeddedResource Include="frmAbout.resx">
       <DependentUpon>frmAbout.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCheckSum.resx">
+      <DependentUpon>frmCheckSum.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmXORTool.resx">
       <DependentUpon>frmXORTool.cs</DependentUpon>
@@ -238,6 +250,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />
+    <None Include="Resources\code.png" />
     <None Include="Resources\cog.png" />
     <None Include="Resources\ico_eye_right_32.png" />
     <None Include="Resources\ico_eye_left_32.png" />

@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace _3DSExplorer
+namespace _3DSExplorer.Modules
 {
     public enum ModuleType
     {
@@ -9,8 +9,10 @@ namespace _3DSExplorer
         CIA,
         CGFX,
         CWAV,
+        ICN,
         MPO,
         CCI,
+        CXI,
         SaveFlash_Decrypted,
         SaveFlash,
         TMD //Contains certificates & ticket so they can't be recognized
@@ -18,17 +20,20 @@ namespace _3DSExplorer
 
     public static class ModuleHelper
     {
+        //TODO: get this from the modules
         public const string OpenString = 
-            @"All Supported (3ds,cci,bin,sav,tmd,cia,mpo,bnr,bcwav,cgfx)|" +
-                "*.3ds;*.cci;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx|" +
-            "3DS CCI Files (*.3ds,*.cci)|*.3ds;*.cci|"+
-            "Save Flash Files (*.bin,*.sav)|*.bin;*.sav|"+
-            "Title Metadata (*.tmd)|*.tmd|"+
-            "MPO (3D Images) Files (*.mpo)|*.mpo|"+
+            @"All Supported|" +
+                "*.3ds;*.cci;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx;*.icn|" +
+            "CTR Cartridge Images (*.cci/3ds/csu)|*.3ds;*.cci;*.csu|"+
+            "CTR Executable (*.cxi)|*.cxi|" +
             "CTR Importable Archives (*.cia)|*.cia|"+
+            "CTR Icons (*.icn)|*.icn|" +
             "CTR Banners (*.bnr)|*.bnr|"+
             "CTR Waves (*.b/cwav)|*.bcwav;*.cwav|"+
             "CTR Graphics (*.cgfx)|*.cgfx|"+
+            "Save Flash Files (*.bin,*.sav)|*.bin;*.sav|" +
+            "Title Metadata (*.tmd)|*.tmd|" +
+            "MPO (3D Images) Files (*.mpo)|*.mpo|" +
             "All Files|*.*";
 
         public static IContext CreateByType(ModuleType type)
@@ -43,10 +48,14 @@ namespace _3DSExplorer
                     return new CIAContext();
                 case ModuleType.CWAV:
                     return new CWAVContext();
+                case ModuleType.ICN:
+                    return new ICNContext();
                 case ModuleType.MPO:
                     return new MPOContext();
                 case ModuleType.CCI:
                     return new CCIContext();
+                case ModuleType.CXI:
+                    return new CXIContext();
                 case ModuleType.SaveFlash_Decrypted:
                 case ModuleType.SaveFlash:
                     return new SaveFlashContext();
@@ -67,8 +76,12 @@ namespace _3DSExplorer
             switch (extension)
             {
                 case ".cci":
+                case ".csu":
                 case ".3ds":
                     type = ModuleType.CCI;
+                    break;
+                case ".cxi":
+                    type = ModuleType.CXI;
                     break;
                 case ".bin":
                 case ".sav":
@@ -79,6 +92,9 @@ namespace _3DSExplorer
                     break;
                 case ".cia":
                     type = ModuleType.CIA;
+                    break;
+                case ".icn":
+                    type = ModuleType.ICN;
                     break;
                 case ".mpo":
                     type = ModuleType.MPO;
@@ -108,6 +124,10 @@ namespace _3DSExplorer
                         type = ModuleType.CGFX;
                     else if (magic[0] == 'C' && magic[1] == 'W' && magic[2] == 'A' && magic[3] == 'V')
                         type = ModuleType.CWAV;
+                    else if (magic[0] == 'S' && magic[1] == 'M' && magic[2] == 'D' && magic[3] == 'H')
+                        type = ModuleType.ICN;
+                    else if (magic[0] == 'N' && magic[1] == 'C' && magic[2] == 'C' && magic[3] == 'H')
+                        type = ModuleType.CXI;
                     else if (fs.Length >= 0x104) // > 256+4
                     {
                         //CCI CHECK

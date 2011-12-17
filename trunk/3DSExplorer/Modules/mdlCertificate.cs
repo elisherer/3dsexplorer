@@ -4,7 +4,7 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace _3DSExplorer
+namespace _3DSExplorer.Modules
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Certificate
@@ -83,17 +83,18 @@ namespace _3DSExplorer
             throw new NotImplementedException();
         }
 
-        public void View(frmExplorer f, int view, int[] values)
+        public void View(frmExplorer f, int view, object[] values)
         {
+            var i = (int) values[0];
             f.ClearInformation();
-            if (values[0] < 0)
+            if (i < 0)
             {
                 f.SetGroupHeaders("Certificates");
                 f.AddListItem(0, 4, "Certificate Count", (ulong)List.Count, 0);
             }
             else
             {
-                var entry = (CertificateEntry)List[values[0]];
+                var entry = (CertificateEntry)List[i];
                 var cert = entry.Certificate;
                 f.SetGroupHeaders("Certificate");
                 f.AddListItem(0, 4, "Signature Type", (ulong)entry.SignatureType, 0);
@@ -125,11 +126,16 @@ namespace _3DSExplorer
             return false;
         }
 
+        public void Activate(string filePath, int type, object[] values)
+        {
+            throw new NotImplementedException();
+        }
+
         public TreeNode GetExplorerTopNode()
         {
-            var tNode = new TreeNode("Certificates") { Tag = TreeViewContextTag.Create(this, 0, new[] { -1 }) };
+            var tNode = new TreeNode("Certificates") { Tag = TreeViewContextTag.Create(this, 0, new object[] { -1 }) };
             for (var i = 0; i < List.Count; i++)
-                tNode.Nodes.Add(new TreeNode("Certificate " + i) { Tag = TreeViewContextTag.Create(this, 0, new[] { i }) });
+                tNode.Nodes.Add(new TreeNode("Certificate " + i) { Tag = TreeViewContextTag.Create(this, 0, new object[] { i }) });
             return tNode;
         }
 

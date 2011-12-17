@@ -50,28 +50,21 @@
             this.treeView = new System.Windows.Forms.TreeView();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.lblCaptionFiles = new System.Windows.Forms.Label();
-            this.lvFileTree = new TreeListView.TreeListViewControl();
-            this.cName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cxtFile = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.cxtFileOpen = new System.Windows.Forms.ToolStripMenuItem();
-            this.cxtFileReplaceWith = new System.Windows.Forms.ToolStripMenuItem();
             this.imlFS = new System.Windows.Forms.ImageList(this.components);
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.bwCheckForUpdates = new System.ComponentModel.BackgroundWorker();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.menuFileOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.menuFileSave = new System.Windows.Forms.ToolStripMenuItem();
             this.menuFileSep0 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuFileSaveImageFile = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuFileSaveKeyFile = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuFileSep1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuFileExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuTools = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsXORTool = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsHashTool = new System.Windows.Forms.ToolStripMenuItem();
             this.menuTools3DVideo = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuToolsQuickCRC = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpCheckNow = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpCheckUpdates = new System.Windows.Forms.ToolStripMenuItem();
@@ -81,7 +74,10 @@
             this.menuHelpVisitNDev = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.bwCheckForUpdates = new System.ComponentModel.BackgroundWorker();
+            this.lvFileTree = new TreeListView.TreeListViewControl();
+            this.cName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -90,7 +86,6 @@
             this.splitContainerLeft.Panel1.SuspendLayout();
             this.splitContainerLeft.Panel2.SuspendLayout();
             this.splitContainerLeft.SuspendLayout();
-            this.cxtFile.SuspendLayout();
             this.menuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -249,61 +244,12 @@
             this.lblCaptionFiles.Text = "File List";
             this.lblCaptionFiles.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // lvFileTree
-            // 
-            this.lvFileTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.cName,
-            this.cSize,
-            this.cOffset});
-            this.lvFileTree.ContextMenuStrip = this.cxtFile;
-            this.lvFileTree.ImageList = this.imlFS;
-            this.lvFileTree.Location = new System.Drawing.Point(0, 23);
-            this.lvFileTree.Name = "lvFileTree";
-            this.lvFileTree.Size = new System.Drawing.Size(261, 196);
-            this.lvFileTree.TabIndex = 1;
-            this.lvFileTree.TreeDoubleClicked += new System.EventHandler(this.lvFileTree_DoubleClick);
-            // 
-            // cName
-            // 
-            this.cName.Text = "Name";
-            this.cName.Width = 150;
-            // 
-            // cSize
-            // 
-            this.cSize.Text = "Size";
-            this.cSize.Width = 50;
-            // 
-            // cOffset
-            // 
-            this.cOffset.Text = "Offset";
-            // 
             // cxtFile
             // 
-            this.cxtFile.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cxtFileOpen,
-            this.cxtFileReplaceWith});
             this.cxtFile.Name = "contextMenuStrip1";
-            this.cxtFile.Size = new System.Drawing.Size(157, 48);
+            this.cxtFile.Size = new System.Drawing.Size(153, 26);
+            this.cxtFile.Opening += new System.ComponentModel.CancelEventHandler(this.cxtFile_Opening);
             this.cxtFile.MouseEnter += new System.EventHandler(this.cxtFile_MouseEnter);
-            // 
-            // cxtFileOpen
-            // 
-            this.cxtFileOpen.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold);
-            this.cxtFileOpen.Name = "cxtFileOpen";
-            this.cxtFileOpen.Size = new System.Drawing.Size(156, 22);
-            this.cxtFileOpen.Text = "&Open";
-            this.cxtFileOpen.Click += new System.EventHandler(this.cxtFileOpen_Click);
-            // 
-            // cxtFileReplaceWith
-            // 
-            this.cxtFileReplaceWith.Image = global::_3DSExplorer.Properties.Resources.page_white_copy;
-            this.cxtFileReplaceWith.Name = "cxtFileReplaceWith";
-            this.cxtFileReplaceWith.Size = new System.Drawing.Size(156, 22);
-            this.cxtFileReplaceWith.Text = "&Replace with...";
-            this.cxtFileReplaceWith.Click += new System.EventHandler(this.cxtFileReplaceWith_Click);
             // 
             // imlFS
             // 
@@ -311,6 +257,11 @@
             this.imlFS.TransparentColor = System.Drawing.Color.Transparent;
             this.imlFS.Images.SetKeyName(0, "page_white_text.png");
             this.imlFS.Images.SetKeyName(1, "folder.png");
+            // 
+            // bwCheckForUpdates
+            // 
+            this.bwCheckForUpdates.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwCheckForUpdates_DoWork);
+            this.bwCheckForUpdates.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwCheckForUpdates_RunWorkerCompleted);
             // 
             // menuStrip
             // 
@@ -333,9 +284,6 @@
             this.menuFileOpen,
             this.menuFileSave,
             this.menuFileSep0,
-            this.menuFileSaveImageFile,
-            this.menuFileSaveKeyFile,
-            this.menuFileSep1,
             this.menuFileExit});
             this.menuFile.Image = global::_3DSExplorer.Properties.Resources.page_white;
             this.menuFile.Name = "menuFile";
@@ -346,7 +294,7 @@
             // 
             this.menuFileOpen.Image = global::_3DSExplorer.Properties.Resources.folder;
             this.menuFileOpen.Name = "menuFileOpen";
-            this.menuFileOpen.Size = new System.Drawing.Size(169, 22);
+            this.menuFileOpen.Size = new System.Drawing.Size(127, 22);
             this.menuFileOpen.Text = "&Open...";
             this.menuFileOpen.Click += new System.EventHandler(this.menuFileOpen_Click);
             // 
@@ -355,43 +303,20 @@
             this.menuFileSave.Enabled = false;
             this.menuFileSave.Image = global::_3DSExplorer.Properties.Resources.disk;
             this.menuFileSave.Name = "menuFileSave";
-            this.menuFileSave.Size = new System.Drawing.Size(169, 22);
+            this.menuFileSave.Size = new System.Drawing.Size(127, 22);
             this.menuFileSave.Text = "&Save as...";
             this.menuFileSave.Click += new System.EventHandler(this.menuFileSave_Click);
             // 
             // menuFileSep0
             // 
             this.menuFileSep0.Name = "menuFileSep0";
-            this.menuFileSep0.Size = new System.Drawing.Size(166, 6);
-            // 
-            // menuFileSaveImageFile
-            // 
-            this.menuFileSaveImageFile.Enabled = false;
-            this.menuFileSaveImageFile.Image = global::_3DSExplorer.Properties.Resources.drive_disk;
-            this.menuFileSaveImageFile.Name = "menuFileSaveImageFile";
-            this.menuFileSaveImageFile.Size = new System.Drawing.Size(169, 22);
-            this.menuFileSaveImageFile.Text = "Save I&mage file...";
-            this.menuFileSaveImageFile.Click += new System.EventHandler(this.menuFileSaveImageFile_Click);
-            // 
-            // menuFileSaveKeyFile
-            // 
-            this.menuFileSaveKeyFile.Enabled = false;
-            this.menuFileSaveKeyFile.Image = global::_3DSExplorer.Properties.Resources.key1;
-            this.menuFileSaveKeyFile.Name = "menuFileSaveKeyFile";
-            this.menuFileSaveKeyFile.Size = new System.Drawing.Size(169, 22);
-            this.menuFileSaveKeyFile.Text = "Save &key file...";
-            this.menuFileSaveKeyFile.Click += new System.EventHandler(this.menuFileSaveKeyFile_Click);
-            // 
-            // menuFileSep1
-            // 
-            this.menuFileSep1.Name = "menuFileSep1";
-            this.menuFileSep1.Size = new System.Drawing.Size(166, 6);
+            this.menuFileSep0.Size = new System.Drawing.Size(124, 6);
             // 
             // menuFileExit
             // 
             this.menuFileExit.Image = global::_3DSExplorer.Properties.Resources.door_in;
             this.menuFileExit.Name = "menuFileExit";
-            this.menuFileExit.Size = new System.Drawing.Size(169, 22);
+            this.menuFileExit.Size = new System.Drawing.Size(127, 22);
             this.menuFileExit.Text = "&Exit";
             this.menuFileExit.Click += new System.EventHandler(this.menuFileExit_Click);
             // 
@@ -400,7 +325,8 @@
             this.menuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuToolsXORTool,
             this.menuToolsHashTool,
-            this.menuTools3DVideo});
+            this.menuTools3DVideo,
+            this.menuToolsQuickCRC});
             this.menuTools.Image = global::_3DSExplorer.Properties.Resources.toolbox;
             this.menuTools.Name = "menuTools";
             this.menuTools.Size = new System.Drawing.Size(64, 20);
@@ -429,6 +355,15 @@
             this.menuTools3DVideo.Size = new System.Drawing.Size(168, 22);
             this.menuTools3DVideo.Text = "3D Video Creator";
             this.menuTools3DVideo.Click += new System.EventHandler(this.menuTools3DVideo_Click);
+            // 
+            // menuToolsQuickCRC
+            // 
+            this.menuToolsQuickCRC.Enabled = false;
+            this.menuToolsQuickCRC.Image = global::_3DSExplorer.Properties.Resources.code;
+            this.menuToolsQuickCRC.Name = "menuToolsQuickCRC";
+            this.menuToolsQuickCRC.Size = new System.Drawing.Size(168, 22);
+            this.menuToolsQuickCRC.Text = "Quick CRC32";
+            this.menuToolsQuickCRC.Click += new System.EventHandler(this.menuToolsQuickCRC_Click);
             // 
             // menuHelp
             // 
@@ -502,10 +437,37 @@
             this.menuHelpAbout.Text = "About...";
             this.menuHelpAbout.Click += new System.EventHandler(this.menuHelpAbout_Click);
             // 
-            // bwCheckForUpdates
+            // lvFileTree
             // 
-            this.bwCheckForUpdates.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwCheckForUpdates_DoWork);
-            this.bwCheckForUpdates.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwCheckForUpdates_RunWorkerCompleted);
+            this.lvFileTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvFileTree.AutoScroll = true;
+            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.cName,
+            this.cSize,
+            this.cOffset});
+            this.lvFileTree.ContextMenuStrip = this.cxtFile;
+            this.lvFileTree.ImageList = this.imlFS;
+            this.lvFileTree.Location = new System.Drawing.Point(0, 23);
+            this.lvFileTree.Name = "lvFileTree";
+            this.lvFileTree.Size = new System.Drawing.Size(261, 197);
+            this.lvFileTree.TabIndex = 1;
+            this.lvFileTree.TreeDoubleClicked += new System.EventHandler(this.lvFileTree_DoubleClick);
+            // 
+            // cName
+            // 
+            this.cName.Text = "Name";
+            this.cName.Width = 150;
+            // 
+            // cSize
+            // 
+            this.cSize.Text = "Size";
+            this.cSize.Width = 50;
+            // 
+            // cOffset
+            // 
+            this.cOffset.Text = "Offset";
             // 
             // frmExplorer
             // 
@@ -529,7 +491,6 @@
             this.splitContainerLeft.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerLeft)).EndInit();
             this.splitContainerLeft.ResumeLayout(false);
-            this.cxtFile.ResumeLayout(false);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.ResumeLayout(false);
@@ -562,14 +523,9 @@
         private System.Windows.Forms.ToolStripSeparator menuFileSep0;
         private System.Windows.Forms.ToolStripMenuItem menuFileExit;
         private System.Windows.Forms.ToolStripMenuItem menuFileSave;
-        private System.Windows.Forms.ToolStripMenuItem menuFileSaveImageFile;
-        private System.Windows.Forms.ToolStripMenuItem menuFileSaveKeyFile;
-        private System.Windows.Forms.ToolStripSeparator menuFileSep1;
         private System.Windows.Forms.ToolStripMenuItem menuHelpVisit3DBrew;
         private System.Windows.Forms.ToolStripSeparator menuHelpSep0;
         private System.Windows.Forms.ContextMenuStrip cxtFile;
-        private System.Windows.Forms.ToolStripMenuItem cxtFileOpen;
-        private System.Windows.Forms.ToolStripMenuItem cxtFileReplaceWith;
         private System.Windows.Forms.ColumnHeader chHexValue;
         private TreeListView.TreeListViewControl lvFileTree;
         private System.Windows.Forms.ColumnHeader cName;
@@ -584,6 +540,7 @@
         private System.Windows.Forms.ToolStripMenuItem menuHelpCheckNow;
         private System.Windows.Forms.ToolStripMenuItem menuHelpVisitGoogleCode;
         private System.Windows.Forms.ToolStripMenuItem menuTools3DVideo;
+        private System.Windows.Forms.ToolStripMenuItem menuToolsQuickCRC;
     }
 }
 

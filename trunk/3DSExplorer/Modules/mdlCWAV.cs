@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace _3DSExplorer
+namespace _3DSExplorer.Modules
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
    public struct INFOBlobHeader
@@ -93,7 +93,7 @@ namespace _3DSExplorer
             throw new NotImplementedException();
         }
 
-        public void View(frmExplorer f, int view, int[] values)
+        public void View(frmExplorer f, int view, object[] values)
         {
             f.ClearInformation();
             switch ((CWAVView)view)
@@ -135,6 +135,20 @@ namespace _3DSExplorer
             return false;
         }
 
+        public void Activate(string filePath, int type, object[] values)
+        {
+            switch (type)
+            {
+                case 0:
+                    MessageBox.Show("Experimental: still doesn't work!");
+                    /* BUG
+                    var ms = new MemoryStream(cxt.MicrosoftWaveData);
+                    var sm = new SoundPlayer(ms);
+                    sm.Play();*/
+                    break;
+            }
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var topNode = new TreeNode("CWAV") { Tag = TreeViewContextTag.Create(this, (int)CWAVView.CWAV) };
@@ -145,17 +159,11 @@ namespace _3DSExplorer
         public TreeNode GetFileSystemTopNode()
         {
             var topNode = new TreeNode("CWAV", 1, 1);
-            topNode.Nodes.Add(new TreeNode(TreeListView.TreeListViewControl.CreateMultiColumnNodeText("Wave.cwav",WaveData.Length.ToString())) { Tag = this });
+            topNode.Nodes.Add(
+                new TreeNode(TreeListView.TreeListViewControl.CreateMultiColumnNodeText("Wave.cwav",
+                                                                                        WaveData.Length.ToString()))
+                    {Tag = new[] {TreeViewContextTag.Create(this,0,"Play")}});
             return topNode;
-        }
-
-        public static void Play(CWAVContext cxt)
-        {
-            MessageBox.Show("Experimental: still doesn't work!");
-            /* BUG
-            var ms = new MemoryStream(cxt.MicrosoftWaveData);
-            var sm = new SoundPlayer(ms);
-            sm.Play();*/
         }
     }
 

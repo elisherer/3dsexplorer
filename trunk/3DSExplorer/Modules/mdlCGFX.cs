@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using _3DSExplorer.Utils;
 
-namespace _3DSExplorer
+namespace _3DSExplorer.Modules
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct CGFX
@@ -80,7 +80,7 @@ namespace _3DSExplorer
             throw new NotImplementedException();
         }
 
-        public void View(frmExplorer f, int view, int[] values)
+        public void View(frmExplorer f, int view, object[] values)
         {
             f.ClearInformation();
             switch ((CGFXView)view)
@@ -105,6 +105,35 @@ namespace _3DSExplorer
             return false;
         }
 
+        public void Activate(string filePath, int type, object[] values)
+        {
+            switch (type)
+            {
+                case 0:
+                    ImageBox.ShowDialog((Image)values[0]);
+                    break;
+                case 1:
+                    var openFileDialog = new OpenFileDialog() { Filter = @"All Files|*.*" };
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        var iconImage = (Image)values[0];
+                        var graphics = System.Drawing.Graphics.FromImage(iconImage);
+                        try
+                        {
+                            var newImage = Image.FromFile(openFileDialog.FileName);
+                            graphics.DrawImage(newImage, 0, 0, iconImage.Width, iconImage.Height);
+                            MessageBox.Show(@"File replaced.");
+                            newImage.Dispose();
+                        }
+                        catch
+                        {
+                            MessageBox.Show(@"The file selected is not a valid image!");
+                        }
+                    }
+                    break;
+            }
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var topNode = new TreeNode("CGFX") { Tag = TreeViewContextTag.Create(this, (int)CGFXView.CGFX) };
@@ -115,7 +144,7 @@ namespace _3DSExplorer
         public TreeNode GetFileSystemTopNode()
         {
             var topNode = new TreeNode("CGFX",1,1);
-            topNode.Nodes.Add(new TreeNode("Banner (256x128)") { Tag = BannerImage });
+            topNode.Nodes.Add(new TreeNode(TreeListView.TreeListViewControl.CreateMultiColumnNodeText("Banner Image", "256x128")) { Tag = new[] { TreeViewContextTag.Create(this, 0, "Show...", new object[] { BannerImage }), TreeViewContextTag.Create(this, 1, "Replace...", new object[] { BannerImage }) } });
             return topNode;
         }
     }

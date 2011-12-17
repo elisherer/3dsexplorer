@@ -45,13 +45,13 @@
                 switch (regionCode)
                 {
                     case 'E':
-                        info.Region = "NTSC";
+                        info.Region = "USA";
                         break;
                     case 'P':
-                        info.Region = "PAL";
+                        info.Region = "EUR";
                         break;
                     case 'J':
-                        info.Region = "NTSC-J";
+                        info.Region = "JPN";
                         break;
                 }
                 var productCode = productChars[7].ToString() + productChars[8];
