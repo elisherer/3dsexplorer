@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using _3DSExplorer.Utils;
 
-namespace _3DSExplorer
+namespace _3DSExplorer.Modules
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct CIAHeader
@@ -17,29 +17,6 @@ namespace _3DSExplorer
         public uint TMDLength;
         public uint BannerLength;
         public ulong AppLength;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct CIALocalizedDescription
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x80)]
-        public byte[] FirstTitle;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x100)]
-        public byte[] SecondTitle;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x80)]
-        public byte[] Publisher;
-    }
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct CIABanner
-    {
-        //SMDH - Header
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
-        public char[] Magic;
-        public uint Padding0;
-        // Entries
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 11)]
-        public CIALocalizedDescription[] Descriptions;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -70,30 +47,13 @@ namespace _3DSExplorer
         public TMDContext TMDContext;
 
         public ArrayList BannerHeaderEntries; //of CIABannerHeaderEntry
-        public CIABanner Banner;
-        public Bitmap SmallIcon, LargeIcon;
+        public ICNContext ICN;
 
         public enum CIAView
         {
             CIA,
-            Banner,
-            BannerMetaData
+            Banner
         };
-
-        enum Localization
-        {
-            Japanese = 0,
-            English,
-            French,
-            German,
-            Italian,
-            Spanish,
-            Chinese,
-            Korean,
-            Dutch,
-            Portuguese,
-            Russian
-        }
 
         public bool Open(Stream fs)
         {
@@ -147,11 +107,8 @@ namespace _3DSExplorer
                     bannerHeaderEntry = MarshalUtil.ReadStruct<CIABannerHeaderEntry>(fs);
                 }
                 fs.Seek(BannerOffset + 0x400, SeekOrigin.Begin); //Jump to the header
-                Banner = MarshalUtil.ReadStruct<CIABanner>(fs);
-                fs.Seek(BannerOffset + 0x2400, SeekOrigin.Begin); //Jump to the icons
-                fs.Seek(0x40, SeekOrigin.Current); //skip header
-                SmallIcon = ImageUtil.ReadImageFromStream(fs, 24, 24, ImageUtil.PixelFormat.RGB565);
-                LargeIcon = ImageUtil.ReadImageFromStream(fs, 48, 48, ImageUtil.PixelFormat.RGB565);
+                ICN = new ICNContext();
+                ICN.Open(fs);
             }
             return true;
         }
@@ -163,16 +120,11 @@ namespace _3DSExplorer
 
         public void Create(FileStream fs, FileStream src)
         {
-            var copyData = new byte[src.Length - 0x1680];
-            src.Read(copyData, 0, copyData.Length);
-            fs.Write(copyData, 0, copyData.Length);
-            ImageUtil.WriteImageToStream(SmallIcon, fs, ImageUtil.PixelFormat.RGB565);
-            ImageUtil.WriteImageToStream(LargeIcon, fs, ImageUtil.PixelFormat.RGB565);
-            fs.Close();
-            src.Close();
+            if (ICN != null)
+                ICN.Create(fs,src);
         }
 
-        public void View(frmExplorer f, int view, int[] values)
+        public void View(frmExplorer f, int view, object[] values)
         {
             f.ClearInformation();
             switch ((CIAView)view)
@@ -203,23 +155,6 @@ namespace _3DSExplorer
                         f.AddListItem(i, 4, "Magic", entry.Magic, 0);
                     }
                     break;
-                case CIAView.BannerMetaData:
-                    f.SetGroupHeaders("Banner Meta-Data", "Icons");
-                    string pubString, firString, secString;
-                    f.AddListItem(0, 4, "Banner Meta-Data Magic (SMDH)", Banner.Magic, 0);
-                    f.AddListItem(4, 4, "Padding 0", Banner.Padding0, 0);
-
-                    for (var i = 0; i < Banner.Descriptions.Length; i++)
-                    {
-                        pubString = Encoding.Unicode.GetString(Banner.Descriptions[i].Publisher);
-                        firString = Encoding.Unicode.GetString(Banner.Descriptions[i].FirstTitle);
-                        secString = Encoding.Unicode.GetString(Banner.Descriptions[i].SecondTitle);
-                        f.AddListItem(i.ToString(), ((Localization)i).ToString(), firString, secString, pubString, 0);
-                    }
-
-                    f.AddListItem(0, 0, "Small Icon", 24, 1);
-                    f.AddListItem(0, 0, "Large Icon", 48, 1);
-                    break;
             }
             f.AutoAlignColumns();
         }
@@ -227,6 +162,11 @@ namespace _3DSExplorer
         public bool CanCreate()
         {
             return Header.BannerLength > 0;
+        }
+
+        public void Activate(string filePath, int type, object[] values)
+        {
+            throw new System.NotImplementedException();
         }
 
         public TreeNode GetExplorerTopNode()
@@ -241,7 +181,7 @@ namespace _3DSExplorer
             if (Header.BannerLength > 0)
             {
                 var bNode = new TreeNode("Banner") {Tag = TreeViewContextTag.Create(this, (int) CIAView.Banner)};
-                bNode.Nodes.Add("Meta-Data").Tag = TreeViewContextTag.Create(this,(int)CIAView.BannerMetaData);
+                bNode.Nodes.Add(ICN.GetExplorerTopNode());
                 tNode.Nodes.Add(bNode);
             }
             return tNode;
@@ -250,10 +190,7 @@ namespace _3DSExplorer
         public TreeNode GetFileSystemTopNode()
         {
             var topNode = new TreeNode("CIA", 1, 1);
-            var iNode = new TreeNode("ICN", 1, 1);
-            iNode.Nodes.Add(new TreeNode(TreeListView.TreeListViewControl.CreateMultiColumnNodeText("Small Icon","24x24")) {Tag = SmallIcon});
-            iNode.Nodes.Add(new TreeNode(TreeListView.TreeListViewControl.CreateMultiColumnNodeText("Large Icon", "48x48")) { Tag = LargeIcon });
-            topNode.Nodes.Add(iNode);
+            topNode.Nodes.Add(ICN.GetFileSystemTopNode());
             return topNode;
         }
     }

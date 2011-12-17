@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 
-namespace _3DSExplorer
+namespace _3DSExplorer.Modules
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct SaveFlashHeader
@@ -283,6 +283,14 @@ namespace _3DSExplorer
             Image,
             Partition,
             Tables
+        };
+
+        public enum SaveFlashActivation
+        {
+            Image,
+            Key,
+            File,
+            ReplaceFile
         };
 
         public bool Open(Stream fs)
@@ -595,7 +603,7 @@ namespace _3DSExplorer
             fs.Write(buffer,0,buffer.Length);
         }
 
-        public void View(frmExplorer f, int view, int[] values)
+        public void View(frmExplorer f, int view, object[] values)
         {
             f.ClearInformation();
             switch ((SaveFlashView)view)
@@ -652,9 +660,10 @@ namespace _3DSExplorer
                     f.AddListItem(0x0FC, 4, "Unknown 23", Disa.Unknown23, 1);
                     break;
                 case SaveFlashView.Partition:
-                    var difi = Partitions[values[0]].Difi;
-                    var ivfc = Partitions[values[0]].Ivfc;
-                    var dpfs = Partitions[values[0]].Dpfs;
+                    var j = (int) values[0];
+                    var difi = Partitions[j].Difi;
+                    var ivfc = Partitions[j].Ivfc;
+                    var dpfs = Partitions[j].Dpfs;
                     var save = Save;
 
                     f.SetGroupHeaders("DIFI", "IVFC", "DPFS", "Hash", "SAVE", "Folders", "Files");
@@ -699,15 +708,15 @@ namespace _3DSExplorer
                     f.AddListItem(0x048, 8, "Data Block", dpfs.DataBlock, 2);
 
 #if DEBUG
-            f.AddListItem(0x000, 4, "* First Flag", Partitions[currentPartition].FirstFlag, 2);
-            f.AddListItem(0x000, 4, "* First Flag Dupe", Partitions[currentPartition].FirstFlagDupe,2);
-            f.AddListItem(0x000, 4, "* Second Flag", Partitions[currentPartition].SecondFlag, 2);
-            f.AddListItem(0x000, 4, "* Second Flag Dupe", Partitions[currentPartition].SecondFlagDupe, 2);
+            f.AddListItem(0x000, 4, "* First Flag", Partitions[j].FirstFlag, 2);
+            f.AddListItem(0x000, 4, "* First Flag Dupe", Partitions[j].FirstFlagDupe,2);
+            f.AddListItem(0x000, 4, "* Second Flag", Partitions[j].SecondFlag, 2);
+            f.AddListItem(0x000, 4, "* Second Flag Dupe", Partitions[j].SecondFlagDupe, 2);
 #endif
 
-                    f.AddListItem(0x000, 0x20, "Hash", Partitions[values[0]].Hash, 3);
+                    f.AddListItem(0x000, 0x20, "Hash", Partitions[j].Hash, 3);
 
-                    if (values[0] == 0)
+                    if (j == 0)
                     {
                         f.AddListItem(0x000, 4, "SAVE Magic", save.Magic, 4);
                         f.AddListItem(0x004, 4, "Magic Padding", save.MagicPadding, 4);
@@ -782,14 +791,60 @@ namespace _3DSExplorer
             return true;
         }
 
+        public void Activate(string filePath, int type, object[] values)
+        {
+            SaveFileDialog saveFileDialog;
+            switch ((SaveFlashActivation)type)
+            {
+                case SaveFlashActivation.Image:
+                    saveFileDialog = new SaveFileDialog {Filter = @"Image Files (*.bin)|*.bin"};
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                        File.WriteAllBytes(saveFileDialog.FileName, Image);
+                    break;
+                case SaveFlashActivation.Key:
+                    saveFileDialog = new SaveFileDialog {Filter = @"Key Xorpad Files (*.bin)|*.bin"};
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                        File.WriteAllBytes(saveFileDialog.FileName, Key);
+                    break;
+                case SaveFlashActivation.File:
+                    var entry = (FileSystemFileEntry)values[0];
+                    saveFileDialog = new SaveFileDialog { FileName = StringUtil.CharArrayToString(entry.Filename) };
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        var fileBuffer = new byte[entry.FileSize];
+                        Buffer.BlockCopy(Image, (int)(FileBase + entry.BlockOffset * 0x200), fileBuffer, 0, fileBuffer.Length);
+                        File.WriteAllBytes(saveFileDialog.FileName, fileBuffer);
+                    }
+                    break;
+                case SaveFlashActivation.ReplaceFile:
+                    var openFileDialog = new OpenFileDialog() { Filter = @"All Files|*.*" };
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        var originalFile = (FileSystemFileEntry)values[0];
+                        var newFile = File.OpenRead(openFileDialog.FileName);
+                        var newFileSize = (ulong)newFile.Length;
+                        newFile.Close();
+                        if (originalFile.FileSize != newFileSize)
+                        {
+                            MessageBox.Show(@"File's size doesn't match the target file. \nIt must be the same size as the one to replace.");
+                            return;
+                        }
+                        var offSetInImage = FileBase + originalFile.BlockOffset * 0x200;
+                        Buffer.BlockCopy(File.ReadAllBytes(openFileDialog.FileName), 0, Image, (int)offSetInImage, (int)newFileSize);
+                        MessageBox.Show(@"File replaced.");
+                    }
+                    break;
+            }
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var tNode = new TreeNode("Save Flash " + (Encrypted ? "(Encrypted)" : "")) { Tag = TreeViewContextTag.Create(this, (int)SaveFlashView.Image) };
-            var sNode = new TreeNode("SAVE Partition") { Tag = TreeViewContextTag.Create(this, (int)SaveFlashView.Partition, new[] { 0 })};
+            var sNode = new TreeNode("SAVE Partition") { Tag = TreeViewContextTag.Create(this, (int)SaveFlashView.Partition, new object[] { 0 }) };
             sNode.Nodes.Add("Maps").Tag = TreeViewContextTag.Create(this,(int)SaveFlashView.Tables);
             tNode.Nodes.Add(sNode);
             if (IsData)
-                tNode.Nodes.Add("DATA Partition").Tag = TreeViewContextTag.Create(this,(int)SaveFlashView.Partition, new[] { 1 } );
+                tNode.Nodes.Add("DATA Partition").Tag = TreeViewContextTag.Create(this, (int)SaveFlashView.Partition, new object[] { 1 });
             return tNode;
         }
 
@@ -797,13 +852,17 @@ namespace _3DSExplorer
         {
             var tNode = new TreeNode("SaveFlash", 1, 1);
             var folders = new TreeNode[Folders.Length];
+
+            tNode.Nodes.Add(new TreeNode("Image.bin") {Tag = new[] {TreeViewContextTag.Create(this,(int)SaveFlashActivation.Image, "Save image...")}});
+            if (Encrypted)
+                tNode.Nodes.Add(new TreeNode("Key.bin") { Tag = new[] {TreeViewContextTag.Create(this, (int)SaveFlashActivation.Key, "Save key...") }});
             //add root folder
             folders[0] = tNode.Nodes.Add("root","ROOT",1,1);
             //add folders
             if (Folders.Length > 1)
                 for (var i = 1; i < Folders.Length; i++)
                 {
-                    folders[i] = folders[Folders[i].ParentFolderIndex - 1].Nodes.Add( StringUtil.CharArrayToString(Folders[i].FolderName));
+                    folders[i] = folders[Folders[i].ParentFolderIndex - 1].Nodes.Add(StringUtil.CharArrayToString(Folders[i].FolderName));
                     folders[i].ImageIndex = 1;
                     folders[i].SelectedImageIndex = 1;
                 }
@@ -811,11 +870,18 @@ namespace _3DSExplorer
             if (Files.Length > 0)
             {
                 for (var i = 0; i < Files.Length; i++)
-                    folders[Files[i].ParentFolderIndex - 1].Nodes.Add(
+                {
+                    var node = folders[Files[i].ParentFolderIndex - 1].Nodes.Add(
                         TreeListView.TreeListViewControl.CreateMultiColumnNodeText(
-                        StringUtil.CharArrayToString(Files[i].Filename),
-                        Files[i].FileSize.ToString(),
-                        StringUtil.ToHexString(6,(ulong)FileBase + 0x200 * Files[i].BlockOffset))).Tag = Files[i];
+                            StringUtil.CharArrayToString(Files[i].Filename),
+                            Files[i].FileSize.ToString(),
+                            StringUtil.ToHexString(6, (ulong) FileBase + 0x200*Files[i].BlockOffset)));
+                    node.Tag = new[]
+                                   {
+                                       TreeViewContextTag.Create(this, (int) SaveFlashActivation.File, "Save...", new object[] {Files[i]}),
+                                       TreeViewContextTag.Create(this, (int) SaveFlashActivation.ReplaceFile, "Replace...", new object[] {Files[i]})
+                                   };
+                }
             }
             return tNode;
         }

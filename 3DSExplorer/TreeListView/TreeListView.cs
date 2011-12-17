@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Drawing.Design;
@@ -23,58 +22,13 @@ namespace TreeListView
         [Editor("System.Windows.Forms.Design.ColumnHeaderCollectionEditor, System.Design, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         [Localizable(true)]
-        public ListView.ColumnHeaderCollection Columns
-        {
-            get
-            {
-                return listView.Columns;
-            }
-        }
+        public ListView.ColumnHeaderCollection Columns { get { return listView.Columns; } }
         public TreeView TreeView { get { return treeView; } }
+        
         [Category("Behavior")]
-        public ImageList ImageList
-        {
-            set { treeView.ImageList = value; }
-            get { return treeView.ImageList; }
-        }
-
-        public int TotalColWidth
-        {
-            get
-            {
-                var width = 0;
-                foreach (var col in Columns.Cast<ColumnHeader>()) { width += col.Width; }
-                return width;
-            }
-        }
-
-        private bool _mScrollbarIsHidden;
-        private Panel _mScrollbarBlanket;
-        private Panel ScrollbarBlanket
-        {
-            get
-            {
-                if (_mScrollbarBlanket == null)
-                {                    
-                    _mScrollbarBlanket = new Panel();
-                    _mScrollbarBlanket.BackColor = SystemColors.ControlLight;
-                    const int scrollbarHeight = 20;
-                    _mScrollbarBlanket.Parent = this;
-                    _mScrollbarBlanket.Location = new Point(2, Height - scrollbarHeight);
-                    _mScrollbarBlanket.Size = new Size(Width-4, scrollbarHeight);
-                    _mScrollbarBlanket.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
-                }
-                return _mScrollbarBlanket;
-            }
-        }
-
-        public TreeNodeCollection Nodes
-        {
-            get
-            {
-                return treeView.Nodes;
-            }
-        }
+        public ImageList ImageList { set { treeView.ImageList = value; }  get { return treeView.ImageList; } }
+        public int TotalColWidth { get { return Columns.Cast<ColumnHeader>().Sum(col => col.Width); } }
+        public TreeNodeCollection Nodes { get  { return treeView.Nodes; } }
 
         public static string CreateMultiColumnNodeText(params string[] texts)
         {
@@ -83,7 +37,7 @@ namespace TreeListView
 
         public void AddSubItem(TreeNode tn, string text)
         {
-            tn.Text += TreeListViewControl.ColumnSeperator + text;
+            tn.Text += ColumnSeperator + text;
         }
 
         public void ExpandAll()
@@ -93,10 +47,7 @@ namespace TreeListView
 
         public string GetMainText(TreeNode tn)
         {
-            if (!tn.Text.Contains(ColumnSeperator))
-                return tn.Text;
-            else
-                return tn.Text.Substring(0,tn.Text.IndexOf(ColumnSeperator));
+            return !tn.Text.Contains(ColumnSeperator) ? tn.Text : tn.Text.Substring(0,tn.Text.IndexOf(ColumnSeperator));
         }
 
         private void listView_ColumnWidthChanged(object sender, ColumnWidthChangedEventArgs e)
@@ -127,24 +78,6 @@ namespace TreeListView
         public List<TreeNode> ExposedTreeNodes
         {
             get { return treeView.ExposedNodes; }
-        }
-
-        private void treeView_HideOrShowScrollBar(object sender, MultiColumnTreeView.HideScrollBarEventArgs e)
-        {
-            if (e.Hide && !_mScrollbarIsHidden)
-            {
-                ScrollbarBlanket.BringToFront();
-                ScrollbarBlanket.Visible = true;
-                ScrollbarBlanket.Show();
-                _mScrollbarIsHidden = true;
-            }
-            else if (!e.Hide && _mScrollbarIsHidden)
-            {
-                ScrollbarBlanket.Visible = false;
-                ScrollbarBlanket.Hide();
-                _mScrollbarIsHidden = false;
-            }
-
         }
 
         private void TreeListViewControl_EnabledChanged(object sender, EventArgs e)

@@ -28,10 +28,6 @@ D:\dev\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.exe
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.pdb
 D:\dev\3DSExplorer\3DSExplorer\bin\3DSExplorer.exe.config
 D:\dev\3DS\3DSExplorer\3DSExplorer\bin\3DSExplorer.exe.config
-D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\GenerateResource-ResGen.read.1.tlog
-D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\ResGen.read.1.tlog
-D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\GenerateResource-ResGen.write.1.tlog
-D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\ResGen.write.1.tlog
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\ResGen.read.1.tlog
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\ResGen.write.1.tlog
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmAbout.resources
@@ -46,3 +42,4 @@ D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmAbout.resources
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\GenerateResource.read.1.tlog
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\GenerateResource.write.1.tlog
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frm3DVideo.resources
+d:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmCheckSum.resources

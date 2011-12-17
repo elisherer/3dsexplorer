@@ -58,6 +58,7 @@
             this.chkHighCPU = new System.Windows.Forms.CheckBox();
             this.lblSuper = new System.Windows.Forms.Label();
             this.lblFilename = new System.Windows.Forms.Label();
+            this.chkEntireFile = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picTool)).BeginInit();
@@ -82,11 +83,11 @@
             // 
             this.btnCompute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCompute.Enabled = false;
-            this.btnCompute.Location = new System.Drawing.Point(465, 4);
+            this.btnCompute.Location = new System.Drawing.Point(517, 4);
             this.btnCompute.Name = "btnCompute";
-            this.btnCompute.Size = new System.Drawing.Size(130, 24);
+            this.btnCompute.Size = new System.Drawing.Size(78, 24);
             this.btnCompute.TabIndex = 1;
-            this.btnCompute.Text = "Compute Hashes";
+            this.btnCompute.Text = "Compute";
             this.btnCompute.UseVisualStyleBackColor = true;
             this.btnCompute.Click += new System.EventHandler(this.btnCompute_Click);
             // 
@@ -123,7 +124,8 @@
             "SHA-2, 512bit",
             "SHA-1, 160bit",
             "MD-5, 128bit",
-            "CRC16 Modbus"});
+            "CRC16 Modbus",
+            "CRC32"});
             this.cbAlgo.Location = new System.Drawing.Point(415, 14);
             this.cbAlgo.Name = "cbAlgo";
             this.cbAlgo.Size = new System.Drawing.Size(107, 21);
@@ -141,7 +143,7 @@
             // 
             // txtOffset
             // 
-            this.txtOffset.Location = new System.Drawing.Point(234, 7);
+            this.txtOffset.Location = new System.Drawing.Point(307, 7);
             this.txtOffset.Name = "txtOffset";
             this.txtOffset.Size = new System.Drawing.Size(69, 20);
             this.txtOffset.TabIndex = 7;
@@ -150,7 +152,7 @@
             // lblOffset
             // 
             this.lblOffset.AutoSize = true;
-            this.lblOffset.Location = new System.Drawing.Point(144, 10);
+            this.lblOffset.Location = new System.Drawing.Point(217, 10);
             this.lblOffset.Name = "lblOffset";
             this.lblOffset.Size = new System.Drawing.Size(84, 13);
             this.lblOffset.TabIndex = 8;
@@ -158,7 +160,7 @@
             // 
             // txtBlocks
             // 
-            this.txtBlocks.Location = new System.Drawing.Point(79, 7);
+            this.txtBlocks.Location = new System.Drawing.Point(152, 7);
             this.txtBlocks.Name = "txtBlocks";
             this.txtBlocks.Size = new System.Drawing.Size(57, 20);
             this.txtBlocks.TabIndex = 9;
@@ -167,7 +169,7 @@
             // lblBlocks
             // 
             this.lblBlocks.AutoSize = true;
-            this.lblBlocks.Location = new System.Drawing.Point(9, 10);
+            this.lblBlocks.Location = new System.Drawing.Point(82, 10);
             this.lblBlocks.Name = "lblBlocks";
             this.lblBlocks.Size = new System.Drawing.Size(64, 13);
             this.lblBlocks.TabIndex = 10;
@@ -260,8 +262,8 @@
             this.superBruteForce.WorkerReportsProgress = true;
             this.superBruteForce.WorkerSupportsCancellation = true;
             this.superBruteForce.DoWork += new System.ComponentModel.DoWorkEventHandler(this.superBruteForce_DoWork);
-            this.superBruteForce.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.superBruteForce_RunWorkerCompleted);
             this.superBruteForce.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.superBruteForce_ProgressChanged);
+            this.superBruteForce.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.superBruteForce_RunWorkerCompleted);
             // 
             // subProgressBar
             // 
@@ -290,6 +292,7 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.Controls.Add(this.chkEntireFile);
             this.panel1.Controls.Add(this.cbComputeBlockSize);
             this.panel1.Controls.Add(this.lblBlocks);
             this.panel1.Controls.Add(this.lblHashesSize);
@@ -312,7 +315,7 @@
             "2048",
             "4096",
             "8192"});
-            this.cbComputeBlockSize.Location = new System.Drawing.Point(373, 7);
+            this.cbComputeBlockSize.Location = new System.Drawing.Point(446, 7);
             this.cbComputeBlockSize.Name = "cbComputeBlockSize";
             this.cbComputeBlockSize.Size = new System.Drawing.Size(65, 21);
             this.cbComputeBlockSize.TabIndex = 23;
@@ -321,7 +324,7 @@
             // lblHashesSize
             // 
             this.lblHashesSize.AutoSize = true;
-            this.lblHashesSize.Location = new System.Drawing.Point(309, 10);
+            this.lblHashesSize.Location = new System.Drawing.Point(382, 10);
             this.lblHashesSize.Name = "lblHashesSize";
             this.lblHashesSize.Size = new System.Drawing.Size(58, 13);
             this.lblHashesSize.TabIndex = 22;
@@ -387,6 +390,17 @@
             this.lblFilename.Size = new System.Drawing.Size(0, 13);
             this.lblFilename.TabIndex = 23;
             // 
+            // chkEntireFile
+            // 
+            this.chkEntireFile.AutoSize = true;
+            this.chkEntireFile.Location = new System.Drawing.Point(7, 9);
+            this.chkEntireFile.Name = "chkEntireFile";
+            this.chkEntireFile.Size = new System.Drawing.Size(69, 17);
+            this.chkEntireFile.TabIndex = 24;
+            this.chkEntireFile.Text = "Entire file";
+            this.chkEntireFile.UseVisualStyleBackColor = true;
+            this.chkEntireFile.CheckedChanged += new System.EventHandler(this.chkEntireFile_CheckedChanged);
+            // 
             // frmHashTool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -449,5 +463,6 @@
         private System.Windows.Forms.Label lblSuper;
         private System.Windows.Forms.PictureBox picTool;
         private System.Windows.Forms.Label lblFilename;
+        private System.Windows.Forms.CheckBox chkEntireFile;
     }
 }

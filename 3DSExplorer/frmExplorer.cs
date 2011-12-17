@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Net;
+using _3DSExplorer.Modules;
 
 namespace _3DSExplorer
 {
@@ -32,7 +34,7 @@ namespace _3DSExplorer
             menuHelpCheckUpdates.Checked = Properties.Settings.Default.CheckForUpdatesOnStartup;
         }
 
-        #region ListView Functions
+        #region Info ListView Functions
 
         public void SetGroupHeaders(params string[] groupHeader)
         {
@@ -93,10 +95,20 @@ namespace _3DSExplorer
             lvi.Group = lstInfo.Groups[group];
             lstInfo.Items.Add(lvi);
         }
+                
+        private void lstInfo_DoubleClick(object sender, EventArgs e)
+        {
+            if (lstInfo.SelectedIndices.Count <= 0) return;
+            var toClip = lstInfo.SelectedItems[0].SubItems[3].Text == "" ? lstInfo.SelectedItems[0].SubItems[4].Text : lstInfo.SelectedItems[0].SubItems[3].Text;
+            Clipboard.SetText(toClip);
+            MessageBox.Show(@"Value copied to clipboard!");
+        }
+        
         #endregion
 
         private void OpenFile(string path)
         {
+            menuToolsQuickCRC.Enabled = false;
             _filePath = path;
             var fs = File.OpenRead(_filePath);
             var type = ModuleHelper.GetModuleType(_filePath, fs);
@@ -132,110 +144,24 @@ namespace _3DSExplorer
             treeView.SelectedNode = treeView.Nodes[0];
 
             menuFileSave.Enabled = _currentContext.CanCreate();
-            menuFileSaveImageFile.Enabled = (type == ModuleType.SaveFlash) || (type == ModuleType.SaveFlash_Decrypted);
-            menuFileSaveKeyFile.Enabled = type == ModuleType.SaveFlash;
+            menuToolsQuickCRC.Enabled = true;
         }
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             var tag = (TreeViewContextTag) e.Node.Tag;
-            tag.Context.View(this, tag.View, tag.Values);
+            tag.Context.View(this, tag.Type, tag.Values);
         }
 
         private void lvFileTree_DoubleClick(object sender, EventArgs e)
         {
-            var tn = lvFileTree.TreeView.SelectedNode;
-            if (tn != null)
-            {
-                if (tn.Tag != null)
-                {
-                    saveFileDialog.Filter = @"All Files (*.*)|*.*";
-                    if (tn.Tag is FileSystemFileEntry)
-                    {
-                        var entry = (FileSystemFileEntry)tn.Tag;
-                        var cxt = (SaveFlashContext)_currentContext;
-                        saveFileDialog.FileName = StringUtil.CharArrayToString(entry.Filename);
-                        if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                        {
-                            var fs = new MemoryStream(cxt.Image);
-                            fs.Seek(cxt.FileBase + entry.BlockOffset * 0x200, SeekOrigin.Begin);
-                            //read entry.filesize
-                            var fileBuffer = new byte[entry.FileSize];
-                            fs.Read(fileBuffer, 0, fileBuffer.Length);
-                            File.WriteAllBytes(saveFileDialog.FileName, fileBuffer);
-                            fs.Close();
-                        }
-                    }
-                    else if (tn.Tag is CXI)
-                    {
-                        var cxi = (CXI)tn.Tag;
-                        var cxt = (CCIContext)_currentContext;
-                        saveFileDialog.FileName = lvFileTree.GetMainText(tn);
-                        if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                        {
-                            string strKey = InputBox.ShowDialog("Please Enter Key:\nPress OK with empty key to save encrypted");
-                            if (strKey != null)
-                            {
-                                byte[] key = StringUtil.ParseKeyStringToByteArray(strKey);
-
-                                if (key == null)
-                                    MessageBox.Show(@"Error parsing key string, (must be a multiple of 2 and made of hex letters.");
-                                else
-                                {
-                                    //string inpath = saveFileDialog.FileName;
-                                    var infs = File.OpenRead(_filePath);
-                                    var isExeFS = tn.Text.StartsWith("Exe");
-
-                                    long offset = (tn.Text[5] == '0' ? cxt.cci.FirstNCCHOffset : tn.Text[5] == '1' ? cxt.cci.SecondNCCHOffset : cxt.cci.ThirdNCCHOffset);
-                                    offset += isExeFS ? cxi.ExeFSOffset : cxi.RomFSOffset;
-                                    offset *= 0x200; //media units
-
-                                    infs.Seek(offset, SeekOrigin.Begin);
-                                    long bufferSize = isExeFS ? cxi.ExeFSSize * 0x200 : cxi.RomFSSize * 0x200;
-                                    var buffer = new byte[bufferSize];
-                                    infs.Read(buffer, 0, buffer.Length);
-                                    infs.Close();
-                                    if (key.Length > 0)
-                                    {
-                                        var iv = new byte[0x10];
-                                        for (var i = 0; i < 8; i++)
-                                            iv[i] = 0;
-                                        Buffer.BlockCopy(cxt.cxis[0].ProgramID, 0, iv, 8, 8);
-
-                                        var aes = new Aes128Ctr(key,iv);
-                                        aes.TransformBlock(buffer);
-                                    }
-                                    var outpath = saveFileDialog.FileName;
-                                    var outfs = File.OpenWrite(outpath);
-                                    outfs.Write(buffer, 0, buffer.Length);
-                                    outfs.Close();
-                                }
-                            }
-                        }
-                    }
-                    else if (tn.Tag is System.Drawing.Image)
-                    {
-                        ImageBox.ShowDialog((System.Drawing.Image)tn.Tag);
-                    }
-                    else if (tn.Tag is CWAVContext)
-                    {
-                        CWAVContext.Play((CWAVContext)tn.Tag);
-                    }
-                }
-            }
+            var contextTag = (TreeViewContextTag)((ToolStripMenuItem)sender).Tag;
+            contextTag.Context.Activate(_filePath, contextTag.Type,contextTag.Values);
         }
 
         private void LoadText(string path)
         {
             lblCaptionTree.Text = path.Substring(path.LastIndexOf('\\') + 1);
-        }
-
-        private void lstInfo_DoubleClick(object sender, EventArgs e)
-        {
-            if (lstInfo.SelectedIndices.Count <= 0) return;
-            var toClip = lstInfo.SelectedItems[0].SubItems[3].Text == "" ? lstInfo.SelectedItems[0].SubItems[4].Text : lstInfo.SelectedItems[0].SubItems[3].Text;
-            Clipboard.SetText(toClip);
-            MessageBox.Show(@"Value copied to clipboard!");
         }
 
         #region Drag & Drop
@@ -258,7 +184,6 @@ namespace _3DSExplorer
 
         private void menuFileOpen_Click(object sender, EventArgs e)
         {
-            //Todo: get strings from the modules
             openFileDialog.Filter = ModuleHelper.OpenString;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
                 OpenFile(openFileDialog.FileName);
@@ -280,24 +205,6 @@ namespace _3DSExplorer
             _currentContext.Create(outStream, inStream);
             inStream.Close();
             outStream.Close();
-        }
-
-        private void menuFileSaveImageFile_Click(object sender, EventArgs e)
-        {
-            var cxt = (SaveFlashContext)_currentContext;
-            saveFileDialog.Filter = @"Image Files (*.bin)|*.bin";
-            saveFileDialog.FileName = _filePath.Substring(_filePath.LastIndexOf('\\') + 1).Replace('.', '_') + ".bin";
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                File.WriteAllBytes(saveFileDialog.FileName, cxt.Image);
-        }
-
-        private void menuFileSaveKeyFile_Click(object sender, EventArgs e)
-        {
-            var cxt = (SaveFlashContext)_currentContext;
-            saveFileDialog.Filter = @"Key file (*.key)|*.key|All Files|*.*";
-            saveFileDialog.FileName = _filePath.Substring(_filePath.LastIndexOf('\\') + 1).Replace('.', '_') + ".key";
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                File.WriteAllBytes(saveFileDialog.FileName, cxt.Key);
         }
 
         private void menuFileExit_Click(object sender, EventArgs e)
@@ -332,6 +239,10 @@ namespace _3DSExplorer
             openForm<frm3DVideo>();
         }
 
+        private void menuToolsQuickCRC_Click(object sender, EventArgs e)
+        {
+            frmCheckSum.ShowDialog(_filePath);
+        }
         #endregion
 
         #region MENU Help
@@ -396,67 +307,23 @@ namespace _3DSExplorer
         {
             if (lvFileTree.TreeView.SelectedNode == null)
                 cxtFile.Close();
-            else
-                if (lvFileTree.TreeView.SelectedNode.Tag == null)
+            else if (lvFileTree.TreeView.SelectedNode.Tag == null)
                     cxtFile.Close();
+        }
+
+        private void cxtFile_Opening(object sender, CancelEventArgs e)
+        {
+            if (lvFileTree.TreeView.SelectedNode == null || lvFileTree.TreeView.SelectedNode.Tag == null) return;
+            var tags = (TreeViewContextTag[]) lvFileTree.TreeView.SelectedNode.Tag;
+            cxtFile.Items.Clear();
+            for (var i = 0; i < tags.Length; i++)
+                cxtFile.Items.Add(tags[i].ActivationString, null, cxtFileOpen_Click).Tag = tags[i];
+            cxtFile.Items[0].Font = new Font(cxtFile.Items[0].Font, FontStyle.Bold);
         }
 
         private void cxtFileOpen_Click(object sender, EventArgs e)
         {
-            lvFileTree_DoubleClick(null, null);
-        }
-
-        private void cxtFileReplaceWith_Click(object sender, EventArgs e)
-        {
-            if (_currentContext is SaveFlashContext)
-            {
-                var cxt = (SaveFlashContext)_currentContext;
-                openFileDialog.Filter = @"All Files|*.*";
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    var originalFile = (FileSystemFileEntry)lvFileTree.TreeView.SelectedNode.Tag;
-                    var newFile = File.OpenRead(openFileDialog.FileName);
-                    var newFileSize = (ulong)newFile.Length;
-                    newFile.Close();
-                    if (originalFile.FileSize != newFileSize)
-                    {
-                        MessageBox.Show(@"File's size doesn't match the target file. \nIt must be the same size as the one to replace.");
-                        return;
-                    }
-                    long offSetInImage = cxt.FileBase + originalFile.BlockOffset * 0x200;
-                    Buffer.BlockCopy(File.ReadAllBytes(openFileDialog.FileName), 0, cxt.Image, (int)offSetInImage, (int)newFileSize);
-                    MessageBox.Show(@"File replaced.");
-                }
-            }
-            else if (_currentContext is CIAContext)
-            {
-                var cxt = (CIAContext)_currentContext;
-                openFileDialog.Filter = @"All Files|*.*";
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    var iconImage = (System.Drawing.Image)lvFileTree.TreeView.SelectedNode.Tag;
-                    var graphics = System.Drawing.Graphics.FromImage(iconImage);
-                    var newImage = System.Drawing.Image.FromFile(openFileDialog.FileName);
-                    if (newImage == null)
-                    {
-                        MessageBox.Show(@"The file selected is not a valid image!");
-                        return;
-                    }
-                    graphics.DrawImage(newImage, 0, 0, iconImage.Width, iconImage.Height);
-
-                    if (imlFS.Images.ContainsKey("small"))
-                        imlFS.Images.RemoveByKey("small");
-                    if (imlFS.Images.ContainsKey("large"))
-                        imlFS.Images.RemoveByKey("large");
-                    imlFS.Images.Add("small", cxt.SmallIcon);
-                    imlFS.Images.Add("large", cxt.LargeIcon);
-
-                    MessageBox.Show(@"File replaced.");
-                    newImage.Dispose();
-                }
-            }
-            else
-                MessageBox.Show(@"This action can't be done!");
+            lvFileTree_DoubleClick(sender, e);
         }
         #endregion
 
@@ -496,7 +363,6 @@ namespace _3DSExplorer
                 MessageBox.Show("v" + Application.ProductVersion + " is the latest version.");
         }
         #endregion
-
 
     }
 

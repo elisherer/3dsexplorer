@@ -161,6 +161,11 @@ namespace _3DSExplorer
             txtQuality.Text = tbQuality.Value.ToString();
         }
 
+        private void tbCores_Scroll(object sender, EventArgs e)
+        {
+            txtCores.Text = tbCores.Value.ToString();
+        }
+
         private void btnDestinationBrowse_Click(object sender, EventArgs e)
         {
             if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
@@ -263,17 +268,17 @@ namespace _3DSExplorer
             ChangeStatus("Status: Start making the left video.");
             Application.DoEvents();
             _ffmpeg.Convert(0,"-y",                   // Overwrite
+                            "-threads " + tbCores.Value,// Make it go faster by using 2 cores
                             "-i \"" + _processedFile + "\"",         // In file
                             "-s 800x240",           // Output size
-                            "-r " + numFps.Value,   // Frame rate
                             "-vcodec mjpeg",        // Video codec = mjpeg
-                            "-q " + tbQuality.Value,// Quality scale
+                            (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value), // Quality
                             "-vf crop=400:240:" + position, // Video filter
                             "-acodec libmp3lame",   // Audio codec = libmp3lame
                             "-ar 44100",            // Audio sample rate
-                            "-ab 96k",              // Audio bit rate
+                            "-ab " + txtAudioBitrate.Text + "k",// Audio bit rate
+                            "-vol " + numVolume.Value, //Audio Volume
                             "-ac 2",                // Audio channels
-                            "-threads 2",           // Make it go faster by using 2 cores
                             "\"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\left.avi\"");
         }
 
@@ -299,15 +304,14 @@ namespace _3DSExplorer
             ChangeStatus("Status: Start making the right video.");
             Application.DoEvents();
             _ffmpeg.Convert(0,"-y",                   // Overwrite
-                            "-i \"" + _processedFile +"\"",         // In file
+                            "-threads " + tbCores.Value,// Make it go faster by using 2 cores
+                            "-i \"" + _processedFile + "\"",         // In file
                             "-s 800x240",           // Output size
-                            "-r " + numFps.Value,   // Frame rate
                             "-t 00:09:59.50",       // Limit 10 minutes
                             "-vcodec mjpeg",        // Video codec = mjpeg
-                            "-q " + tbQuality.Value,// Quality scale
+                            (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value), // Quality
                             "-vf crop=400:240:" + position, //top-bottom or side-by-side
                             "-an",                  // No Audio
-                            "-threads 2",           // Make it go faster by using 2 cores
                             "\"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\right.avi\"");
         }
         
@@ -316,33 +320,32 @@ namespace _3DSExplorer
             ChangeStatus("Status: Start making 2D video.");
             Application.DoEvents();
             _ffmpeg.Convert(TimeLimit,"-y",         // Overwrite
+                            "-threads " + tbCores.Value,// Make it go faster by using 2 cores
                             "-i \"" + _processedFile + "\"",// In file
                             "-s 400x240",           // Output size
-                            "-r " + numFps.Value,   // Frame rate
                             "-t 00:09:59.50",       // Limit 10 minutes
                             "-vcodec mjpeg",        // Video codec = mjpeg
-                            "-q " + tbQuality.Value,// Quality scale
+                            (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value), // Quality
                             "-acodec adpcm_ima_wav",// Audio codec = adpcm_ima_wav
                             "-ar 44100",            // Audio sample rate
-                            "-ab 96k",              // Audio bit rate
+                            "-ab " + txtAudioBitrate.Text + "k",// Audio bit rate
+                            "-vol " + numVolume.Value, //Audio Volume
                             "-ac 2",                // Audio channels
-                            "-threads 2",           // Make it go faster by using 2 cores
                             "\"" + txtOutputFile.Text + "\"");
         }
 
         private void CombineLeftAndRight()
         {
-            //ffmpeg -y -i "left.avi" -i "right.avi" -vcodec copy -acodec adpcm_ima_wav -ac 2 -vcodec copy -map 0:0 -map 0:1 -map 1:0 "LGG_0001.AVI"
             ChangeStatus("Status: Start combining.");
             Application.DoEvents();
             _ffmpeg.Convert(TimeLimit, "-y",        // Overwrite
+                            "-threads " + tbCores.Value,// Make it go faster by using 2 cores
                             "-i \"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\left.avi\"", // left file
                             "-i \"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\right.avi\"", // right file
                             "-vcodec copy",         // Video codec = <copy>
                             "-acodec adpcm_ima_wav",// Audio codec = adpcm_ima_wav
                             "-ac 2",                // Audio channels
                             "-vcodec copy",         // Video codec = <copy> (TODO: is this needed?)
-                            "-threads 2",           // Make it go faster by using 2 cores
                             "-map 0:0",             // Mappings for audio & video
                             "-map 0:1",
                             "-map 1:0",
@@ -393,6 +396,21 @@ namespace _3DSExplorer
                     break;
             }
         }
+
+        private void chkAdvanced_CheckedChanged(object sender, EventArgs e)
+        {
+            txtQuality.Visible = !chkAdvanced.Checked;
+            lblQuality.Visible = !chkAdvanced.Checked;
+            lblQualityBest.Visible = !chkAdvanced.Checked;
+            lblQualityWorst.Visible = !chkAdvanced.Checked;
+            tbQuality.Visible = !chkAdvanced.Checked;
+            lblFPS.Visible = chkAdvanced.Checked;
+            numFps.Visible = chkAdvanced.Checked;
+            lblVideoBitRate.Visible = chkAdvanced.Checked;
+            txtVideoBitrate.Visible = chkAdvanced.Checked;
+            lblKbps.Visible = chkAdvanced.Checked;
+        }
+
 
     }
 }

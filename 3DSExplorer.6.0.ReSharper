@@ -94,6 +94,8 @@
       <Abbreviation Text="MPF" />
       <Abbreviation Text="FF" />
       <Abbreviation Text="MPO" />
+      <Abbreviation Text="FS" />
+      <Abbreviation Text="CRC" />
     </Naming2>
   </CodeStyleSettings>
   <Daemon.SolutionSettings>

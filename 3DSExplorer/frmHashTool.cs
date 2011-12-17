@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using _3DSExplorer.Crypt;
 
 namespace _3DSExplorer
 {
@@ -99,6 +100,9 @@ namespace _3DSExplorer
                     case 4:
                         //stays null for Modbus-CRC16
                         break;
+                    case 5:
+                        _ha = new Crc32();
+                        break;
                 }
         }
         // ReSharper restore AccessToStaticMemberViaDerivedType
@@ -109,13 +113,13 @@ namespace _3DSExplorer
             {
                 var fs = File.OpenRead(_filePath);
                 
-                var blockSize = Int32.Parse(cbComputeBlockSize.Text);
-                var blocks = Int32.Parse(txtBlocks.Text);
+                var blockSize = chkEntireFile.Checked ? fs.Length : Int32.Parse(cbComputeBlockSize.Text);
+                var blocks = chkEntireFile.Checked ? 1 : Int32.Parse(txtBlocks.Text);
 
                 var block = new byte[blockSize];
                 setHashAlgorithm();
-                
-                progressBar.Maximum = (blocks > 0 ? blocks : (int)fs.Length / blockSize);
+
+                progressBar.Maximum = (blocks > 0 ? blocks : (int)(fs.Length / blockSize));
                 progressBar.Value = 0;
                 var sb = new StringBuilder();
                 fs.Seek(Int32.Parse(txtOffset.Text), SeekOrigin.Begin);
@@ -123,7 +127,7 @@ namespace _3DSExplorer
                 do
                 {
                     var pos = fs.Position;
-                    readBytes = fs.Read(block, 0, blockSize);
+                    readBytes = fs.Read(block, 0, (int)blockSize);
                     var hash = _ha != null ? _ha.ComputeHash(block) : CRC16.GetCRC(block);
                     sb.Append("@" + pos.ToString("X7") + ": " + byteArrayToString(hash) + Environment.NewLine);
                     blocks--;
@@ -143,14 +147,12 @@ namespace _3DSExplorer
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                btnCompute.Enabled = true;
-                btnBrute.Enabled = true;
-                btnSuperBrute.Enabled = true;
-                _filePath = openFileDialog.FileName;
-                lblFilename.Text = _filePath;
-            }
+            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+            btnCompute.Enabled = true;
+            btnBrute.Enabled = true;
+            btnSuperBrute.Enabled = true;
+            _filePath = openFileDialog.FileName;
+            lblFilename.Text = _filePath;
         }
 
         private byte[] parseByteArray(string baString)
@@ -329,6 +331,13 @@ namespace _3DSExplorer
                 @"You could speed it up by checking the High CPU usage but be aware" + Environment.NewLine +
                 @"that your CPU might heat up because of the intense processing." + Environment.NewLine + 
                 @"Good luck!...";
+        }
+
+        private void chkEntireFile_CheckedChanged(object sender, EventArgs e)
+        {
+            txtBlocks.Enabled = !chkEntireFile.Checked;
+            txtOffset.Enabled = !chkEntireFile.Checked;
+            cbComputeBlockSize.Enabled = !chkEntireFile.Checked;
         }
     }
 }
