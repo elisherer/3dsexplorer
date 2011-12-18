@@ -25,8 +25,6 @@ namespace _3DSExplorer
         private ChangeFormDelegate ChangeForm;
         private ChangeStatusDelegate ChangeStatus;
 
-        private const int TimeLimit = 599; // 00:09:59
-
         enum ConvertionState
         {
             Left = 0,
@@ -46,6 +44,7 @@ namespace _3DSExplorer
             _webClient = new WebClient { Proxy = null }; //Make connection smooth
             _webClient.DownloadProgressChanged += WebClientDownloadProgressChanged;
             _webClient.DownloadFileCompleted += WebClientDownloadFileCompleted;
+            cmbSampleRate.SelectedIndex = 4;
         }
 
         #region YouTube Methods
@@ -103,6 +102,8 @@ namespace _3DSExplorer
         {
             grpDestination.Enabled = state;
             grpSource.Enabled = state;
+            grpVideo.Enabled = state;
+            grpAudio.Enabled = state;
             btnGo.Enabled = state;
         }
         private void ChangeStatusMethod(string text)
@@ -275,7 +276,7 @@ namespace _3DSExplorer
                             (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value), // Quality
                             "-vf crop=400:240:" + position, // Video filter
                             "-acodec libmp3lame",   // Audio codec = libmp3lame
-                            "-ar 44100",            // Audio sample rate
+                            "-ar " + cmbSampleRate.Text,// Audio sample rate
                             "-ab " + txtAudioBitrate.Text + "k",// Audio bit rate
                             "-vol " + numVolume.Value, //Audio Volume
                             "-ac 2",                // Audio channels
@@ -307,7 +308,6 @@ namespace _3DSExplorer
                             "-threads " + tbCores.Value,// Make it go faster by using 2 cores
                             "-i \"" + _processedFile + "\"",         // In file
                             "-s 800x240",           // Output size
-                            "-t 00:09:59.50",       // Limit 10 minutes
                             "-vcodec mjpeg",        // Video codec = mjpeg
                             (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value), // Quality
                             "-vf crop=400:240:" + position, //top-bottom or side-by-side
@@ -319,15 +319,14 @@ namespace _3DSExplorer
         {
             ChangeStatus("Status: Start making 2D video.");
             Application.DoEvents();
-            _ffmpeg.Convert(TimeLimit,"-y",         // Overwrite
+            _ffmpeg.Convert(chkSplit.Checked ? (int)numLimit.Value : 0,"-y", // Overwrite
                             "-threads " + tbCores.Value,// Make it go faster by using 2 cores
                             "-i \"" + _processedFile + "\"",// In file
                             "-s 400x240",           // Output size
-                            "-t 00:09:59.50",       // Limit 10 minutes
                             "-vcodec mjpeg",        // Video codec = mjpeg
                             (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value), // Quality
                             "-acodec adpcm_ima_wav",// Audio codec = adpcm_ima_wav
-                            "-ar 44100",            // Audio sample rate
+                            "-ar " + cmbSampleRate.Text,// Audio sample rate
                             "-ab " + txtAudioBitrate.Text + "k",// Audio bit rate
                             "-vol " + numVolume.Value, //Audio Volume
                             "-ac 2",                // Audio channels
@@ -338,7 +337,7 @@ namespace _3DSExplorer
         {
             ChangeStatus("Status: Start combining.");
             Application.DoEvents();
-            _ffmpeg.Convert(TimeLimit, "-y",        // Overwrite
+            _ffmpeg.Convert(chkSplit.Checked ? (int)numLimit.Value : 0, "-y", // Overwrite
                             "-threads " + tbCores.Value,// Make it go faster by using 2 cores
                             "-i \"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\left.avi\"", // left file
                             "-i \"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\right.avi\"", // right file
@@ -409,6 +408,11 @@ namespace _3DSExplorer
             lblVideoBitRate.Visible = chkAdvanced.Checked;
             txtVideoBitrate.Visible = chkAdvanced.Checked;
             lblKbps.Visible = chkAdvanced.Checked;
+        }
+
+        private void chkSplit_CheckedChanged(object sender, EventArgs e)
+        {
+            numLimit.Enabled = chkSplit.Checked;
         }
 
 

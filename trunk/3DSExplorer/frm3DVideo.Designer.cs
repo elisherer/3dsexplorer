@@ -42,17 +42,20 @@
             this.radSourceYoutube = new System.Windows.Forms.RadioButton();
             this.radSourceFile = new System.Windows.Forms.RadioButton();
             this.grpDestination = new System.Windows.Forms.GroupBox();
+            this.tbCores = new System.Windows.Forms.TrackBar();
+            this.txtCores = new System.Windows.Forms.TextBox();
+            this.lblThreads = new System.Windows.Forms.Label();
+            this.chkDeleteTempFiles = new System.Windows.Forms.CheckBox();
+            this.lblOutputFile = new System.Windows.Forms.Label();
+            this.btnDestinationBrowse = new System.Windows.Forms.Button();
+            this.txtOutputFile = new System.Windows.Forms.TextBox();
             this.lblQualityWorst = new System.Windows.Forms.Label();
             this.lblQualityBest = new System.Windows.Forms.Label();
             this.numFps = new System.Windows.Forms.NumericUpDown();
             this.lblFPS = new System.Windows.Forms.Label();
-            this.chkDeleteTempFiles = new System.Windows.Forms.CheckBox();
             this.lblQuality = new System.Windows.Forms.Label();
             this.tbQuality = new System.Windows.Forms.TrackBar();
-            this.lblOutputFile = new System.Windows.Forms.Label();
-            this.btnDestinationBrowse = new System.Windows.Forms.Button();
             this.txtQuality = new System.Windows.Forms.TextBox();
-            this.txtOutputFile = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.progressBar = new System.Windows.Forms.ProgressBar();
@@ -62,30 +65,33 @@
             this.openFfmpegDialog = new System.Windows.Forms.OpenFileDialog();
             this.btnSet = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.label4 = new System.Windows.Forms.Label();
-            this.tbCores = new System.Windows.Forms.TrackBar();
-            this.txtCores = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.chkAdvanced = new System.Windows.Forms.CheckBox();
-            this.lblVideoBitRate = new System.Windows.Forms.Label();
-            this.txtVideoBitrate = new System.Windows.Forms.TextBox();
+            this.grpVideo = new System.Windows.Forms.GroupBox();
             this.lblKbps = new System.Windows.Forms.Label();
-            this.lblAudioBitrate = new System.Windows.Forms.Label();
-            this.txtAudioBitrate = new System.Windows.Forms.TextBox();
+            this.txtVideoBitrate = new System.Windows.Forms.TextBox();
+            this.lblVideoBitRate = new System.Windows.Forms.Label();
+            this.chkAdvanced = new System.Windows.Forms.CheckBox();
+            this.grpAudio = new System.Windows.Forms.GroupBox();
+            this.lblVolumeDefault = new System.Windows.Forms.Label();
             this.lblAudioKbps = new System.Windows.Forms.Label();
             this.lblVolume = new System.Windows.Forms.Label();
-            this.lblVolumeDefault = new System.Windows.Forms.Label();
+            this.txtAudioBitrate = new System.Windows.Forms.TextBox();
+            this.lblAudioBitrate = new System.Windows.Forms.Label();
             this.numVolume = new System.Windows.Forms.NumericUpDown();
+            this.chkSplit = new System.Windows.Forms.CheckBox();
+            this.lblSampleRate = new System.Windows.Forms.Label();
+            this.cmbSampleRate = new System.Windows.Forms.ComboBox();
+            this.lvlOutputRes = new System.Windows.Forms.Label();
+            this.numLimit = new System.Windows.Forms.NumericUpDown();
             this.grpSource.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picThumb)).BeginInit();
             this.grpDestination.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbCores)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numFps)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbCores)).BeginInit();
-            this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
+            this.grpVideo.SuspendLayout();
+            this.grpAudio.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numVolume)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numLimit)).BeginInit();
             this.SuspendLayout();
             // 
             // grpSource
@@ -219,9 +225,11 @@
             // 
             // grpDestination
             // 
+            this.grpDestination.Controls.Add(this.numLimit);
+            this.grpDestination.Controls.Add(this.chkSplit);
             this.grpDestination.Controls.Add(this.tbCores);
             this.grpDestination.Controls.Add(this.txtCores);
-            this.grpDestination.Controls.Add(this.label4);
+            this.grpDestination.Controls.Add(this.lblThreads);
             this.grpDestination.Controls.Add(this.chkDeleteTempFiles);
             this.grpDestination.Controls.Add(this.lblOutputFile);
             this.grpDestination.Controls.Add(this.btnDestinationBrowse);
@@ -232,6 +240,75 @@
             this.grpDestination.TabIndex = 1;
             this.grpDestination.TabStop = false;
             this.grpDestination.Text = "Destination:";
+            // 
+            // tbCores
+            // 
+            this.tbCores.AutoSize = false;
+            this.tbCores.Location = new System.Drawing.Point(490, 45);
+            this.tbCores.Maximum = 8;
+            this.tbCores.Minimum = 1;
+            this.tbCores.Name = "tbCores";
+            this.tbCores.Size = new System.Drawing.Size(60, 29);
+            this.tbCores.TabIndex = 16;
+            this.tbCores.Value = 2;
+            this.tbCores.Scroll += new System.EventHandler(this.tbCores_Scroll);
+            // 
+            // txtCores
+            // 
+            this.txtCores.Location = new System.Drawing.Point(459, 47);
+            this.txtCores.Name = "txtCores";
+            this.txtCores.ReadOnly = true;
+            this.txtCores.Size = new System.Drawing.Size(25, 20);
+            this.txtCores.TabIndex = 15;
+            this.txtCores.Text = "2";
+            // 
+            // lblThreads
+            // 
+            this.lblThreads.AutoSize = true;
+            this.lblThreads.Location = new System.Drawing.Point(404, 49);
+            this.lblThreads.Name = "lblThreads";
+            this.lblThreads.Size = new System.Drawing.Size(49, 13);
+            this.lblThreads.TabIndex = 14;
+            this.lblThreads.Text = "Threads:";
+            // 
+            // chkDeleteTempFiles
+            // 
+            this.chkDeleteTempFiles.AutoSize = true;
+            this.chkDeleteTempFiles.Checked = true;
+            this.chkDeleteTempFiles.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkDeleteTempFiles.Location = new System.Drawing.Point(15, 48);
+            this.chkDeleteTempFiles.Name = "chkDeleteTempFiles";
+            this.chkDeleteTempFiles.Size = new System.Drawing.Size(206, 17);
+            this.chkDeleteTempFiles.TabIndex = 9;
+            this.chkDeleteTempFiles.Text = "Delete temporary files after conversion";
+            this.chkDeleteTempFiles.UseVisualStyleBackColor = true;
+            // 
+            // lblOutputFile
+            // 
+            this.lblOutputFile.AutoSize = true;
+            this.lblOutputFile.Location = new System.Drawing.Point(13, 23);
+            this.lblOutputFile.Name = "lblOutputFile";
+            this.lblOutputFile.Size = new System.Drawing.Size(58, 13);
+            this.lblOutputFile.TabIndex = 6;
+            this.lblOutputFile.Text = "Output file:";
+            // 
+            // btnDestinationBrowse
+            // 
+            this.btnDestinationBrowse.Location = new System.Drawing.Point(500, 19);
+            this.btnDestinationBrowse.Name = "btnDestinationBrowse";
+            this.btnDestinationBrowse.Size = new System.Drawing.Size(50, 21);
+            this.btnDestinationBrowse.TabIndex = 4;
+            this.btnDestinationBrowse.Text = "...";
+            this.btnDestinationBrowse.UseVisualStyleBackColor = true;
+            this.btnDestinationBrowse.Click += new System.EventHandler(this.btnDestinationBrowse_Click);
+            // 
+            // txtOutputFile
+            // 
+            this.txtOutputFile.Location = new System.Drawing.Point(103, 20);
+            this.txtOutputFile.Name = "txtOutputFile";
+            this.txtOutputFile.ReadOnly = true;
+            this.txtOutputFile.Size = new System.Drawing.Size(391, 20);
+            this.txtOutputFile.TabIndex = 3;
             // 
             // lblQualityWorst
             // 
@@ -284,18 +361,6 @@
             this.lblFPS.Text = "FPS:";
             this.lblFPS.Visible = false;
             // 
-            // chkDeleteTempFiles
-            // 
-            this.chkDeleteTempFiles.AutoSize = true;
-            this.chkDeleteTempFiles.Checked = true;
-            this.chkDeleteTempFiles.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkDeleteTempFiles.Location = new System.Drawing.Point(15, 48);
-            this.chkDeleteTempFiles.Name = "chkDeleteTempFiles";
-            this.chkDeleteTempFiles.Size = new System.Drawing.Size(206, 17);
-            this.chkDeleteTempFiles.TabIndex = 9;
-            this.chkDeleteTempFiles.Text = "Delete temporary files after conversion";
-            this.chkDeleteTempFiles.UseVisualStyleBackColor = true;
-            // 
             // lblQuality
             // 
             this.lblQuality.AutoSize = true;
@@ -317,42 +382,15 @@
             this.tbQuality.Value = 5;
             this.tbQuality.Scroll += new System.EventHandler(this.tbQuality_Scroll);
             // 
-            // lblOutputFile
-            // 
-            this.lblOutputFile.AutoSize = true;
-            this.lblOutputFile.Location = new System.Drawing.Point(13, 23);
-            this.lblOutputFile.Name = "lblOutputFile";
-            this.lblOutputFile.Size = new System.Drawing.Size(58, 13);
-            this.lblOutputFile.TabIndex = 6;
-            this.lblOutputFile.Text = "Output file:";
-            // 
-            // btnDestinationBrowse
-            // 
-            this.btnDestinationBrowse.Location = new System.Drawing.Point(500, 19);
-            this.btnDestinationBrowse.Name = "btnDestinationBrowse";
-            this.btnDestinationBrowse.Size = new System.Drawing.Size(50, 21);
-            this.btnDestinationBrowse.TabIndex = 4;
-            this.btnDestinationBrowse.Text = "...";
-            this.btnDestinationBrowse.UseVisualStyleBackColor = true;
-            this.btnDestinationBrowse.Click += new System.EventHandler(this.btnDestinationBrowse_Click);
-            // 
             // txtQuality
             // 
-            this.txtQuality.Location = new System.Drawing.Point(82, 47);
+            this.txtQuality.Location = new System.Drawing.Point(80, 48);
             this.txtQuality.Name = "txtQuality";
             this.txtQuality.ReadOnly = true;
             this.txtQuality.Size = new System.Drawing.Size(36, 20);
             this.txtQuality.TabIndex = 4;
             this.txtQuality.Text = "5";
             this.txtQuality.TextChanged += new System.EventHandler(this.txtYoutube_TextChanged);
-            // 
-            // txtOutputFile
-            // 
-            this.txtOutputFile.Location = new System.Drawing.Point(103, 20);
-            this.txtOutputFile.Name = "txtOutputFile";
-            this.txtOutputFile.ReadOnly = true;
-            this.txtOutputFile.Size = new System.Drawing.Size(391, 20);
-            this.txtOutputFile.TabIndex = 3;
             // 
             // openFileDialog
             // 
@@ -417,70 +455,55 @@
             this.btnSet.UseVisualStyleBackColor = false;
             this.btnSet.Click += new System.EventHandler(this.btnSetLocation_Click);
             // 
-            // label4
+            // grpVideo
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(404, 49);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(49, 13);
-            this.label4.TabIndex = 14;
-            this.label4.Text = "Threads:";
+            this.grpVideo.Controls.Add(this.lblKbps);
+            this.grpVideo.Controls.Add(this.txtVideoBitrate);
+            this.grpVideo.Controls.Add(this.lblVideoBitRate);
+            this.grpVideo.Controls.Add(this.chkAdvanced);
+            this.grpVideo.Controls.Add(this.lvlOutputRes);
+            this.grpVideo.Controls.Add(this.lblQuality);
+            this.grpVideo.Controls.Add(this.lblQualityWorst);
+            this.grpVideo.Controls.Add(this.numFps);
+            this.grpVideo.Controls.Add(this.txtQuality);
+            this.grpVideo.Controls.Add(this.lblFPS);
+            this.grpVideo.Controls.Add(this.tbQuality);
+            this.grpVideo.Controls.Add(this.lblQualityBest);
+            this.grpVideo.Location = new System.Drawing.Point(12, 153);
+            this.grpVideo.Name = "grpVideo";
+            this.grpVideo.Size = new System.Drawing.Size(285, 115);
+            this.grpVideo.TabIndex = 17;
+            this.grpVideo.TabStop = false;
+            this.grpVideo.Text = "Video Options:";
             // 
-            // tbCores
+            // lblKbps
             // 
-            this.tbCores.AutoSize = false;
-            this.tbCores.Location = new System.Drawing.Point(490, 45);
-            this.tbCores.Maximum = 8;
-            this.tbCores.Minimum = 1;
-            this.tbCores.Name = "tbCores";
-            this.tbCores.Size = new System.Drawing.Size(60, 29);
-            this.tbCores.TabIndex = 16;
-            this.tbCores.Value = 2;
-            this.tbCores.Scroll += new System.EventHandler(this.tbCores_Scroll);
+            this.lblKbps.AutoSize = true;
+            this.lblKbps.Location = new System.Drawing.Point(239, 50);
+            this.lblKbps.Name = "lblKbps";
+            this.lblKbps.Size = new System.Drawing.Size(30, 13);
+            this.lblKbps.TabIndex = 17;
+            this.lblKbps.Text = "kbps";
+            this.lblKbps.Visible = false;
             // 
-            // txtCores
+            // txtVideoBitrate
             // 
-            this.txtCores.Location = new System.Drawing.Point(459, 47);
-            this.txtCores.Name = "txtCores";
-            this.txtCores.ReadOnly = true;
-            this.txtCores.Size = new System.Drawing.Size(25, 20);
-            this.txtCores.TabIndex = 15;
-            this.txtCores.Text = "2";
+            this.txtVideoBitrate.Location = new System.Drawing.Point(164, 47);
+            this.txtVideoBitrate.Name = "txtVideoBitrate";
+            this.txtVideoBitrate.Size = new System.Drawing.Size(73, 20);
+            this.txtVideoBitrate.TabIndex = 16;
+            this.txtVideoBitrate.Text = "2000";
+            this.txtVideoBitrate.Visible = false;
             // 
-            // groupBox1
+            // lblVideoBitRate
             // 
-            this.groupBox1.Controls.Add(this.lblKbps);
-            this.groupBox1.Controls.Add(this.txtVideoBitrate);
-            this.groupBox1.Controls.Add(this.lblVideoBitRate);
-            this.groupBox1.Controls.Add(this.chkAdvanced);
-            this.groupBox1.Controls.Add(this.lblQuality);
-            this.groupBox1.Controls.Add(this.lblQualityWorst);
-            this.groupBox1.Controls.Add(this.numFps);
-            this.groupBox1.Controls.Add(this.txtQuality);
-            this.groupBox1.Controls.Add(this.lblFPS);
-            this.groupBox1.Controls.Add(this.tbQuality);
-            this.groupBox1.Controls.Add(this.lblQualityBest);
-            this.groupBox1.Location = new System.Drawing.Point(12, 153);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(285, 115);
-            this.groupBox1.TabIndex = 17;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Video Options:";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.lblVolumeDefault);
-            this.groupBox2.Controls.Add(this.lblAudioKbps);
-            this.groupBox2.Controls.Add(this.lblVolume);
-            this.groupBox2.Controls.Add(this.txtAudioBitrate);
-            this.groupBox2.Controls.Add(this.lblAudioBitrate);
-            this.groupBox2.Controls.Add(this.numVolume);
-            this.groupBox2.Location = new System.Drawing.Point(303, 153);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(265, 115);
-            this.groupBox2.TabIndex = 17;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Audio Options:";
+            this.lblVideoBitRate.AutoSize = true;
+            this.lblVideoBitRate.Location = new System.Drawing.Point(122, 50);
+            this.lblVideoBitRate.Name = "lblVideoBitRate";
+            this.lblVideoBitRate.Size = new System.Drawing.Size(40, 13);
+            this.lblVideoBitRate.TabIndex = 15;
+            this.lblVideoBitRate.Text = "Bitrate:";
+            this.lblVideoBitRate.Visible = false;
             // 
             // chkAdvanced
             // 
@@ -493,51 +516,31 @@
             this.chkAdvanced.UseVisualStyleBackColor = true;
             this.chkAdvanced.CheckedChanged += new System.EventHandler(this.chkAdvanced_CheckedChanged);
             // 
-            // lblVideoBitRate
+            // grpAudio
             // 
-            this.lblVideoBitRate.AutoSize = true;
-            this.lblVideoBitRate.Location = new System.Drawing.Point(122, 50);
-            this.lblVideoBitRate.Name = "lblVideoBitRate";
-            this.lblVideoBitRate.Size = new System.Drawing.Size(40, 13);
-            this.lblVideoBitRate.TabIndex = 15;
-            this.lblVideoBitRate.Text = "Bitrate:";
-            this.lblVideoBitRate.Visible = false;
+            this.grpAudio.Controls.Add(this.cmbSampleRate);
+            this.grpAudio.Controls.Add(this.lblSampleRate);
+            this.grpAudio.Controls.Add(this.lblVolumeDefault);
+            this.grpAudio.Controls.Add(this.lblAudioKbps);
+            this.grpAudio.Controls.Add(this.lblVolume);
+            this.grpAudio.Controls.Add(this.txtAudioBitrate);
+            this.grpAudio.Controls.Add(this.lblAudioBitrate);
+            this.grpAudio.Controls.Add(this.numVolume);
+            this.grpAudio.Location = new System.Drawing.Point(303, 153);
+            this.grpAudio.Name = "grpAudio";
+            this.grpAudio.Size = new System.Drawing.Size(265, 115);
+            this.grpAudio.TabIndex = 17;
+            this.grpAudio.TabStop = false;
+            this.grpAudio.Text = "Audio Options:";
             // 
-            // txtVideoBitrate
+            // lblVolumeDefault
             // 
-            this.txtVideoBitrate.Location = new System.Drawing.Point(164, 47);
-            this.txtVideoBitrate.Name = "txtVideoBitrate";
-            this.txtVideoBitrate.Size = new System.Drawing.Size(73, 20);
-            this.txtVideoBitrate.TabIndex = 16;
-            this.txtVideoBitrate.Text = "2000";
-            this.txtVideoBitrate.Visible = false;
-            // 
-            // lblKbps
-            // 
-            this.lblKbps.AutoSize = true;
-            this.lblKbps.Location = new System.Drawing.Point(239, 50);
-            this.lblKbps.Name = "lblKbps";
-            this.lblKbps.Size = new System.Drawing.Size(30, 13);
-            this.lblKbps.TabIndex = 17;
-            this.lblKbps.Text = "kbps";
-            this.lblKbps.Visible = false;
-            // 
-            // lblAudioBitrate
-            // 
-            this.lblAudioBitrate.AutoSize = true;
-            this.lblAudioBitrate.Location = new System.Drawing.Point(18, 54);
-            this.lblAudioBitrate.Name = "lblAudioBitrate";
-            this.lblAudioBitrate.Size = new System.Drawing.Size(40, 13);
-            this.lblAudioBitrate.TabIndex = 15;
-            this.lblAudioBitrate.Text = "Bitrate:";
-            // 
-            // txtAudioBitrate
-            // 
-            this.txtAudioBitrate.Location = new System.Drawing.Point(69, 51);
-            this.txtAudioBitrate.Name = "txtAudioBitrate";
-            this.txtAudioBitrate.Size = new System.Drawing.Size(59, 20);
-            this.txtAudioBitrate.TabIndex = 16;
-            this.txtAudioBitrate.Text = "96";
+            this.lblVolumeDefault.AutoSize = true;
+            this.lblVolumeDefault.Location = new System.Drawing.Point(135, 25);
+            this.lblVolumeDefault.Name = "lblVolumeDefault";
+            this.lblVolumeDefault.Size = new System.Drawing.Size(71, 13);
+            this.lblVolumeDefault.TabIndex = 17;
+            this.lblVolumeDefault.Text = "[Default: 256]";
             // 
             // lblAudioKbps
             // 
@@ -557,14 +560,22 @@
             this.lblVolume.TabIndex = 15;
             this.lblVolume.Text = "Volume:";
             // 
-            // lblVolumeDefault
+            // txtAudioBitrate
             // 
-            this.lblVolumeDefault.AutoSize = true;
-            this.lblVolumeDefault.Location = new System.Drawing.Point(135, 25);
-            this.lblVolumeDefault.Name = "lblVolumeDefault";
-            this.lblVolumeDefault.Size = new System.Drawing.Size(71, 13);
-            this.lblVolumeDefault.TabIndex = 17;
-            this.lblVolumeDefault.Text = "[Default: 256]";
+            this.txtAudioBitrate.Location = new System.Drawing.Point(69, 51);
+            this.txtAudioBitrate.Name = "txtAudioBitrate";
+            this.txtAudioBitrate.Size = new System.Drawing.Size(59, 20);
+            this.txtAudioBitrate.TabIndex = 16;
+            this.txtAudioBitrate.Text = "96";
+            // 
+            // lblAudioBitrate
+            // 
+            this.lblAudioBitrate.AutoSize = true;
+            this.lblAudioBitrate.Location = new System.Drawing.Point(18, 54);
+            this.lblAudioBitrate.Name = "lblAudioBitrate";
+            this.lblAudioBitrate.Size = new System.Drawing.Size(40, 13);
+            this.lblAudioBitrate.TabIndex = 15;
+            this.lblAudioBitrate.Text = "Bitrate:";
             // 
             // numVolume
             // 
@@ -588,6 +599,72 @@
             0,
             0});
             // 
+            // chkSplit
+            // 
+            this.chkSplit.AutoSize = true;
+            this.chkSplit.Checked = true;
+            this.chkSplit.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSplit.Location = new System.Drawing.Point(232, 48);
+            this.chkSplit.Name = "chkSplit";
+            this.chkSplit.Size = new System.Drawing.Size(160, 17);
+            this.chkSplit.TabIndex = 17;
+            this.chkSplit.Text = "Split to                 sec videos";
+            this.chkSplit.UseVisualStyleBackColor = true;
+            this.chkSplit.CheckedChanged += new System.EventHandler(this.chkSplit_CheckedChanged);
+            // 
+            // lblSampleRate
+            // 
+            this.lblSampleRate.AutoSize = true;
+            this.lblSampleRate.Location = new System.Drawing.Point(18, 82);
+            this.lblSampleRate.Name = "lblSampleRate";
+            this.lblSampleRate.Size = new System.Drawing.Size(71, 13);
+            this.lblSampleRate.TabIndex = 18;
+            this.lblSampleRate.Text = "Sample Rate:";
+            // 
+            // cmbSampleRate
+            // 
+            this.cmbSampleRate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbSampleRate.FormattingEnabled = true;
+            this.cmbSampleRate.Items.AddRange(new object[] {
+            "8000",
+            "11025",
+            "16000",
+            "22050",
+            "44100",
+            "48000",
+            "96000"});
+            this.cmbSampleRate.Location = new System.Drawing.Point(95, 79);
+            this.cmbSampleRate.Name = "cmbSampleRate";
+            this.cmbSampleRate.Size = new System.Drawing.Size(108, 21);
+            this.cmbSampleRate.TabIndex = 19;
+            // 
+            // lvlOutputRes
+            // 
+            this.lvlOutputRes.AutoSize = true;
+            this.lvlOutputRes.Location = new System.Drawing.Point(154, 16);
+            this.lvlOutputRes.Name = "lvlOutputRes";
+            this.lvlOutputRes.Size = new System.Drawing.Size(124, 13);
+            this.lvlOutputRes.TabIndex = 5;
+            this.lvlOutputRes.Text = "Video output is: 400x240";
+            this.lvlOutputRes.Visible = false;
+            // 
+            // numLimit
+            // 
+            this.numLimit.Location = new System.Drawing.Point(287, 47);
+            this.numLimit.Maximum = new decimal(new int[] {
+            599,
+            0,
+            0,
+            0});
+            this.numLimit.Name = "numLimit";
+            this.numLimit.Size = new System.Drawing.Size(43, 20);
+            this.numLimit.TabIndex = 18;
+            this.numLimit.Value = new decimal(new int[] {
+            599,
+            0,
+            0,
+            0});
+            // 
             // frm3DVideo
             // 
             this.AcceptButton = this.btnGo;
@@ -595,8 +672,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(581, 429);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.grpAudio);
+            this.Controls.Add(this.grpVideo);
             this.Controls.Add(this.btnSet);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.btnCancel);
@@ -614,14 +691,15 @@
             ((System.ComponentModel.ISupportInitialize)(this.picThumb)).EndInit();
             this.grpDestination.ResumeLayout(false);
             this.grpDestination.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbCores)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numFps)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbCores)).EndInit();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
+            this.grpVideo.ResumeLayout(false);
+            this.grpVideo.PerformLayout();
+            this.grpAudio.ResumeLayout(false);
+            this.grpAudio.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numVolume)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numLimit)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -662,18 +740,23 @@
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.TrackBar tbCores;
         private System.Windows.Forms.TextBox txtCores;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label lblThreads;
+        private System.Windows.Forms.GroupBox grpVideo;
         private System.Windows.Forms.Label lblKbps;
         private System.Windows.Forms.TextBox txtVideoBitrate;
         private System.Windows.Forms.Label lblVideoBitRate;
         private System.Windows.Forms.CheckBox chkAdvanced;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox grpAudio;
         private System.Windows.Forms.Label lblVolumeDefault;
         private System.Windows.Forms.Label lblAudioKbps;
         private System.Windows.Forms.Label lblVolume;
         private System.Windows.Forms.TextBox txtAudioBitrate;
         private System.Windows.Forms.Label lblAudioBitrate;
         private System.Windows.Forms.NumericUpDown numVolume;
+        private System.Windows.Forms.CheckBox chkSplit;
+        private System.Windows.Forms.ComboBox cmbSampleRate;
+        private System.Windows.Forms.Label lblSampleRate;
+        private System.Windows.Forms.Label lvlOutputRes;
+        private System.Windows.Forms.NumericUpDown numLimit;
     }
 }
