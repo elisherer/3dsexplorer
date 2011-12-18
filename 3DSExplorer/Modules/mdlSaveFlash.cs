@@ -349,7 +349,7 @@ namespace _3DSExplorer.Modules
                 if (foundKey == null)
                 {
                     ms.Close();
-#if true///DEBUG
+#if DEBUG
                     foundKey = MakeKey(Image);
                     File.WriteAllBytes("_img.bin", Image);
                     XorByteArray(Image, foundKey, 0);
@@ -361,7 +361,6 @@ namespace _3DSExplorer.Modules
                                    "_img, _dec & _key";
 #else
                     errorMessage = "Can't find key in binary file. (corrupted or for fw:2.2.0-4+)";
-
 #endif
                     return false;
                 }

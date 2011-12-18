@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 
 namespace _3DSExplorer
 {
@@ -96,10 +97,16 @@ namespace _3DSExplorer
             //start creating the splits
             var durationTime = TimeSpan.FromSeconds(duration);
             var startTime = TimeSpan.FromSeconds(_timeLimit);
-            //TODO: cut the filename and enter a new file name
+            //cut the filename and enter a new file name
+            var filenameIndex = args.LastIndexOf(" \"") + 2;
+            var filename = args.Substring(filenameIndex,args.Length-filenameIndex-1);
+            args = args.Remove(filenameIndex);
+            var filePrefix = Path.GetDirectoryName(filename) + "\\" + Path.GetFileNameWithoutExtension(filename);
+            var filePostfix = Path.GetExtension(filename);
+            var counter = 2;
             while (startTime.CompareTo(durationTime) < 0)
             {
-                var newArgs = string.Format("-ss {0} {1}", ts, args);
+                var newArgs = string.Format("-ss {0} {1}\"{2}\"", ts, args, filePrefix + (counter++) + filePostfix);
                 process = new Process
                               {
                                   StartInfo =
