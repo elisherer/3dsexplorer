@@ -27,10 +27,10 @@ namespace _3DSExplorer
 
         enum ConvertionState
         {
+            Video2D = -1,
             Left = 0,
             Right = 100,
-            Combination = 200,
-            Video2D
+            Combination = 200
         }
 
         public frm3DVideo()
@@ -268,19 +268,12 @@ namespace _3DSExplorer
             }
             ChangeStatus("Status: Start making the left video.");
             Application.DoEvents();
-            _ffmpeg.Convert(0,"-y",                   // Overwrite
-                            "-threads " + tbCores.Value,// Make it go faster by using 2 cores
-                            "-i \"" + _processedFile + "\"",         // In file
-                            "-s 800x240",           // Output size
-                            "-vcodec mjpeg",        // Video codec = mjpeg
-                            (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value), // Quality
-                            "-vf crop=400:240:" + position, // Video filter
-                            "-acodec libmp3lame",   // Audio codec = libmp3lame
-                            "-ar " + cmbSampleRate.Text,// Audio sample rate
-                            "-ab " + txtAudioBitrate.Text + "k",// Audio bit rate
-                            "-vol " + numVolume.Value, //Audio Volume
-                            "-ac 2",                // Audio channels
-                            "\"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\left.avi\"");
+            var parameters =
+                string.Format(
+                    "-y -threads {0} -i \"{1}\" -s 800x240 -vcodec mjpeg {2} -vf crop=400:240:{3} -acodec libmp3lame -ar {4} -ab {5}k -vol {6} -ac {7}",
+                    tbCores.Value, _processedFile, (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value),
+                    position, cmbSampleRate.Text, txtAudioBitrate.Text, numVolume.Value,2);
+            _ffmpeg.Convert(0,parameters,Path.GetDirectoryName(Application.ExecutablePath) + "\\left.avi");
         }
 
 
@@ -304,58 +297,44 @@ namespace _3DSExplorer
             }
             ChangeStatus("Status: Start making the right video.");
             Application.DoEvents();
-            _ffmpeg.Convert(0,"-y",                   // Overwrite
-                            "-threads " + tbCores.Value,// Make it go faster by using 2 cores
-                            "-i \"" + _processedFile + "\"",         // In file
-                            "-s 800x240",           // Output size
-                            "-vcodec mjpeg",        // Video codec = mjpeg
-                            (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value), // Quality
-                            "-vf crop=400:240:" + position, //top-bottom or side-by-side
-                            "-an",                  // No Audio
-                            "\"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\right.avi\"");
+            var parameters =
+                string.Format(
+                    "-y -threads {0} -i \"{1}\" -s 800x240 -vcodec mjpeg {2} -vf crop=400:240:{3} -an",
+                    tbCores.Value, _processedFile, (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value),
+                    position);
+            _ffmpeg.Convert(0, parameters, Path.GetDirectoryName(Application.ExecutablePath) + "\\right.avi");
         }
         
         private void Make2D()
         {
             ChangeStatus("Status: Start making 2D video.");
             Application.DoEvents();
-            _ffmpeg.Convert(chkSplit.Checked ? (int)numLimit.Value : 0,"-y", // Overwrite
-                            "-threads " + tbCores.Value,// Make it go faster by using 2 cores
-                            "-i \"" + _processedFile + "\"",// In file
-                            "-s 400x240",           // Output size
-                            "-vcodec mjpeg",        // Video codec = mjpeg
-                            (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value), // Quality
-                            "-acodec adpcm_ima_wav",// Audio codec = adpcm_ima_wav
-                            "-ar " + cmbSampleRate.Text,// Audio sample rate
-                            "-ab " + txtAudioBitrate.Text + "k",// Audio bit rate
-                            "-vol " + numVolume.Value, //Audio Volume
-                            "-ac 2",                // Audio channels
-                            "\"" + txtOutputFile.Text + "\"");
+            var parameters =
+                string.Format(
+                    "-y -threads {0} -i \"{1}\" -s 400x240 -vcodec mjpeg {2} -acodec adpcm_ima_wav -ar {3} -ab {4}k -vol {5} -ac {6}",
+                    tbCores.Value, _processedFile, (chkAdvanced.Checked ? "-r " + numFps.Value + " -b:v " + txtVideoBitrate.Text : "-q " + tbQuality.Value),
+                    cmbSampleRate.Text, txtAudioBitrate.Text, numVolume.Value, 2);
+            _ffmpeg.Convert(chkSplit.Checked ? (int)numLimit.Value : 0, parameters, txtOutputFile.Text);
         }
 
         private void CombineLeftAndRight()
         {
             ChangeStatus("Status: Start combining.");
             Application.DoEvents();
-            _ffmpeg.Convert(chkSplit.Checked ? (int)numLimit.Value : 0, "-y", // Overwrite
-                            "-threads " + tbCores.Value,// Make it go faster by using 2 cores
-                            "-i \"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\left.avi\"", // left file
-                            "-i \"" + Path.GetDirectoryName(Application.ExecutablePath) + "\\right.avi\"", // right file
-                            "-vcodec copy",         // Video codec = <copy>
-                            "-acodec adpcm_ima_wav",// Audio codec = adpcm_ima_wav
-                            "-ac 2",                // Audio channels
-                            "-vcodec copy",         // Video codec = <copy> (TODO: is this needed?)
-                            "-map 0:0",             // Mappings for audio & video
-                            "-map 0:1",
-                            "-map 1:0",
-                            "\"" + txtOutputFile.Text + "\"");
+            var parameters =
+                string.Format(
+                    "-y -threads {0} -i \"{1}\" -i \"{2}\" -vcodec copy -acodec adpcm_ima_wav -ac 2 -vcodec copy -map 0:0 -map 0:1 -map 1:0",
+                    tbCores.Value, Path.GetDirectoryName(Application.ExecutablePath) + "\\left.avi", Path.GetDirectoryName(Application.ExecutablePath) + "\\right.avi");
+            _ffmpeg.Convert(chkSplit.Checked ? (int)numLimit.Value : 0, parameters, txtOutputFile.Text);
         }
+
         private void FfmpegProgressChanged(int value, int max)
         {
             var startValue = (int) _state;
+            if (startValue < 0) startValue = 0;
             if (radSourceYoutube.Checked)
                 startValue += 100;
-            progressBar.Value = startValue + value/max;
+            progressBar.Value = startValue + (100 * value / max);
             ChangeStatus(string.Format("Status: Making {0} ({1}/{2})", _state, value, max));
         }
 
