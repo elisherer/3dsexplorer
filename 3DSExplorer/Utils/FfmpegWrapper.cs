@@ -7,6 +7,8 @@ namespace _3DSExplorer
 {
     public class FfmpegWrapper
     {
+        private static bool _busy;
+
         private readonly string _ffpmegPath;
 
         public delegate void ProgressChanged(int value, int max);
@@ -17,6 +19,14 @@ namespace _3DSExplorer
 
         private string _errorMessage;
         private int _timeLimit;
+
+        private bool _accepted, _started;
+        private int _duration, _timeProgress;
+        private BackgroundWorker _backgroundWorker;
+        private TimeSpan _durationTime;
+        private string _filename;
+        private string _filePrefix;
+        private string _filePostfix;
 
         public FfmpegWrapper(string ffpmegPath, ProgressChanged progressChanged, ProcessFinished processFinished)
         {
@@ -36,121 +46,85 @@ namespace _3DSExplorer
 
         private void BackgroundWorkerRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            _busy = false;
             _processFinished(_errorMessage);
         }
 
         private void BackgroundWorkerDoWork(object sender, DoWorkEventArgs e)
         {
-            //Start a process for part number 1
-            var ts = TimeSpan.FromSeconds(_timeLimit);
+            var tsTimeLimit = TimeSpan.FromSeconds(_timeLimit);
             var limited = _timeLimit > 0;
-            var args = (limited ? "-t " + ts : string.Empty) + string.Join(" ", (string[])e.Argument);
+            var args = (limited ? "-t " + tsTimeLimit : string.Empty) + e.Argument;
+            _duration = 1;
+            _durationTime = TimeSpan.FromSeconds(_duration); 
+            _timeProgress = 0;
 
-            var process = new Process { StartInfo = { FileName = _ffpmegPath , Arguments = args, CreateNoWindow = true, RedirectStandardError = true, UseShellExecute = false} };
-            if (!process.Start())
+            var part2AndUp = false;
+            var tsStartTime = TimeSpan.Zero;
+            var count = 0;
+            while (tsStartTime.CompareTo(_durationTime) < 0)
             {
-                _errorMessage = "Error starting ffmpeg.exe";
-                return;
-            }
-            var reader = process.StandardError;
-            var needMoreParts = false;
-
-            //Start reading the output
-            var started = false;
-            var accepted = false;
-            var duration = 0;
-            do
-            {
-                var line = reader.ReadLine();
-                if (line == null)
-                    break;
-                _errorMessage = line;
-
-                if (!accepted && line.StartsWith("Input #"))
-                    accepted = true;
-                if (!accepted) continue;
-                if (!started && line.StartsWith("frame"))
-                    started = true;
-                else
+                var process = new Process
                 {
-                    //get duration
-                    if (line.StartsWith("  Duration:"))
-                    {
-                        duration = ConvertTimeToInt(line.Substring(line.IndexOf('0'), 11));
-                        if (limited && duration > _timeLimit)
-                            needMoreParts = true;
-                    }
-                    continue;
-                }
-
-                if (!line.StartsWith("fr")) continue;
-                var value = ConvertTimeToInt(line.Substring(line.IndexOf("time=") + 5, 11));
-                ((BackgroundWorker)sender).ReportProgress(value, duration);
-
-            } while (!reader.EndOfStream);
-            if (started)
-                _errorMessage = string.Empty;
-            process.Close();
-
-
-            if (!needMoreParts) return;
-            //start creating the splits
-            var durationTime = TimeSpan.FromSeconds(duration);
-            var startTime = TimeSpan.FromSeconds(_timeLimit);
-            //cut the filename and enter a new file name
-            var filenameIndex = args.LastIndexOf(" \"") + 2;
-            var filename = args.Substring(filenameIndex,args.Length-filenameIndex-1);
-            args = args.Remove(filenameIndex);
-            var filePrefix = Path.GetDirectoryName(filename) + "\\" + Path.GetFileNameWithoutExtension(filename);
-            var filePostfix = Path.GetExtension(filename);
-            var counter = 2;
-            while (startTime.CompareTo(durationTime) < 0)
-            {
-                var newArgs = string.Format("-ss {0} {1}\"{2}\"", ts, args, filePrefix + (counter++) + filePostfix);
-                process = new Process
-                              {
-                                  StartInfo =
-                                      {
-                                          FileName = _ffpmegPath,
-                                          Arguments = newArgs,
-                                          CreateNoWindow = true,
-                                          RedirectStandardError = true,
-                                          UseShellExecute = false
-                                      }
-                              };
+                    StartInfo =
+                        {
+                            FileName = _ffpmegPath,
+                            Arguments =
+                            string.Format("{0} {1} \"{2}\"", 
+                                part2AndUp ? "-ss " + tsStartTime : string.Empty, 
+                                args,
+                                part2AndUp ? _filePrefix + count++ + _filePostfix : _filename),
+                            CreateNoWindow = true,
+                            RedirectStandardError = true,
+                            RedirectStandardOutput = false,
+                            UseShellExecute = false
+                        }
+                };
+                process.ErrorDataReceived += ProcessErrorDataReceived;
+                _started = false;
+                _accepted = false;
                 if (!process.Start())
                 {
                     _errorMessage = "Error starting ffmpeg.exe";
                     return;
                 }
-                reader = process.StandardError;
-                //Start reading the output
-                started = false;
-                accepted = false;
-                do
+                process.BeginErrorReadLine();
+                process.WaitForExit();
+                if (!_started)
+                    break;
+                _errorMessage = string.Empty;
+                if (!part2AndUp)
+                    part2AndUp = true;
+
+                if (!limited) break;
+                tsStartTime = tsStartTime.Add(tsTimeLimit);
+            }
+        }
+
+        void ProcessErrorDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            var line = e.Data;
+            if (line == null) return;
+            _errorMessage = line;
+
+            if (!_accepted && line.StartsWith("Input #"))
+                _accepted = true;
+            if (!_accepted) return;
+            if (!_started && line.StartsWith("frame"))
+                _started = true;
+            else if (!line.StartsWith("fr"))
+            {
+                //get duration
+                if (line.StartsWith("  Duration:"))
                 {
-                    var line = reader.ReadLine();
-                    if (line == null)
-                        break;
-                    _errorMessage = line;
-
-                    if (!accepted && line.StartsWith("Input #"))
-                        accepted = true;
-                    if (!accepted) continue;
-                    if (!started && line.StartsWith("frame"))
-                        started = true;
-                    else
-                        continue; //BUG
-
-                    if (!line.StartsWith("fr")) continue;
-                    var value = ConvertTimeToInt(line.Substring(line.IndexOf("time=") + 5, 11));
-                    ((BackgroundWorker) sender).ReportProgress(value, duration);
-
-                } while (!reader.EndOfStream);
-                if (started)
-                    _errorMessage = string.Empty;
-                process.Close();
-                startTime = startTime.Add(ts);
+                    _duration = ConvertTimeToInt(line.Substring(line.IndexOf('0'), 11));
+                    _durationTime = TimeSpan.FromSeconds(_duration);
+                }
+            }
+            else
+            {
+                _timeProgress = ConvertTimeToInt(line.Substring(line.IndexOf("time=") + 5, 11));
+                _backgroundWorker.ReportProgress(_timeProgress, _duration);
             }
         }
 
@@ -163,14 +137,19 @@ namespace _3DSExplorer
 
         #endregion
 
-        public void Convert(int timeLimit, params string[] args)
+        public void Convert(int timeLimit, string args, string outputFilename)
         {
+            if (_busy) return;
             _timeLimit = timeLimit;
-            var backgroundWorker = new BackgroundWorker {WorkerReportsProgress = true};
-            backgroundWorker.ProgressChanged += BackgroundWorkerProgressChanged;
-            backgroundWorker.DoWork += BackgroundWorkerDoWork;
-            backgroundWorker.RunWorkerCompleted += BackgroundWorkerRunWorkerCompleted;
-            backgroundWorker.RunWorkerAsync(args);
+            _filename = outputFilename;
+            _filePrefix = Path.GetDirectoryName(_filename) + "\\" + Path.GetFileNameWithoutExtension(_filename);
+            _filePostfix = Path.GetExtension(_filename);
+            _backgroundWorker = new BackgroundWorker {WorkerReportsProgress = true};
+            _backgroundWorker.ProgressChanged += BackgroundWorkerProgressChanged;
+            _backgroundWorker.DoWork += BackgroundWorkerDoWork;
+            _backgroundWorker.RunWorkerCompleted += BackgroundWorkerRunWorkerCompleted;
+            _backgroundWorker.RunWorkerAsync(args);
+            _busy = true;
         }
 
     }

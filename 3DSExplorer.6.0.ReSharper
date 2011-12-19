@@ -96,6 +96,7 @@
       <Abbreviation Text="MPO" />
       <Abbreviation Text="FS" />
       <Abbreviation Text="CRC" />
+      <Abbreviation Text="CCICXI" />
     </Naming2>
   </CodeStyleSettings>
   <Daemon.SolutionSettings>
