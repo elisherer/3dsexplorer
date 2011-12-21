@@ -140,6 +140,11 @@ namespace _3DSExplorer.Modules
             }
         }
 
+        public string GetFileFilter()
+        {
+            return "CTR Icons (*.icn)|*.icn";
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var tNode = new TreeNode("ICN") {Tag = TreeViewContextTag.Create(this, (int) ICNView.ICN)};

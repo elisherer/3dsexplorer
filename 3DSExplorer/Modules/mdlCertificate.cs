@@ -131,6 +131,11 @@ namespace _3DSExplorer.Modules
             throw new NotImplementedException();
         }
 
+        public string GetFileFilter()
+        {
+            return "Certificate file (*.cert)|*.cert";
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var tNode = new TreeNode("Certificates") { Tag = TreeViewContextTag.Create(this, 0, new object[] { -1 }) };

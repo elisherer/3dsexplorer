@@ -118,6 +118,11 @@ namespace _3DSExplorer.Modules
             throw new NotImplementedException();
         }
 
+        public string GetFileFilter()
+        {
+            return "Ticket files (*.tik)|*.tik";
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var topNode = new TreeNode("Ticket") { Tag = TreeViewContextTag.Create(this) };

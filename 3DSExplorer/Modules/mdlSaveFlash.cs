@@ -836,6 +836,11 @@ namespace _3DSExplorer.Modules
             }
         }
 
+        public string GetFileFilter()
+        {
+            return "Save Flash Files (*.sav/bin)|*.bin;*.sav";
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var tNode = new TreeNode("Save Flash " + (Encrypted ? "(Encrypted)" : "")) { Tag = TreeViewContextTag.Create(this, (int)SaveFlashView.Image) };

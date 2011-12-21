@@ -54,13 +54,18 @@ namespace _3DSExplorer.Modules
 
     public class CCIContext : IContext
     {
-        private string errorMessage = string.Empty;
-        public CCIHeader Header;
-        public CXIContext[] CXIContexts;
+        private string _errorMessage = string.Empty;
+        private CCIHeader Header;
+        private CXIContext[] CXIContexts;
 
-        public enum CCIView
+        private enum CCIView
         {
             NCSD
+        };
+
+        private enum CCIActivation
+        {
+            SaveCXI
         };
 
         public bool Open(Stream fs)
@@ -80,7 +85,7 @@ namespace _3DSExplorer.Modules
 
         public string GetErrorMessage()
         {
-            return errorMessage;
+            return _errorMessage;
         }
 
         public void Create(FileStream fs, FileStream src)
@@ -100,7 +105,7 @@ namespace _3DSExplorer.Modules
                     f.AddListItem(0x100, 4, "Magic (='NCSD')", Header.Magic, 1);
                     f.AddListItem(0x104, 4, "CCI length [medias]", Header.CCILength, 1);
                     f.AddListItem(0x108, 8, "Main Title ID", Header.MainTitleID, 1);
-                    f.AddListItem(0x110, 8, "Unknown 0", Header.Unknown0, 1);
+                    f.AddListItem(0x110, 16, "Unknown 0", Header.Unknown0, 1);
                     for (var i = 0; i < Header.CXIEntries.Length; i++)
                     {
                         f.AddListItem(0x120 + i * 8, 4, "CXI " + i + " offset [medias]", Header.CXIEntries[i].Offset, 1);
@@ -115,7 +120,7 @@ namespace _3DSExplorer.Modules
                     f.AddListItem(0x200, 4, "Always 0xFFFFFFFF", Header.PaddingFF, 1);
                     f.AddListItem(0x204, 252, "Unknown 2", Header.Unknown2, 1);
                     f.AddListItem(0x300, 4, "Used ROM length [bytes]", Header.UsedRomLength, 1);
-                    f.AddListItem(0x204, 28, "Unknown 3", Header.Unknown3, 1);
+                    f.AddListItem(0x304, 28, "Unknown 3", Header.Unknown3, 1);
                     f.AddListItem(0x320, 8, "Loader Title ID", Header.LoaderTitleId, 1);
                     f.AddListItem(0x328, 8, "Loader Title Version", Header.LoaderTitleVersion, 1);
                     break;
@@ -130,7 +135,24 @@ namespace _3DSExplorer.Modules
 
         public void Activate(string filePath, int type, object[] values)
         {
-            throw new NotImplementedException();
+            switch ((CCIActivation)type)
+            {
+                case CCIActivation.SaveCXI:
+                    var cxiIndex = (int)values[0];
+                    var saveFileDialog = new SaveFileDialog() { Filter = CXIContexts[cxiIndex].GetFileFilter(), FileName = CXIContexts[cxiIndex].TitleInfo.ProductCode };
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        var infs = File.OpenRead(filePath);
+                        infs.Seek(Header.CXIEntries[cxiIndex].Offset * 0x200, SeekOrigin.Begin);
+                        SaverProcess.Run("Saving CXI",infs,saveFileDialog.FileName,Header.CXIEntries[cxiIndex].Length*0x200);
+                    }
+                    break;
+            }
+        }
+
+        public string GetFileFilter()
+        {
+            return "CTR Cartridge Images (*.cci/3ds/csu)|*.3ds;*.cci;*.csu";
         }
 
         public TreeNode GetExplorerTopNode()
@@ -154,6 +176,7 @@ namespace _3DSExplorer.Modules
                 {
                     var cxiNode = CXIContexts[i].GetFileSystemTopNode();
                     cxiNode.Text = cxiNode.Text + @" " + i;
+                    cxiNode.Tag = new[] {TreeViewContextTag.Create(this, (int) CCIActivation.SaveCXI, "Save CXI...",new object[] { i } )};
                     tNode.Nodes.Add(cxiNode);
                 }
             return tNode;
