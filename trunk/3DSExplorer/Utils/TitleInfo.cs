@@ -6,6 +6,7 @@
         public string Title;
         public string Region;
         public string Developer;
+        public string ProductCode;
 
         public TitleInfo()
         {
@@ -14,6 +15,7 @@
             Title = unknown;
             Region = unknown;
             Developer = unknown;
+            ProductCode = unknown;
         }
 
         public override string ToString()
@@ -26,6 +28,8 @@
             var info = new TitleInfo();
             //CTR-P-#$$%
             //0123456789
+            info.ProductCode = new string(productChars);
+
             if (productChars != null)
             {
                 var type = productChars[6];

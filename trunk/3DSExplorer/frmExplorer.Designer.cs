@@ -50,8 +50,12 @@
             this.treeView = new System.Windows.Forms.TreeView();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.lblCaptionFiles = new System.Windows.Forms.Label();
-            this.cxtFile = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.lvFileTree = new TreeListView.TreeListViewControl();
+            this.cName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imlFS = new System.Windows.Forms.ImageList(this.components);
+            this.cxtFile = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.bwCheckForUpdates = new System.ComponentModel.BackgroundWorker();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
@@ -74,10 +78,6 @@
             this.menuHelpVisitNDev = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.lvFileTree = new TreeListView.TreeListViewControl();
-            this.cName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -244,12 +244,38 @@
             this.lblCaptionFiles.Text = "File List";
             this.lblCaptionFiles.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // cxtFile
+            // lvFileTree
             // 
-            this.cxtFile.Name = "contextMenuStrip1";
-            this.cxtFile.Size = new System.Drawing.Size(153, 26);
-            this.cxtFile.Opening += new System.ComponentModel.CancelEventHandler(this.cxtFile_Opening);
-            this.cxtFile.MouseEnter += new System.EventHandler(this.cxtFile_MouseEnter);
+            this.lvFileTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvFileTree.AutoScroll = true;
+            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.cName,
+            this.cSize,
+            this.cOffset});
+            this.lvFileTree.ImageList = this.imlFS;
+            this.lvFileTree.Location = new System.Drawing.Point(0, 23);
+            this.lvFileTree.Name = "lvFileTree";
+            this.lvFileTree.SelectedNode = null;
+            this.lvFileTree.Size = new System.Drawing.Size(261, 197);
+            this.lvFileTree.TabIndex = 1;
+            this.lvFileTree.TreeDoubleClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeDoubleClicked);
+            this.lvFileTree.TreeMouseClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeMouseClicked);
+            // 
+            // cName
+            // 
+            this.cName.Text = "Name";
+            this.cName.Width = 150;
+            // 
+            // cSize
+            // 
+            this.cSize.Text = "Size";
+            this.cSize.Width = 50;
+            // 
+            // cOffset
+            // 
+            this.cOffset.Text = "Offset";
             // 
             // imlFS
             // 
@@ -257,6 +283,11 @@
             this.imlFS.TransparentColor = System.Drawing.Color.Transparent;
             this.imlFS.Images.SetKeyName(0, "page_white_text.png");
             this.imlFS.Images.SetKeyName(1, "folder.png");
+            // 
+            // cxtFile
+            // 
+            this.cxtFile.Name = "contextMenuStrip1";
+            this.cxtFile.Size = new System.Drawing.Size(61, 4);
             // 
             // bwCheckForUpdates
             // 
@@ -436,38 +467,6 @@
             this.menuHelpAbout.Size = new System.Drawing.Size(235, 22);
             this.menuHelpAbout.Text = "About...";
             this.menuHelpAbout.Click += new System.EventHandler(this.menuHelpAbout_Click);
-            // 
-            // lvFileTree
-            // 
-            this.lvFileTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvFileTree.AutoScroll = true;
-            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.cName,
-            this.cSize,
-            this.cOffset});
-            this.lvFileTree.ContextMenuStrip = this.cxtFile;
-            this.lvFileTree.ImageList = this.imlFS;
-            this.lvFileTree.Location = new System.Drawing.Point(0, 23);
-            this.lvFileTree.Name = "lvFileTree";
-            this.lvFileTree.Size = new System.Drawing.Size(261, 197);
-            this.lvFileTree.TabIndex = 1;
-            this.lvFileTree.TreeDoubleClicked += new System.EventHandler(this.lvFileTree_DoubleClick);
-            // 
-            // cName
-            // 
-            this.cName.Text = "Name";
-            this.cName.Width = 150;
-            // 
-            // cSize
-            // 
-            this.cSize.Text = "Size";
-            this.cSize.Width = 50;
-            // 
-            // cOffset
-            // 
-            this.cOffset.Text = "Offset";
             // 
             // frmExplorer
             // 

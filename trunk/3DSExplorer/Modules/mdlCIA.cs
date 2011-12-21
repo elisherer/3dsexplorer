@@ -169,6 +169,11 @@ namespace _3DSExplorer.Modules
             throw new System.NotImplementedException();
         }
 
+        public string GetFileFilter()
+        {
+            return "CTR Importable Archives (*.cia)|*.cia";
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var tNode = new TreeNode("CIA") { Tag = TreeViewContextTag.Create(this, (int)CIAView.CIA) };

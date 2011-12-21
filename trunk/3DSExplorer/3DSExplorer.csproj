@@ -152,6 +152,12 @@
       <DependentUpon>frmExplorer.cs</DependentUpon>
     </Compile>
     <Compile Include="Modules\ModuleHelper.cs" />
+    <Compile Include="Modules\ProgressDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Modules\ProgressDialog.Designer.cs">
+      <DependentUpon>ProgressDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Utils\Anaglyph.cs" />
     <Compile Include="Utils\FfmpegWrapper.cs" />
     <Compile Include="Utils\TitleInfo.cs" />
@@ -203,6 +209,9 @@
     <EmbeddedResource Include="frmInputBox.resx">
       <DependentUpon>frmInputBox.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Modules\ProgressDialog.resx">
+      <DependentUpon>ProgressDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

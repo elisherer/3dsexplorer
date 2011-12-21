@@ -470,6 +470,11 @@ namespace _3DSExplorer.Modules
             }
         }
 
+        public string GetFileFilter()
+        {
+            return "MPO (3D Images) Files (*.mpo)|*.mpo";
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var topNode = new TreeNode("MPO") { Tag = TreeViewContextTag.Create(this, (int)MPOView.MPO) };

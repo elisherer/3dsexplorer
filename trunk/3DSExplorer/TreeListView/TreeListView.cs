@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Drawing.Design;
@@ -17,6 +18,8 @@ namespace TreeListView
         }
 
         public const char ColumnSeperator = '©';
+
+        public TreeNode SelectedNode { get { return treeView.SelectedNode; } set { treeView.SelectedNode = value; } }
 
         [MergableProperty(false)]
         [Editor("System.Windows.Forms.Design.ColumnHeaderCollectionEditor, System.Design, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
@@ -45,6 +48,11 @@ namespace TreeListView
             treeView.ExpandAll();
         }
 
+        public TreeNode NodeAt(Point point)
+        {
+            return treeView.HitTest(point).Node;
+        }
+
         public string GetMainText(TreeNode tn)
         {
             return !tn.Text.Contains(ColumnSeperator) ? tn.Text : tn.Text.Substring(0,tn.Text.IndexOf(ColumnSeperator));
@@ -66,9 +74,12 @@ namespace TreeListView
         }
 
         [Category("Action")]
-        [Description("Fires when the a node in the treeview being double clicked.")]
-        public event EventHandler TreeDoubleClicked;
+        [Description("Fires when the treeview being double clicked.")]
+        public event MouseEventHandler TreeDoubleClicked;
 
+        [Category("Action")]
+        [Description("Fires when the treeview being clicked.")]
+        public event MouseEventHandler TreeMouseClicked;
 
         public List<TreeNode> TreeNodeListRecursive
         {
@@ -87,9 +98,14 @@ namespace TreeListView
             listView.HeaderStyle = Enabled ? ColumnHeaderStyle.Clickable : ColumnHeaderStyle.Nonclickable;
         }
 
-        private void treeView_DoubleClick(object sender, EventArgs e)
+        private void treeView_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            TreeDoubleClicked(sender,e);
+            TreeDoubleClicked(sender, e);
+        }
+
+        private void treeView_MouseClick(object sender, MouseEventArgs e)
+        {
+            TreeMouseClicked(sender, e);
         }
 
     }

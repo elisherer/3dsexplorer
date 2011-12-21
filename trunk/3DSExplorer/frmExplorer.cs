@@ -153,12 +153,6 @@ namespace _3DSExplorer
             tag.Context.View(this, tag.Type, tag.Values);
         }
 
-        private void lvFileTree_DoubleClick(object sender, EventArgs e)
-        {
-            var contextTag = (TreeViewContextTag)((ToolStripMenuItem)sender).Tag;
-            contextTag.Context.Activate(_filePath, contextTag.Type,contextTag.Values);
-        }
-
         private void LoadText(string path)
         {
             lblCaptionTree.Text = path.Substring(path.LastIndexOf('\\') + 1);
@@ -191,13 +185,7 @@ namespace _3DSExplorer
 
         private void menuFileSave_Click(object sender, EventArgs e)
         {
-            
-            //TODO: add these strings to the modules
-            if (_currentContext is SaveFlashContext)
-                saveFileDialog.Filter = @"SaveFlash Files (*.sav)|*.sav;*.bin|All Files|*.*";
-            else if (_currentContext is CIAContext)
-                saveFileDialog.Filter = @"CTR Importable Archives (*.cia)|*.cia|All Files|*.*";
-
+            saveFileDialog.Filter = _currentContext.GetFileFilter() + @"|All Files|*.*";
             if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
 
             var outStream = File.OpenWrite(saveFileDialog.FileName);
@@ -303,27 +291,54 @@ namespace _3DSExplorer
         #endregion
 
         #region CXTMENU FileContext
-        private void cxtFile_MouseEnter(object sender, EventArgs e)
+
+        private void cxtFileItemClick(object sender, EventArgs e)
         {
-            if (lvFileTree.TreeView.SelectedNode == null)
-                cxtFile.Close();
-            else if (lvFileTree.TreeView.SelectedNode.Tag == null)
-                    cxtFile.Close();
+            var contextTag = (TreeViewContextTag)((ToolStripItem)sender).Tag;
+            contextTag.Context.Activate(_filePath, contextTag.Type, contextTag.Values);
         }
 
-        private void cxtFile_Opening(object sender, CancelEventArgs e)
+        private void lvFileTree_TreeDoubleClicked(object sender, MouseEventArgs e)
         {
-            if (lvFileTree.TreeView.SelectedNode == null || lvFileTree.TreeView.SelectedNode.Tag == null) return;
-            var tags = (TreeViewContextTag[]) lvFileTree.TreeView.SelectedNode.Tag;
-            cxtFile.Items.Clear();
-            for (var i = 0; i < tags.Length; i++)
-                cxtFile.Items.Add(tags[i].ActivationString, null, cxtFileOpen_Click).Tag = tags[i];
-            cxtFile.Items[0].Font = new Font(cxtFile.Items[0].Font, FontStyle.Bold);
+            var node = lvFileTree.NodeAt(e.Location);
+            if (node == null) return;
+            lvFileTree.TreeView.SelectedNode = node;
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+
+                    if (node.Tag != null)
+                    {
+                        var contextTag = ((TreeViewContextTag[])node.Tag)[0];
+                        contextTag.Context.Activate(_filePath, contextTag.Type, contextTag.Values);
+                    }
+                    break;
+            }
         }
 
-        private void cxtFileOpen_Click(object sender, EventArgs e)
+        private void lvFileTree_TreeMouseClicked(object sender, MouseEventArgs e)
         {
-            lvFileTree_DoubleClick(sender, e);
+            var node = lvFileTree.NodeAt(e.Location);
+            if (node == null) return;
+            lvFileTree.TreeView.SelectedNode = node;
+            switch (e.Button)
+            {
+                case MouseButtons.Right:
+                        
+                    if (node.Tag != null)
+                    {
+                        var tags = (TreeViewContextTag[])node.Tag;
+                        cxtFile.Items.Clear();
+                        for (var i = 0; i < tags.Length; i++)
+                        {
+                            var toolItem = cxtFile.Items.Add(tags[i].ActivationString, null, cxtFileItemClick);
+                            toolItem.Tag = tags[i];
+                        }
+                        cxtFile.Items[0].Font = new Font(cxtFile.Items[0].Font, FontStyle.Bold);
+                        cxtFile.Show(lvFileTree.TreeView, e.Location);
+                    }
+                    break;
+            }
         }
         #endregion
 
@@ -353,9 +368,16 @@ namespace _3DSExplorer
             }
         }
 
+        private bool IsNewerAvailable(string newerVersion)
+        {
+            var thisVersion = Version.Parse(Application.ProductVersion);
+            var remoteVersion = Version.Parse(newerVersion);
+            return remoteVersion.CompareTo(thisVersion) > 0;
+        }
+
         private void bwCheckForUpdates_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (!Application.ProductVersion.Equals(_remoteVer))
+            if (IsNewerAvailable(_remoteVer))
                 MessageBox.Show("This version is v" + Application.ProductVersion + Environment.NewLine +
                                 "The version on the server is v" + _remoteVer + Environment.NewLine +
                                 "You might want to download a newer version.");
@@ -363,7 +385,6 @@ namespace _3DSExplorer
                 MessageBox.Show("v" + Application.ProductVersion + " is the latest version.");
         }
         #endregion
-
     }
 
 }

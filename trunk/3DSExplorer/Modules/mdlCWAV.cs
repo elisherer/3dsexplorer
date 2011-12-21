@@ -149,6 +149,11 @@ namespace _3DSExplorer.Modules
             }
         }
 
+        public string GetFileFilter()
+        {
+            return "CTR Waves (*.b/cwav)|*.bcwav;*.cwav";
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var topNode = new TreeNode("CWAV") { Tag = TreeViewContextTag.Create(this, (int)CWAVView.CWAV) };

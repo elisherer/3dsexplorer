@@ -107,6 +107,11 @@ namespace _3DSExplorer.Modules
             throw new NotImplementedException();
         }
 
+        public string GetFileFilter()
+        {
+            return "CTR Banners (*.bnr)|*.bnr";
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var topNode = new TreeNode("CBMD") { Tag = TreeViewContextTag.Create(this, (int)BannerView.Banner) };

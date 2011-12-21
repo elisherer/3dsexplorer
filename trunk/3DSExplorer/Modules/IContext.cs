@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace _3DSExplorer.Modules
@@ -45,6 +46,7 @@ namespace _3DSExplorer.Modules
         bool CanCreate();
         void Activate(string filePath, int type, object[] values);
 
+        string GetFileFilter();
         TreeNode GetExplorerTopNode();
         TreeNode GetFileSystemTopNode();
     }

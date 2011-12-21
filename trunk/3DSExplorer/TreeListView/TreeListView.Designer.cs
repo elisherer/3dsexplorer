@@ -59,7 +59,8 @@
             this.treeView.Name = "treeView";
             this.treeView.Size = new System.Drawing.Size(100, 74);
             this.treeView.TabIndex = 1;
-            this.treeView.DoubleClick += new System.EventHandler(this.treeView_DoubleClick);
+            this.treeView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.treeView_MouseClick);
+            this.treeView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.treeView_MouseDoubleClick);
             // 
             // TreeListViewControl
             // 

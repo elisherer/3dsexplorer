@@ -194,6 +194,7 @@ namespace _3DSExplorer.Modules
         public CXIHeader Header;
         private string errorMessage = string.Empty;
         public CXIPlaingRegion PlainRegion;
+        public TitleInfo TitleInfo;
         //public CXIExtendedHeader ExtendedHeader;
 
         public long OffsetInCCI;
@@ -226,6 +227,7 @@ namespace _3DSExplorer.Modules
             // byte[] exhBytes = new byte[2048];
             // fs.Read(exhBytes, 0, exhBytes.Length); //TODO: read extended header
             // Array.Reverse(exh);
+            TitleInfo = TitleInfo.Resolve(Header.ProductCode, Header.MakerCode);
             return true;
         }
 
@@ -247,10 +249,9 @@ namespace _3DSExplorer.Modules
             {
                 case CXIView.NCCH:
                     f.SetGroupHeaders("Title", "Hash", "NCCH");
-                    var info = TitleInfo.Resolve(Header.ProductCode, Header.MakerCode);
-                    f.AddListItem(string.Empty, string.Empty, "Full Title (Name & Region)", string.Empty, info.Title + " - " + info.Region, 0);
-                    f.AddListItem(string.Empty, string.Empty, "Title Type", string.Empty, info.Type, 0);
-                    f.AddListItem(string.Empty, string.Empty, "Developer", string.Empty, info.Developer, 0);
+                    f.AddListItem(string.Empty, string.Empty, "Full Title (Name & Region)", string.Empty, TitleInfo.Title + " - " + TitleInfo.Region, 0);
+                    f.AddListItem(string.Empty, string.Empty, "Title Type", string.Empty, TitleInfo.Type, 0);
+                    f.AddListItem(string.Empty, string.Empty, "Developer", string.Empty, TitleInfo.Developer, 0);
 
                     f.AddListItem(0x000, 0x100, "RSA-2048 signature of the NCCH header [SHA-256]", Header.NCCHHeaderSignature, 1);
 
@@ -297,7 +298,7 @@ namespace _3DSExplorer.Modules
                 case CXIActivation.RomFS:
                 case CXIActivation.ExeFS:
                     var isRom = (CXIActivation) type == CXIActivation.RomFS;
-                    var saveFileDialog = new SaveFileDialog();
+                    var saveFileDialog = new SaveFileDialog() { Filter = "Binary files (*.bin)|*.bin"};
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         var strKey = InputBox.ShowDialog("Please Enter Key:\nPress OK with empty key to save encrypted");
@@ -336,6 +337,11 @@ namespace _3DSExplorer.Modules
             }
         }
 
+        public string GetFileFilter()
+        {
+            return "CTR Executable (*.cxi)|*.cxi";
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var tNode = new TreeNode(string.Format("CXI ({0})", StringUtil.CharArrayToString(Header.ProductCode))) { Tag = TreeViewContextTag.Create(this, (int)CXIView.NCCH) };
@@ -355,7 +361,7 @@ namespace _3DSExplorer.Modules
                             (Header.ExeFSLength * 0x200).ToString(),
                             StringUtil.ToHexString(6, (ulong)OffsetInCCI + Header.ExeFSOffset * 0x200)
                             )) 
-                            { Tag = new[] {TreeViewContextTag.Create(this, (int)CXIActivation.ExeFS,"Save")} });
+                            { Tag = new[] {TreeViewContextTag.Create(this, (int)CXIActivation.ExeFS,"Save...")} });
 
                 if (Header.RomFSLength > 0)
                     tNode.Nodes.Add(new TreeNode(
@@ -363,7 +369,7 @@ namespace _3DSExplorer.Modules
                                 "RomFS.bin",
                                 (Header.RomFSLength * 0x200).ToString(),
                                 StringUtil.ToHexString(6, (ulong)OffsetInCCI + Header.RomFSOffset * 0x200)
-                                )) { Tag = new[] { TreeViewContextTag.Create(this, (int)CXIActivation.RomFS, "Save") } });
+                                )) { Tag = new[] { TreeViewContextTag.Create(this, (int)CXIActivation.RomFS, "Save...") } });
             return tNode;
         }
     }

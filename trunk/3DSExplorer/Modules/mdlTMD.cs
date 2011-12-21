@@ -228,6 +228,11 @@ namespace _3DSExplorer.Modules
             throw new NotImplementedException();
         }
 
+        public string GetFileFilter()
+        {
+            return "Title Metadata (*.tmd)|*.tmd";
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var tNode = new TreeNode("TMD") { Tag = TreeViewContextTag.Create(this, (int)TMDView.TMD) };

@@ -134,6 +134,11 @@ namespace _3DSExplorer.Modules
             }
         }
 
+        public string GetFileFilter()
+        {
+            return "CTR Graphics (*.cgfx)|*.cgfx";
+        }
+
         public TreeNode GetExplorerTopNode()
         {
             var topNode = new TreeNode("CGFX") { Tag = TreeViewContextTag.Create(this, (int)CGFXView.CGFX) };
