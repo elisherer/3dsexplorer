@@ -278,6 +278,8 @@ namespace _3DSExplorer.Modules
         public uint[] FoldersMap;
         public SaveFlashBlockMapEntry[] BlockMap;
 
+        private static int count;
+
         public enum SaveFlashView
         {
             Image,
@@ -346,6 +348,11 @@ namespace _3DSExplorer.Modules
             if (Encrypted)
             {
                 var foundKey = FindKey(Image);
+
+                /*
+                File.WriteAllBytes("d:\\_img" + count + ".bin", Image);
+                File.WriteAllBytes("d:\\_key" + count++ + ".bin", foundKey);
+                */
                 if (foundKey == null)
                 {
                     ms.Close();

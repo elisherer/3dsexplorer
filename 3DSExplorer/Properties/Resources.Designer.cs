@@ -137,20 +137,6 @@ namespace _3DSExplorer.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap ico_eye_left_32 {
-            get {
-                object obj = ResourceManager.GetObject("ico_eye_left_32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap ico_eye_right_32 {
-            get {
-                object obj = ResourceManager.GetObject("ico_eye_right_32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         internal static System.Drawing.Bitmap information {
             get {
                 object obj = ResourceManager.GetObject("information", resourceCulture);
@@ -203,13 +189,6 @@ namespace _3DSExplorer.Properties {
         internal static System.Drawing.Bitmap spinner {
             get {
                 object obj = ResourceManager.GetObject("spinner", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap toolbox {
-            get {
-                object obj = ResourceManager.GetObject("toolbox", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -37,7 +37,11 @@ namespace _3DSExplorer
             this.lblAuthor = new System.Windows.Forms.Label();
             this.lblCred = new System.Windows.Forms.Label();
             this.btnThanks = new System.Windows.Forms.Button();
+            this.lblDex = new System.Windows.Forms.Label();
+            this.cmbDex = new System.Windows.Forms.ComboBox();
+            this.picDex = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.openGLControl1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picDex)).BeginInit();
             this.SuspendLayout();
             // 
             // openGLControl1
@@ -86,18 +90,50 @@ namespace _3DSExplorer
             // btnThanks
             // 
             this.btnThanks.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnThanks.Location = new System.Drawing.Point(403, 114);
+            this.btnThanks.Location = new System.Drawing.Point(403, 125);
             this.btnThanks.Name = "btnThanks";
             this.btnThanks.Size = new System.Drawing.Size(87, 26);
             this.btnThanks.TabIndex = 4;
             this.btnThanks.Text = "Thanks";
             this.btnThanks.UseVisualStyleBackColor = true;
             // 
+            // lblDex
+            // 
+            this.lblDex.AutoSize = true;
+            this.lblDex.Location = new System.Drawing.Point(424, 9);
+            this.lblDex.Name = "lblDex";
+            this.lblDex.Size = new System.Drawing.Size(76, 26);
+            this.lblDex.TabIndex = 6;
+            this.lblDex.Text = "Pokedex 3D\r\n150 AR Codes";
+            this.lblDex.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // cmbDex
+            // 
+            this.cmbDex.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbDex.FormattingEnabled = true;
+            this.cmbDex.Location = new System.Drawing.Point(436, 38);
+            this.cmbDex.Name = "cmbDex";
+            this.cmbDex.Size = new System.Drawing.Size(54, 21);
+            this.cmbDex.TabIndex = 7;
+            this.cmbDex.SelectedIndexChanged += new System.EventHandler(this.cmbDex_SelectedIndexChanged);
+            // 
+            // picDex
+            // 
+            this.picDex.Location = new System.Drawing.Point(436, 65);
+            this.picDex.Name = "picDex";
+            this.picDex.Size = new System.Drawing.Size(54, 54);
+            this.picDex.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picDex.TabIndex = 8;
+            this.picDex.TabStop = false;
+            // 
             // frmAbout
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(502, 152);
+            this.ClientSize = new System.Drawing.Size(502, 162);
+            this.Controls.Add(this.picDex);
+            this.Controls.Add(this.cmbDex);
+            this.Controls.Add(this.lblDex);
             this.Controls.Add(this.btnThanks);
             this.Controls.Add(this.lblCred);
             this.Controls.Add(this.lblAuthor);
@@ -112,6 +148,7 @@ namespace _3DSExplorer
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "About 3DSExplorer";
             ((System.ComponentModel.ISupportInitialize)(this.openGLControl1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picDex)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -124,6 +161,9 @@ namespace _3DSExplorer
         private System.Windows.Forms.Label lblAuthor;
         private System.Windows.Forms.Label lblCred;
         private System.Windows.Forms.Button btnThanks;
+        private System.Windows.Forms.Label lblDex;
+        private System.Windows.Forms.ComboBox cmbDex;
+        private System.Windows.Forms.PictureBox picDex;
 
     }
 }

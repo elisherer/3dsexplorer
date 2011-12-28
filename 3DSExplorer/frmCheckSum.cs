@@ -14,6 +14,8 @@ namespace _3DSExplorer
         {
             InitializeComponent();
             _quickCrc= new QuickCrc32(CRCProgressChanged,CRCProcessFinished);
+            txtResult.Text = "Press 'Start'";
+            btnStartStop.Text = "Start";
             _filePath = filePath;
         }
 

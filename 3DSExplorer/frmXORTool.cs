@@ -11,29 +11,11 @@ namespace _3DSExplorer
 {
     public partial class frmXORTool : Form
     {
-        bool first = false, second = false;
-
-        private byte[] parseByteArray(string baString)
-        {
-            baString.Replace(" ", ""); //delete all spaces
-            if (baString.Length % 2 != 0)
-                return null;
-            try
-            {
-                byte[] ret = new byte[(int)baString.Length / 2];
-                for (int i = 0, j = 0; i < baString.Length; i += 2, j++)
-                    ret[j] = Convert.ToByte(baString.Substring(i, 2), 16);
-                return ret;
-            }
-            catch
-            {
-                return null;
-            }
-        }
+        bool _first, _second;
 
         // returns the bigger array xored with the smaller cyclicly
         // dst suppose to be the size of the bigger array
-        private void XorBlock(byte[] dst, byte[] first, byte[] second)
+        private static void XorBlock(byte[] dst, byte[] first, byte[] second)
         {
             byte[] big = first, small = second;
             if (first.Length < second.Length)
@@ -41,7 +23,7 @@ namespace _3DSExplorer
                 big = second;
                 small = first;
             }
-            for (int i = 0; i < dst.Length; i++)
+            for (var i = 0; i < dst.Length; i++)
                 dst[i] = (byte)(big[i] ^ small[i % small.Length]);
         }
 
@@ -52,32 +34,27 @@ namespace _3DSExplorer
 
         private void btnFirst_Click(object sender, EventArgs e)
         {
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                txtFirst.Text = openFileDialog.FileName;
-                first = true;
-                btnSave.Enabled = first && second;
-            }
+            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+            txtFirst.Text = openFileDialog.FileName;
+            _first = true;
+            btnSave.Enabled = _first && _second;
         }
 
         private void btnSecond_Click(object sender, EventArgs e)
         {
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                txtSecond.Text = openFileDialog.FileName;
-                second = true;
-                btnSave.Enabled = first && second;
-            }
+            if (openFileDialog.ShowDialog() != DialogResult.OK) return;
+            txtSecond.Text = openFileDialog.FileName;
+            _second = true;
+            btnSave.Enabled = _first && _second;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                byte[] firstByteArray, secondByteArray;
-                firstByteArray = File.ReadAllBytes(txtFirst.Text);
-                secondByteArray = File.ReadAllBytes(txtSecond.Text);
-                byte[] xored = new byte[Math.Max(firstByteArray.Length, secondByteArray.Length)];
+                var firstByteArray = File.ReadAllBytes(txtFirst.Text);
+                var secondByteArray = File.ReadAllBytes(txtSecond.Text);
+                var xored = new byte[Math.Max(firstByteArray.Length, secondByteArray.Length)];
                 XorBlock(xored, firstByteArray, secondByteArray);
                 File.WriteAllBytes(saveFileDialog.FileName, xored);
             }
@@ -99,13 +76,13 @@ namespace _3DSExplorer
 
         private void btnXorArrays_Click(object sender, EventArgs e)
         {
-            byte[] one = parseByteArray(txtBox1.Text);
-            byte[] two = parseByteArray(txtBox2.Text);
+            var one = StringUtil.ParseByteArray(txtBox1.Text);
+            var two = StringUtil.ParseByteArray(txtBox2.Text);
 
             if (one != null && two != null && one.Length == two.Length)
             {
-                byte[] dst = new byte[one.Length];
-                for (int i = 0; i < dst.Length; i++)
+                var dst = new byte[one.Length];
+                for (var i = 0; i < dst.Length; i++)
                     dst[i] = (byte)(one[i] ^ two[i]);
                 txtBoxResult.Text = byteArrayToString(dst);
             }
@@ -115,13 +92,13 @@ namespace _3DSExplorer
 
         private void btnAesGo_Click(object sender, EventArgs e)
         {
-            byte[] key = parseByteArray(txtKey.Text);
-            byte[] iv = parseByteArray(txtIV.Text);
-            byte[] data = parseByteArray(txtEncData.Text);
+            var key = StringUtil.ParseByteArray(txtKey.Text);
+            var iv = StringUtil.ParseByteArray(txtIV.Text);
+            var data = StringUtil.ParseByteArray(txtEncData.Text);
 
             if (key != null && iv != null && data != null && key.Length == 16 && iv.Length == 16)
             {
-                Aes128Ctr aes = new Aes128Ctr(key, iv);
+                var aes = new Aes128Ctr(key, iv);
                 aes.TransformBlock(data);
                 txtDecData.Text = byteArrayToString(data);
             }
