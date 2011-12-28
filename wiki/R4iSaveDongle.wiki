@@ -2,7 +2,7 @@
 
 = Introduction =
 
-The R4iSaveDongle is a save dumber sold by the R4i-sdhc.com website.
+The R4iSaveDongle is a save dumper sold by the R4i-sdhc.com website.
 It is a new save dumper which uses the HID compliance so it doesn't need
 installing.
 
