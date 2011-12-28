@@ -30,7 +30,7 @@ namespace _3DSExplorer
 
         private void InitializeForm()
         {
-            Text = @"3DS Explorer v." + Application.ProductVersion;
+            Text = string.Format("{0} v.{1}",Application.ProductName,Application.ProductVersion);
             menuHelpCheckUpdates.Checked = Properties.Settings.Default.CheckForUpdatesOnStartup;
         }
 
@@ -101,7 +101,7 @@ namespace _3DSExplorer
             if (lstInfo.SelectedIndices.Count <= 0) return;
             var toClip = lstInfo.SelectedItems[0].SubItems[3].Text == "" ? lstInfo.SelectedItems[0].SubItems[4].Text : lstInfo.SelectedItems[0].SubItems[3].Text;
             Clipboard.SetText(toClip);
-            MessageBox.Show(@"Value copied to clipboard!");
+            MessageBox.Show("Value copied to clipboard!");
         }
         
         #endregion
@@ -115,14 +115,14 @@ namespace _3DSExplorer
             var tempContext = ModuleHelper.CreateByType(type);
             if (tempContext == null)
             {
-                MessageBox.Show(@"This file is unsupported!");
+                MessageBox.Show("This file is unsupported!");
                 fs.Close();
                 return;
             }
             fs.Seek(0, SeekOrigin.Begin);
             if (!tempContext.Open(fs))
             {
-                MessageBox.Show(@"Error: " + tempContext.GetErrorMessage());
+                MessageBox.Show(string.Format("Error: {0}",tempContext.GetErrorMessage()));
                 fs.Close();
                 return;
             }
@@ -155,7 +155,7 @@ namespace _3DSExplorer
 
         private void LoadText(string path)
         {
-            lblCaptionTree.Text = path.Substring(path.LastIndexOf('\\') + 1);
+            lblTreeViewTitle.Text = Path.GetFileName(path);
         }
 
         #region Drag & Drop
@@ -185,7 +185,7 @@ namespace _3DSExplorer
 
         private void menuFileSave_Click(object sender, EventArgs e)
         {
-            saveFileDialog.Filter = _currentContext.GetFileFilter() + @"|All Files|*.*";
+            saveFileDialog.Filter = _currentContext.GetFileFilter() + "|All Files|*.*";
             if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
 
             var outStream = File.OpenWrite(saveFileDialog.FileName);
@@ -247,40 +247,31 @@ namespace _3DSExplorer
             Properties.Settings.Default.Save();
         }
 
-        private void menuHelpVisitGoogleCode_Click(object sender, EventArgs e)
+        private void GoToUrl(string url)
         {
             try
             {
-                System.Diagnostics.Process.Start("http://3dsexplorer.googlecode.com/");
+                System.Diagnostics.Process.Start(url);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(@"This system doesn't support clicking a link...\n\n" + ex.Message);
+                MessageBox.Show(string.Format("This system doesn't support clicking a link...\n\n{0}",ex.Message));
             }
+        }
+
+        private void menuHelpVisitGoogleCode_Click(object sender, EventArgs e)
+        {
+            GoToUrl("http://3dsexplorer.googlecode.com/");
         }
 
         private void menuHelpVisit3DBrew_Click(object sender, EventArgs e)
         {
-            try
-            {
-                System.Diagnostics.Process.Start("http://www.3dbrew.org/");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(@"This system doesn't support clicking a link...\n\n" + ex.Message);
-            }
+            GoToUrl("http://www.3dbrew.org/");
         }
 
         private void menuHelpVisitNDev_Click(object sender, EventArgs e)
         {
-            try
-            {
-                System.Diagnostics.Process.Start("http://www.n-dev.net");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(@"This system doesn't support clicking a link...\n\n" + ex.Message);
-            }
+            GoToUrl("http://www.n-dev.net");
         }
 
         private void menuHelpAbout_Click(object sender, EventArgs e)
@@ -347,11 +338,11 @@ namespace _3DSExplorer
         {
             try
             {
-                _remoteVer = @"<Error: Couldn't parse the version number>";
-                var checkUrl = @"http://3dsexplorer.googlecode.com/svn/trunk/3DSExplorer/Properties/AssemblyInfo.cs";
-                var request = (HttpWebRequest) WebRequest.Create(checkUrl);
-                if (request.GetResponse().GetResponseStream() == null) return;
-                var reader = new StreamReader(request.GetResponse().GetResponseStream());
+                _remoteVer = "<Error: Couldn't parse the version number>";
+                var request = (HttpWebRequest) WebRequest.Create("http://3dsexplorer.googlecode.com/svn/trunk/3DSExplorer/Properties/AssemblyInfo.cs");
+                var responseStream = request.GetResponse().GetResponseStream();
+                if (responseStream == null) return;
+                var reader = new StreamReader(responseStream);
                 string line;
                 while ((line = reader.ReadLine()) != null)
                     if (line.Contains("AssemblyFileVersion")) //Get the version between the quotation marks
@@ -378,11 +369,9 @@ namespace _3DSExplorer
         private void bwCheckForUpdates_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (IsNewerAvailable(_remoteVer))
-                MessageBox.Show("This version is v" + Application.ProductVersion + Environment.NewLine +
-                                "The version on the server is v" + _remoteVer + Environment.NewLine +
-                                "You might want to download a newer version.");
+                MessageBox.Show(string.Format("This version is v{0}\nThe version on the server is v{1}\nYou might want to download a newer version.",Application.ProductVersion,_remoteVer));
             else if (_checkNow)
-                MessageBox.Show("v" + Application.ProductVersion + " is the latest version.");
+                MessageBox.Show(string.Format("v{0} is the latest version.", Application.ProductVersion));
         }
         #endregion
     }

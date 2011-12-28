@@ -63,5 +63,23 @@ namespace _3DSExplorer
             }
             return retArray;
         }
+
+        public static byte[] ParseByteArray(string baString)
+        {
+            baString.Replace(" ", ""); //delete all spaces
+            if (baString.Length % 2 != 0)
+                return null;
+            try
+            {
+                byte[] ret = new byte[(int)baString.Length / 2];
+                for (int i = 0, j = 0; i < baString.Length; i += 2, j++)
+                    ret[j] = Convert.ToByte(baString.Substring(i, 2), 16);
+                return ret;
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }
