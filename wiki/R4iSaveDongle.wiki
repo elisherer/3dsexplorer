@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary The protocol used by the r4i-sdhc.com "R4iSaveDongle"
 
 = Introduction =
 
