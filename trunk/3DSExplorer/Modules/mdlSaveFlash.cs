@@ -336,14 +336,39 @@ namespace _3DSExplorer.Modules
                 if (IsFF(Journal[jc].Sector.CheckSums))
                     break;
                 MemoryMap[Journal[jc].Sector.VirtualSector] = Journal[jc].Sector.PhysicalSector;
+                //update the blockmap
+                Blockmap[Journal[jc].Sector.VirtualSector].PhysicalSector = Journal[jc].Sector.PhysicalSector;
+                Buffer.BlockCopy(Journal[jc].Sector.CheckSums, 0, Blockmap[Journal[jc].Sector.VirtualSector].CheckSums, 0, Journal[jc].Sector.CheckSums.Length);
                 jc++;
             }
             JournalSize = jc;
 
+            var errors = 0;
+            //check the wearleveling checksums
+            for (var i = 0; i < Blockmap.Length; i++)
+            {
+                var chks = Blockmap[i].CheckSums;
+                if (!Is00(chks)) //not all zeros
+                {
+                    for (var j = 0; j < chks.Length; j++) //go over all the checksums
+                    {
+                        var crc = CRC16.Xor2(CRC16.GetCRC(fileBuffer, (Blockmap[i].PhysicalSector & 0x7F) * 0x1000 + j * 0x200, 0x200));
+                        if (crc != chks[j])
+                            errors++;
+                    }
+                }
+            }
+            if (errors > 0)
+            {
+                errorMessage = "CRC Error in the wearleveling. (" + errors + " errors)";
+                ms.Close();
+                return false;
+            }
+            
             //rearragne by virtual
             Image = new byte[fileBuffer.Length - 0x1000];
             for (var i = 0; i < MemoryMap.Length; i++)
-                Buffer.BlockCopy(fileBuffer, (MemoryMap[i] & 0x7F) * 0x1000, Image, i * 0x1000, 0x1000);
+                Buffer.BlockCopy(fileBuffer, (MemoryMap[i] & 0x7F)*0x1000, Image, i*0x1000, 0x1000);
 
             if (Encrypted)
             {
@@ -574,11 +599,13 @@ namespace _3DSExplorer.Modules
             var temp = MarshalUtil.StructureToByteArray(FileHeader);
             Buffer.BlockCopy(temp, 0, crcBlock, 0, temp.Length);
 
-            //Update & Prepare the blockmap (straight)
+            //Update & Prepare the blockmap (straight, no journal)
             for (byte i = 0; i < MemoryMap.Length; i++)
                 MemoryMap[i] = i;
             Journal = new SaveFlashLongSectorEntry[0];
             JournalSize = 0;
+
+            XorByteArray(Image, Key, 0); //Encrypt for blockmap building
 
             for (byte i = 0; i < Blockmap.Length; i++)
             {
@@ -589,6 +616,8 @@ namespace _3DSExplorer.Modules
                 temp = MarshalUtil.StructureToByteArray(Blockmap[i]);
                 Buffer.BlockCopy(temp, 0, crcBlock, sfHeaderSize + i * blockmapEntrySize, blockmapEntrySize);
             }
+            XorByteArray(Image, Key, 0); //Decrypt image back
+
             //Write the header and the blockmap
             ms.Write(crcBlock, 0, crcBlock.Length);
 
