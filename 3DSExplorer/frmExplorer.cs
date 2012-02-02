@@ -110,7 +110,7 @@ namespace _3DSExplorer
         {
             menuToolsQuickCRC.Enabled = false;
             _filePath = path;
-            var fs = File.OpenRead(_filePath);
+            var fs = new FileStream(_filePath, FileMode.Open, FileAccess.ReadWrite);//File.OpenWrite(_filePath));
             var type = ModuleHelper.GetModuleType(_filePath, fs);
             var tempContext = ModuleHelper.CreateByType(type);
             if (tempContext == null)

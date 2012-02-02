@@ -42,3 +42,4 @@ d:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmCheckSum.resources
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmCheckSum.resources
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.Modules.ProgressDialog.resources
 d:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.Modules.ProgressDialog.resources
+d:\dev\3DS\3DSExplorer\3DSExplorer\bin\SharpCompress.dll

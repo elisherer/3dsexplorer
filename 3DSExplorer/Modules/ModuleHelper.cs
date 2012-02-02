@@ -17,6 +17,7 @@ namespace _3DSExplorer.Modules
         CXI,
         SaveFlash_Decrypted,
         SaveFlash,
+        Archive,
         TMD //Contains certificates & ticket so they can't be recognized
     }
 
@@ -24,8 +25,9 @@ namespace _3DSExplorer.Modules
     {
         //TODO: get this from the modules
         public const string OpenString = 
-            @"All Supported|*.3ds;*.cci;*.cxi;*.csu;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx;*.icn|" +
+            @"All Supported|*.3ds;*.cci;*.cxi;*.csu;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx;*.icn;*.zip;*.7z|" +
             "CTR Cartridge Images (*.cci/3ds/csu)|*.3ds;*.cci;*.csu|"+
+            "Archived CCI (zip/7z)|*.zip;*.7z|" +
             "CTR Executable (*.cxi)|*.cxi|" +
             "CTR Importable Archives (*.cia)|*.cia|"+
             "CTR Icons (*.icn)|*.icn|" +
@@ -60,6 +62,8 @@ namespace _3DSExplorer.Modules
                 case ModuleType.SaveFlash_Decrypted:
                 case ModuleType.SaveFlash:
                     return new SaveFlashContext();
+                case ModuleType.Archive:
+                    return new ArchivedCCIContext();
                 case ModuleType.TMD:
                     return new TMDContext();
             }
@@ -76,6 +80,10 @@ namespace _3DSExplorer.Modules
 
             switch (extension)
             {
+                case ".zip":
+                case ".7z":
+                    type = ModuleType.Archive;
+                    break;
                 case ".cci":
                 case ".csu":
                 case ".3ds":
@@ -113,7 +121,9 @@ namespace _3DSExplorer.Modules
                 default:
                     fs.Seek(0, SeekOrigin.Begin);
                     fs.Read(magic, 0, 4);
-                    if (magic[0] < 5 && magic[1] == 0 && magic[2] == 1 && magic[3] == 0)
+                    if ((magic[0] == 'P' && magic[1] == 'K' && magic[2] == 3 && magic[3] == 4) || (magic[0] == '7' && magic[1] == 'z' && magic[2] == 0xBC && magic[3] == 0xAF))
+                        type = ModuleType.Archive;
+                    else if (magic[0] < 5 && magic[1] == 0 && magic[2] == 1 && magic[3] == 0)
                         type = ModuleType.TMD;
                     else if (magic[0] == 0x20 && magic[1] == 0x20 && magic[2] == 0 && magic[3] == 0)
                         type = ModuleType.CIA;
