@@ -7,6 +7,7 @@ namespace _3DSExplorer.Utils
     public static class TitleDatabase
     {
         private const string DatabaseFileName = "title.db";
+        public static readonly string FilePath;
         private static readonly bool Loaded;
         private static readonly Dictionary<string, Dictionary<string, string>> Contents = new Dictionary<string, Dictionary<string, string>>();
 
@@ -14,9 +15,9 @@ namespace _3DSExplorer.Utils
         {
             Dictionary<string, string> currentSection = null;
             Loaded = false;
-            var filePath = Path.GetDirectoryName(Application.ExecutablePath) + "/" + DatabaseFileName;
-            if (!File.Exists(filePath)) return;
-            var reader = new StreamReader(filePath);
+            FilePath = Path.GetDirectoryName(Application.ExecutablePath) + "/" + DatabaseFileName;
+            if (!File.Exists(FilePath)) return;
+            var reader = new StreamReader(FilePath);
             string line;
             while ((line = reader.ReadLine()) != null)
             {
@@ -108,6 +109,12 @@ namespace _3DSExplorer.Utils
                         break;
                     case 'J':
                         info.Region = "JPN";
+                        break;
+                    case 'F':
+                        info.Region = "FRA";
+                        break;
+                    case 'Z':
+                        info.Region = "ENG";
                         break;
                 }
                 var productCode = productChars[7].ToString() + productChars[8];

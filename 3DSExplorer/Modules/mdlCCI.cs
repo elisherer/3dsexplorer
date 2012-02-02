@@ -77,7 +77,11 @@ namespace _3DSExplorer.Modules
                 if (Header.CXIEntries[i].Length > 0)
                 {
                     CXIContexts[i] = new CXIContext();
-                    fs.Seek(Header.CXIEntries[i].Offset * 0x200, SeekOrigin.Begin);
+                    var offset = Header.CXIEntries[i].Offset*0x200;
+                    if (!(fs is MemoryStream) ||  offset < fs.Length) //fix for reading from memory streams (archived)
+                        fs.Seek(offset, SeekOrigin.Begin);
+                    else
+                        fs.Seek(0, SeekOrigin.End);
                     CXIContexts[i].Open(fs);
                 }
             return true;

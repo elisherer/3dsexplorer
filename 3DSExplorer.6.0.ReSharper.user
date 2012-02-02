@@ -8,11 +8,10 @@
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frm3DVideo.cs" caret="14157" fromTop="21" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:FfmpegWrapper.cs" caret="2009" fromTop="8" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmCheckSum.cs" caret="463" fromTop="13" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.Designer.cs" caret="26749" fromTop="494" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.Designer.cs" caret="28015" fromTop="494" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:ImageUtil.cs" caret="0" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:Anaglyph.cs" caret="0" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:MarshalUtil.cs" caret="0" fromTop="0" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:StringUtil.cs" caret="0" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:YouTube.cs" caret="2084" fromTop="19" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:Winmm.cs" caret="352" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:WaveUtil.cs" caret="0" fromTop="0" />
@@ -22,47 +21,48 @@
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmInputBox.cs" caret="0" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmXORTool.cs" caret="3603" fromTop="64" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:CRC16.cs" caret="648" fromTop="21" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="314" fromTop="12" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:TitleInfo.cs" caret="161" fromTop="7" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlSaveFlash.cs" caret="191" fromTop="6" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlBanner.cs" caret="756" fromTop="15" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="495" fromTop="25" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="2366" fromTop="21" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="4211" fromTop="43" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:bin/f:title.db" caret="0" fromTop="0" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="540" fromTop="18" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="2533" fromTop="22" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:StringUtil.cs" caret="42" fromTop="1" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="7458" fromTop="21" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="535" fromTop="0" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="14738" fromTop="26" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:TitleInfo.cs" caret="270" fromTop="9" />
     </RecentFiles>
     <RecentEdits>
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:TitleInfo.cs" caret="4392" fromTop="3" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:TitleInfo.cs" caret="4392" fromTop="17" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:TitleInfo.cs" caret="4392" fromTop="125" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="6826" fromTop="21" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="3933" fromTop="6" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="2986" fromTop="41" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="251" fromTop="11" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="2707" fromTop="31" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="2886" fromTop="37" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="2341" fromTop="18" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1408" fromTop="33" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="251" fromTop="13" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1408" fromTop="26" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1408" fromTop="30" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1386" fromTop="30" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="486" fromTop="33" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="486" fromTop="30" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="62" fromTop="3" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1408" fromTop="37" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="4123" fromTop="10" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1070" fromTop="32" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1117" fromTop="33" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="535" fromTop="20" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1386" fromTop="37" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="4150" fromTop="10" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1048" fromTop="32" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1095" fromTop="33" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="395" fromTop="16" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1899" fromTop="22" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="2444" fromTop="26" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1877" fromTop="22" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="2422" fromTop="26" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="2904" fromTop="7" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="350" fromTop="19" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="4440" fromTop="33" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="693" fromTop="27" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="862" fromTop="25" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="840" fromTop="25" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="2595" fromTop="25" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="2533" fromTop="22" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="535" fromTop="18" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:TitleInfo.cs" caret="4127" fromTop="35" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="8328" fromTop="13" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="8297" fromTop="14" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="15255" fromTop="21" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="14834" fromTop="41" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:TitleInfo.cs" caret="800" fromTop="19" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:TitleInfo.cs" caret="246" fromTop="9" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="14438" fromTop="30" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="14704" fromTop="30" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="14196" fromTop="21" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="15212" fromTop="37" />
     </RecentEdits>
   </RecentFiles>
   <CompletionStatisticsManager>
@@ -86,23 +86,23 @@
       <Item value="using" priority="526" />
       <Item value="System" priority="379" />
       <Item value="Reflection" priority="26" />
-      <Item value="string" priority="3320" />
-      <Item value="var" priority="3327" />
+      <Item value="string" priority="3352" />
+      <Item value="var" priority="3423" />
       <Item value="formatString" priority="31" />
       <Item value="this" priority="255" />
       <Item value="ComponentModel" priority="27" />
       <Item value="Net" priority="53" />
-      <Item value="while" priority="351" />
-      <Item value="reader" priority="224" />
-      <Item value="if" priority="2847" />
+      <Item value="while" priority="415" />
+      <Item value="reader" priority="256" />
+      <Item value="if" priority="2911" />
       <Item value="line" priority="543" />
-      <Item value="int" priority="1378" />
+      <Item value="int" priority="1410" />
       <Item value="indexOf" priority="31" />
       <Item value="lastIndexOf" priority="31" />
       <Item value="firstIndexOf" priority="31" />
-      <Item value="break" priority="1439" />
+      <Item value="break" priority="1503" />
       <Item value="bwCheckForUpdates" priority="90" />
-      <Item value="MessageBox`0" priority="255" />
+      <Item value="MessageBox`0" priority="287" />
       <Item value="Environment`0" priority="127" />
       <Item value="_remoteVer" priority="63" />
       <Item value="start" priority="31" />
@@ -110,14 +110,14 @@
       <Item value="Settings`0" priority="117" />
       <Item value="menuHelpCheckUpdates" priority="63" />
       <Item value="bool" priority="351" />
-      <Item value="else" priority="415" />
+      <Item value="else" priority="479" />
       <Item value="_checkNow" priority="63" />
-      <Item value="false" priority="895" />
-      <Item value="true" priority="991" />
+      <Item value="false" priority="927" />
+      <Item value="true" priority="1023" />
       <Item value="_currentContext" priority="191" />
       <Item value="is" priority="95" />
       <Item value="SRAMContext`0" priority="63" />
-      <Item value="public" priority="2487" />
+      <Item value="public" priority="2519" />
       <Item value="static" priority="478" />
       <Item value="void" priority="927" />
       <Item value="FileStream`0" priority="287" />
@@ -125,15 +125,15 @@
       <Item value="bmp" priority="95" />
       <Item value="ax" priority="31" />
       <Item value="color" priority="96" />
-      <Item value="byte" priority="1439" />
+      <Item value="byte" priority="1469" />
       <Item value="Color`0" priority="255" />
-      <Item value="new" priority="3140" />
+      <Item value="new" priority="3172" />
       <Item value="bytes" priority="127" />
       <Item value="clr" priority="192" />
       <Item value="source" priority="351" />
       <Item value="Bitmap`0" priority="122" />
       <Item value="CIAContext`0" priority="162" />
-      <Item value="File`0" priority="447" />
+      <Item value="File`0" priority="479" />
       <Item value="filePath" priority="154" />
       <Item value="fsrc" priority="127" />
       <Item value="RawDecoder`0" priority="31" />
@@ -158,7 +158,7 @@
       <Item value="iconImage" priority="63" />
       <Item value="type" priority="320" />
       <Item value="tn" priority="159" />
-      <Item value="SeekOrigin`0" priority="255" />
+      <Item value="SeekOrigin`0" priority="287" />
       <Item value="enum" priority="219" />
       <Item value="i" priority="992" />
       <Item value="try" priority="319" />
@@ -187,7 +187,7 @@
       <Item value="Guid" priority="28" />
       <Item value="switch" priority="351" />
       <Item value="pf" priority="31" />
-      <Item value="case" priority="3263" />
+      <Item value="case" priority="3327" />
       <Item value="RGB565" priority="33" />
       <Item value="default" priority="159" />
       <Item value="r" priority="31" />
@@ -206,8 +206,8 @@
       <Item value="ETC1A4" priority="16" />
       <Item value="ImageUtil`0" priority="95" />
       <Item value="bmd" priority="127" />
-      <Item value="fs" priority="927" />
-      <Item value="Length" priority="566" />
+      <Item value="fs" priority="1087" />
+      <Item value="Length" priority="593" />
       <Item value="compressedCGFX" priority="31" />
       <Item value="threeBytes" priority="63" />
       <Item value="UnsignedInteger`0" priority="31" />
@@ -225,7 +225,7 @@
       <Item value="bcxt" priority="95" />
       <Item value="topNode" priority="127" />
       <Item value="BannerContext`0" priority="31" />
-      <Item value="e" priority="991" />
+      <Item value="e" priority="1087" />
       <Item value="Bitmap" priority="86" />
       <Item value="class" priority="124" />
       <Item value="TreeViewContextTag`0" priority="196" />
@@ -261,7 +261,7 @@
       <Item value="IsEncrypted`0" priority="31" />
       <Item value="lastPos" priority="31" />
       <Item value="fileBuffer" priority="95" />
-      <Item value="buffer" priority="319" />
+      <Item value="buffer" priority="415" />
       <Item value="Partition`0" priority="31" />
       <Item value="SRAMContext" priority="55" />
       <Item value="scxt" priority="31" />
@@ -366,7 +366,7 @@
       <Item value="cube_front" priority="31" />
       <Item value="foreach" priority="127" />
       <Item value="_cube" priority="63" />
-      <Item value="const" priority="255" />
+      <Item value="const" priority="287" />
       <Item value="length" priority="31" />
       <Item value="array1" priority="31" />
       <Item value="array2" priority="31" />
@@ -535,7 +535,7 @@
       <Item value="override" priority="31" />
       <Item value="chars" priority="31" />
       <Item value="TitleInfo`0" priority="127" />
-      <Item value="info" priority="255" />
+      <Item value="info" priority="319" />
       <Item value="regionCode" priority="31" />
       <Item value="productCode" priority="63" />
       <Item value="Type" priority="31" />
@@ -596,7 +596,7 @@
       <Item value="Exception`0" priority="63" />
       <Item value="ex" priority="63" />
       <Item value="ByteConverter" priority="28" />
-      <Item value="readBytes" priority="31" />
+      <Item value="readBytes" priority="127" />
       <Item value="grpAudio" priority="31" />
       <Item value="cmbSampleRate" priority="63" />
       <Item value="_ffpmegPath" priority="31" />
@@ -726,6 +726,7 @@
       <Item value="tempStream" priority="159" />
       <Item value="_cciName" priority="63" />
       <Item value="_crc" priority="31" />
+      <Item value="offset" priority="31" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:@System.TypedReference">
       <Item value="MakeTypedReference`0" priority="26" />
@@ -750,7 +751,7 @@
       <Item value="ToString`0" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:@System.Windows.Forms.MessageBox">
-      <Item value="Show`0" priority="244" />
+      <Item value="Show`0" priority="271" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:@System.Environment">
       <Item value="NewLine" priority="107" />
@@ -792,7 +793,7 @@
     </ItemStatistics>
     <ItemStatistics item="Qualified:@System.IO.File">
       <Item value="OpenRead`0" priority="190" />
-      <Item value="OpenWrite`0" priority="76" />
+      <Item value="OpenWrite`0" priority="103" />
       <Item value="Exists`0" priority="53" />
       <Item value="Delete`0" priority="54" />
       <Item value="WriteAllBytes`0" priority="26" />
@@ -800,11 +801,11 @@
     <ItemStatistics item="Qualified:System.IO.FileStream">
       <Item value="Length" priority="134" />
       <Item value="Read`0" priority="157" />
-      <Item value="Close`0" priority="242" />
+      <Item value="Close`0" priority="269" />
       <Item value="Seek`0" priority="135" />
       <Item value="Position" priority="80" />
       <Item value="SafeFileHandle" priority="26" />
-      <Item value="Write`0" priority="53" />
+      <Item value="Write`0" priority="80" />
       <Item value="ReadByte`0" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:@_3DSExplorer.CIATool+RawDecoder">
@@ -854,6 +855,7 @@
     <ItemStatistics item="Qualified:@System.IO.SeekOrigin">
       <Item value="Begin" priority="242" />
       <Item value="Current" priority="26" />
+      <Item value="End" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:System.Int32">
       <Item value="ToString`0" priority="134" />
@@ -1065,10 +1067,10 @@
       <Item value="WriteWAVFile`0" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:System.IO.Stream">
-      <Item value="Seek`0" priority="53" />
-      <Item value="Read`0" priority="53" />
+      <Item value="Seek`0" priority="80" />
+      <Item value="Read`0" priority="80" />
       <Item value="Position" priority="80" />
-      <Item value="Length" priority="26" />
+      <Item value="Length" priority="53" />
       <Item value="ReadByte`0" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:_3DSExplorer.INFOBlobHeader">
@@ -1228,7 +1230,7 @@
     </ItemStatistics>
     <ItemStatistics item="Qualified:System.ComponentModel.DoWorkEventArgs">
       <Item value="Argument" priority="134" />
-      <Item value="Result" priority="80" />
+      <Item value="Result" priority="134" />
       <Item value="Cancel" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:@System.IO.Path">
@@ -1337,7 +1339,7 @@
       <Item value="GetFileSystemTopNode`0" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:System.ComponentModel.RunWorkerCompletedEventArgs">
-      <Item value="Result" priority="26" />
+      <Item value="Result" priority="53" />
       <Item value="Cancelled" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:_3DSExplorer.Crypt.QuickCrc32">
@@ -1518,6 +1520,12 @@
     <ItemStatistics item="Qualified:SharpCompress.Archive.IArchiveEntry">
       <Item value="Crc" priority="26" />
       <Item value="WriteToFile`0" priority="26" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:_3DSExplorer.Utils.TitleInfo">
+      <Item value="Region" priority="53" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@_3DSExplorer.Utils.TitleDatabase">
+      <Item value="FilePath" priority="26" />
     </ItemStatistics>
   </CompletionStatisticsManager>
   <NAntValidationSettings>
