@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.ComponentModel;
 using System.Net;
 using _3DSExplorer.Modules;
+using _3DSExplorer.Utils;
 
 namespace _3DSExplorer
 {
@@ -235,6 +236,11 @@ namespace _3DSExplorer
 
         #region MENU Help
 
+        private void menuHelpUpdateTitleDb_Click(object sender, EventArgs e)
+        {
+            bwUpdateTitleDb.RunWorkerAsync();
+        }
+
         private void menuHelpCheckNow_Click(object sender, EventArgs e)
         {
             _checkNow = true;
@@ -374,6 +380,45 @@ namespace _3DSExplorer
                 MessageBox.Show(string.Format("v{0} is the latest version.", Application.ProductVersion));
         }
         #endregion
+
+        private void bwUpdateTitleDb_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create("http://3dsexplorer.googlecode.com/files/title.db");
+                var responseStream = request.GetResponse().GetResponseStream();
+                if (responseStream == null)
+                {
+                    e.Result = false;
+                    return;
+                }
+                var reader = responseStream;
+                var readBytes = -1;
+                var buffer = new byte[0x400];
+                var fs = File.OpenWrite(TitleDatabase.FilePath);
+                while (readBytes != 0)
+                {
+                    readBytes = reader.Read(buffer, 0, buffer.Length);
+                    fs.Write(buffer,0,readBytes);
+                }
+                fs.Close();
+                e.Result = true;
+            }
+            catch
+            {
+                //No harm done...possibly no internet connection
+            }
+        }
+
+        private void bwUpdateTitleDb_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if ((bool)e.Result)
+                MessageBox.Show("Title.db file updated please restart application for changes to take effect.");
+            else
+                MessageBox.Show("There was an error while trying to update the title.db file..");
+        }
+
+ 
     }
 
 }

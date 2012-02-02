@@ -19,7 +19,7 @@ namespace _3DSExplorer.Modules
 
         public bool Open(Stream fs)
         {
-            var reader = ArchiveFactory.Open(fs);//ZipArchive.Open(fs);
+            var reader = ArchiveFactory.Open(fs);
 
             foreach (var entry in reader.Entries)
                 if (entry.FilePath.EndsWith(".3ds") || entry.FilePath.EndsWith(".cci") || entry.FilePath.EndsWith(".csu"))

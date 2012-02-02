@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup15 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup20 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup21 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.lstInfo = new System.Windows.Forms.ListView();
@@ -50,6 +50,10 @@
             this.treeView = new System.Windows.Forms.TreeView();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.lblFileListTitle = new System.Windows.Forms.Label();
+            this.lvFileTree = new TreeListView.TreeListViewControl();
+            this.cName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imlFS = new System.Windows.Forms.ImageList(this.components);
             this.cxtFile = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
@@ -74,10 +78,9 @@
             this.menuHelpVisitNDev = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.lvFileTree = new TreeListView.TreeListViewControl();
-            this.cName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.menuHelpUpdateTitleDb = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelpSep2 = new System.Windows.Forms.ToolStripSeparator();
+            this.bwUpdateTitleDb = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -100,28 +103,28 @@
             this.chHexValue});
             this.lstInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstInfo.FullRowSelect = true;
-            listViewGroup8.Header = "";
-            listViewGroup8.Name = "lvg0";
-            listViewGroup9.Header = "";
-            listViewGroup9.Name = "lvg1";
-            listViewGroup10.Header = "";
-            listViewGroup10.Name = "lvg2";
-            listViewGroup11.Header = "";
-            listViewGroup11.Name = "lvg3";
-            listViewGroup12.Header = "";
-            listViewGroup12.Name = "lvg4";
-            listViewGroup13.Header = "";
-            listViewGroup13.Name = "lvg5";
-            listViewGroup14.Header = "";
-            listViewGroup14.Name = "lvg6";
+            listViewGroup15.Header = "";
+            listViewGroup15.Name = "lvg0";
+            listViewGroup16.Header = "";
+            listViewGroup16.Name = "lvg1";
+            listViewGroup17.Header = "";
+            listViewGroup17.Name = "lvg2";
+            listViewGroup18.Header = "";
+            listViewGroup18.Name = "lvg3";
+            listViewGroup19.Header = "";
+            listViewGroup19.Name = "lvg4";
+            listViewGroup20.Header = "";
+            listViewGroup20.Name = "lvg5";
+            listViewGroup21.Header = "";
+            listViewGroup21.Name = "lvg6";
             this.lstInfo.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup8,
-            listViewGroup9,
-            listViewGroup10,
-            listViewGroup11,
-            listViewGroup12,
-            listViewGroup13,
-            listViewGroup14});
+            listViewGroup15,
+            listViewGroup16,
+            listViewGroup17,
+            listViewGroup18,
+            listViewGroup19,
+            listViewGroup20,
+            listViewGroup21});
             this.lstInfo.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lstInfo.HideSelection = false;
             this.lstInfo.Location = new System.Drawing.Point(0, 0);
@@ -244,6 +247,39 @@
             this.lblFileListTitle.Text = "File List";
             this.lblFileListTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // lvFileTree
+            // 
+            this.lvFileTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvFileTree.AutoScroll = true;
+            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.cName,
+            this.cSize,
+            this.cOffset});
+            this.lvFileTree.ImageList = this.imlFS;
+            this.lvFileTree.Location = new System.Drawing.Point(0, 23);
+            this.lvFileTree.Name = "lvFileTree";
+            this.lvFileTree.SelectedNode = null;
+            this.lvFileTree.Size = new System.Drawing.Size(261, 197);
+            this.lvFileTree.TabIndex = 1;
+            this.lvFileTree.TreeDoubleClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeDoubleClicked);
+            this.lvFileTree.TreeMouseClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeMouseClicked);
+            // 
+            // cName
+            // 
+            this.cName.Text = "Name";
+            this.cName.Width = 150;
+            // 
+            // cSize
+            // 
+            this.cSize.Text = "Size";
+            this.cSize.Width = 50;
+            // 
+            // cOffset
+            // 
+            this.cOffset.Text = "Offset";
+            // 
             // imlFS
             // 
             this.imlFS.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imlFS.ImageStream")));
@@ -364,13 +400,15 @@
             // menuHelp
             // 
             this.menuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuHelpUpdateTitleDb,
+            this.menuHelpSep1,
             this.menuHelpCheckNow,
             this.menuHelpCheckUpdates,
-            this.menuHelpSep1,
+            this.menuHelpSep0,
             this.menuHelpVisitGoogleCode,
             this.menuHelpVisit3DBrew,
             this.menuHelpVisitNDev,
-            this.menuHelpSep0,
+            this.menuHelpSep2,
             this.menuHelpAbout});
             this.menuHelp.Name = "menuHelp";
             this.menuHelp.Size = new System.Drawing.Size(43, 20);
@@ -432,38 +470,22 @@
             this.menuHelpAbout.Text = "&About...";
             this.menuHelpAbout.Click += new System.EventHandler(this.menuHelpAbout_Click);
             // 
-            // lvFileTree
+            // menuHelpUpdateTitleDb
             // 
-            this.lvFileTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvFileTree.AutoScroll = true;
-            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.cName,
-            this.cSize,
-            this.cOffset});
-            this.lvFileTree.ImageList = this.imlFS;
-            this.lvFileTree.Location = new System.Drawing.Point(0, 23);
-            this.lvFileTree.Name = "lvFileTree";
-            this.lvFileTree.SelectedNode = null;
-            this.lvFileTree.Size = new System.Drawing.Size(261, 197);
-            this.lvFileTree.TabIndex = 1;
-            this.lvFileTree.TreeDoubleClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeDoubleClicked);
-            this.lvFileTree.TreeMouseClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeMouseClicked);
+            this.menuHelpUpdateTitleDb.Name = "menuHelpUpdateTitleDb";
+            this.menuHelpUpdateTitleDb.Size = new System.Drawing.Size(235, 22);
+            this.menuHelpUpdateTitleDb.Text = "Update title.db file...";
+            this.menuHelpUpdateTitleDb.Click += new System.EventHandler(this.menuHelpUpdateTitleDb_Click);
             // 
-            // cName
+            // menuHelpSep2
             // 
-            this.cName.Text = "Name";
-            this.cName.Width = 150;
+            this.menuHelpSep2.Name = "menuHelpSep2";
+            this.menuHelpSep2.Size = new System.Drawing.Size(232, 6);
             // 
-            // cSize
+            // bwUpdateTitleDb
             // 
-            this.cSize.Text = "Size";
-            this.cSize.Width = 50;
-            // 
-            // cOffset
-            // 
-            this.cOffset.Text = "Offset";
+            this.bwUpdateTitleDb.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwUpdateTitleDb_DoWork);
+            this.bwUpdateTitleDb.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwUpdateTitleDb_RunWorkerCompleted);
             // 
             // frmExplorer
             // 
@@ -537,6 +559,9 @@
         private System.Windows.Forms.ToolStripMenuItem menuHelpVisitGoogleCode;
         private System.Windows.Forms.ToolStripMenuItem menuTools3DVideo;
         private System.Windows.Forms.ToolStripMenuItem menuToolsQuickCRC;
+        private System.Windows.Forms.ToolStripMenuItem menuHelpUpdateTitleDb;
+        private System.Windows.Forms.ToolStripSeparator menuHelpSep2;
+        private System.ComponentModel.BackgroundWorker bwUpdateTitleDb;
     }
 }
 
