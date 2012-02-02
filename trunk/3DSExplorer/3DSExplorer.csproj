@@ -56,6 +56,10 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="SharpCompress, Version=0.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\SharpCompress.dll</HintPath>
+    </Reference>
     <Reference Include="SharpGL, Version=1.99.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\SharpGL.dll</HintPath>
@@ -135,6 +139,7 @@
     <Compile Include="Modules\mdlCXI.cs" />
     <Compile Include="Modules\mdlMPO.cs" />
     <Compile Include="Modules\mdlCCI.cs" />
+    <Compile Include="Modules\mdlArchivedCCI.cs" />
     <Compile Include="Modules\mdlSaveFlash.cs" />
     <Compile Include="Modules\mdlTicket.cs" />
     <Compile Include="Modules\mdlTMD.cs" />
@@ -232,6 +237,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <None Include="bin\title.db" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
