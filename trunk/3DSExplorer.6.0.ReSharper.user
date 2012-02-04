@@ -1,9 +1,7 @@
 <Configuration>
   <RecentFiles>
     <RecentFiles>
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmHashTool.cs" caret="4102" fromTop="21" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="6170" fromTop="22" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:Crc32.cs" caret="9174" fromTop="45" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frm3DVideo.Designer.cs" caret="0" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frm3DVideo.cs" caret="14157" fromTop="21" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:FfmpegWrapper.cs" caret="2009" fromTop="8" />
@@ -21,33 +19,20 @@
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmInputBox.cs" caret="0" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmXORTool.cs" caret="3603" fromTop="64" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:CRC16.cs" caret="648" fromTop="21" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlSaveFlash.cs" caret="191" fromTop="6" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlBanner.cs" caret="756" fromTop="15" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="495" fromTop="25" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:bin/f:title.db" caret="0" fromTop="0" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="2533" fromTop="22" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:StringUtil.cs" caret="42" fromTop="1" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="7458" fromTop="21" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="535" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="14738" fromTop="26" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:TitleInfo.cs" caret="270" fromTop="9" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:Crc32.cs" caret="0" fromTop="0" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="0" fromTop="0" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlSaveFlash.cs" caret="22445" fromTop="30" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="925" fromTop="24" />
     </RecentFiles>
     <RecentEdits>
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1386" fromTop="30" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="486" fromTop="33" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="486" fromTop="30" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="62" fromTop="3" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1386" fromTop="37" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="4150" fromTop="10" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1048" fromTop="32" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1095" fromTop="33" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="395" fromTop="16" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="1877" fromTop="22" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="2422" fromTop="26" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="2904" fromTop="7" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="350" fromTop="19" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="4440" fromTop="33" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="693" fromTop="27" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="840" fromTop="25" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="2595" fromTop="25" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="2533" fromTop="22" />
@@ -63,6 +48,21 @@
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="14704" fromTop="30" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="14196" fromTop="21" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="15212" fromTop="37" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="3540" fromTop="56" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="1347" fromTop="16" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="2437" fromTop="14" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="2724" fromTop="20" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="1634" fromTop="18" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="997" fromTop="34" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="997" fromTop="30" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="427" fromTop="13" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="421" fromTop="12" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="977" fromTop="35" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="427" fromTop="20" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="427" fromTop="26" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="284" fromTop="8" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="572" fromTop="27" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="572" fromTop="18" />
     </RecentEdits>
   </RecentFiles>
   <CompletionStatisticsManager>
@@ -78,7 +78,7 @@
       <Item value="temp" priority="31" />
       <Item value="private" priority="2207" />
       <Item value="object" priority="185" />
-      <Item value="return" priority="4318" />
+      <Item value="return" priority="4414" />
       <Item value="null" priority="575" />
       <Item value="found" priority="223" />
       <Item value="#pragma" priority="63" />
@@ -87,14 +87,14 @@
       <Item value="System" priority="379" />
       <Item value="Reflection" priority="26" />
       <Item value="string" priority="3352" />
-      <Item value="var" priority="3423" />
+      <Item value="var" priority="3583" />
       <Item value="formatString" priority="31" />
       <Item value="this" priority="255" />
       <Item value="ComponentModel" priority="27" />
       <Item value="Net" priority="53" />
       <Item value="while" priority="415" />
       <Item value="reader" priority="256" />
-      <Item value="if" priority="2911" />
+      <Item value="if" priority="2943" />
       <Item value="line" priority="543" />
       <Item value="int" priority="1410" />
       <Item value="indexOf" priority="31" />
@@ -112,22 +112,22 @@
       <Item value="bool" priority="351" />
       <Item value="else" priority="479" />
       <Item value="_checkNow" priority="63" />
-      <Item value="false" priority="927" />
-      <Item value="true" priority="1023" />
+      <Item value="false" priority="959" />
+      <Item value="true" priority="1055" />
       <Item value="_currentContext" priority="191" />
       <Item value="is" priority="95" />
       <Item value="SRAMContext`0" priority="63" />
-      <Item value="public" priority="2519" />
-      <Item value="static" priority="478" />
+      <Item value="public" priority="2551" />
+      <Item value="static" priority="510" />
       <Item value="void" priority="927" />
       <Item value="FileStream`0" priority="287" />
       <Item value="Image`0" priority="90" />
       <Item value="bmp" priority="95" />
       <Item value="ax" priority="31" />
       <Item value="color" priority="96" />
-      <Item value="byte" priority="1469" />
+      <Item value="byte" priority="1533" />
       <Item value="Color`0" priority="255" />
-      <Item value="new" priority="3172" />
+      <Item value="new" priority="3268" />
       <Item value="bytes" priority="127" />
       <Item value="clr" priority="192" />
       <Item value="source" priority="351" />
@@ -160,7 +160,7 @@
       <Item value="tn" priority="159" />
       <Item value="SeekOrigin`0" priority="287" />
       <Item value="enum" priority="219" />
-      <Item value="i" priority="992" />
+      <Item value="i" priority="1120" />
       <Item value="try" priority="319" />
       <Item value="catch" priority="319" />
       <Item value="Ticket" priority="28" />
@@ -207,7 +207,7 @@
       <Item value="ImageUtil`0" priority="95" />
       <Item value="bmd" priority="127" />
       <Item value="fs" priority="1087" />
-      <Item value="Length" priority="593" />
+      <Item value="Length" priority="620" />
       <Item value="compressedCGFX" priority="31" />
       <Item value="threeBytes" priority="63" />
       <Item value="UnsignedInteger`0" priority="31" />
@@ -309,7 +309,7 @@
       <Item value="InfoBlob" priority="161" />
       <Item value="INFOBlobHeader`0" priority="31" />
       <Item value="InfoBlocks" priority="95" />
-      <Item value="for" priority="351" />
+      <Item value="for" priority="383" />
       <Item value="DataBlob" priority="31" />
       <Item value="TreeNodeCollection" priority="28" />
       <Item value="nodes" priority="127" />
@@ -727,6 +727,15 @@
       <Item value="_cciName" priority="63" />
       <Item value="_crc" priority="31" />
       <Item value="offset" priority="31" />
+      <Item value="RSAEncrypt`0" priority="31" />
+      <Item value="data" priority="31" />
+      <Item value="rsaParams" priority="64" />
+      <Item value="RSAParameters" priority="28" />
+      <Item value="rsaFormatter" priority="31" />
+      <Item value="rsa" priority="127" />
+      <Item value="RSACryptoServiceProvider" priority="28" />
+      <Item value="sig" priority="62" />
+      <Item value="srcSig" priority="31" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:@System.TypedReference">
       <Item value="MakeTypedReference`0" priority="26" />
@@ -1526,6 +1535,14 @@
     </ItemStatistics>
     <ItemStatistics item="Qualified:@_3DSExplorer.Utils.TitleDatabase">
       <Item value="FilePath" priority="26" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Security.Cryptography.RSAPKCS1SignatureFormatter">
+      <Item value="SetHashAlgorithm`0" priority="53" />
+      <Item value="CreateSignature`0" priority="26" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Security.Cryptography.RSACryptoServiceProvider">
+      <Item value="ExportParameters`0" priority="26" />
+      <Item value="CspKeyContainerInfo" priority="26" />
     </ItemStatistics>
   </CompletionStatisticsManager>
   <NAntValidationSettings>

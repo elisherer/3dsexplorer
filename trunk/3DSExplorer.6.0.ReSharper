@@ -98,6 +98,8 @@
       <Abbreviation Text="CRC" />
       <Abbreviation Text="CCICXI" />
       <Abbreviation Text="ID" />
+      <Abbreviation Text="RSA" />
+      <Abbreviation Text="OAEP" />
     </Naming2>
   </CodeStyleSettings>
   <Daemon.SolutionSettings>
