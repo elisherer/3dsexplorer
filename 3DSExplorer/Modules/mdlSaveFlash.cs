@@ -650,8 +650,8 @@ namespace _3DSExplorer.Modules
                     f.AddListItem(0, 4, "** Blockmap length", (ulong)Blockmap.Length, 0);
                     f.AddListItem(0, 4, "** Journal size", JournalSize, 0);
                     f.AddListItem(0, 0x10, "** Image Hash", ImageHash, 1);
-                    f.AddListItem(0x000, 4, "DISA Magic", Disa.Magic, 1);
-                    f.AddListItem(0x004, 4, "Unknown", Disa.Unknown0, 1);
+                    f.AddListItem(0x000, 4, "Magic DISA", Disa.Magic, 1);
+                    f.AddListItem(0x004, 4, "Magic Number", Disa.Unknown0, 1);
                     f.AddListItem(0x008, 8, "Table Size", Disa.TableSize, 1);
                     f.AddListItem(0x010, 8, "Primary Table offset", Disa.PrimaryTableOffset, 1);
                     f.AddListItem(0x018, 8, "Secondary Table offset", Disa.SecondaryTableOffset, 1);
@@ -703,7 +703,7 @@ namespace _3DSExplorer.Modules
 
                     f.SetGroupHeaders("DIFI", "IVFC", "DPFS", "Hash", "SAVE", "Folders", "Files");
                     f.AddListItem(0x000, 4, "Magic DIFI", difi.Magic, 0);
-                    f.AddListItem(0x004, 4, "Magic Padding", difi.MagicPadding, 0);
+                    f.AddListItem(0x004, 4, "Magic Number", difi.MagicPadding, 0);
                     f.AddListItem(0x008, 8, "IVFC Offset", difi.IVFCOffset, 0);
                     f.AddListItem(0x010, 8, "IVFC Size", difi.IVFCSize, 0);
                     f.AddListItem(0x018, 8, "DPFS Offset", difi.DPFSOffset, 0);
@@ -714,7 +714,7 @@ namespace _3DSExplorer.Modules
                     f.AddListItem(0x03C, 8, "File Base (for DATA partitions)", difi.FileBase, 0);
 
                     f.AddListItem(0x000, 4, "Magic IVFC", ivfc.Magic, 1);
-                    f.AddListItem(0x004, 4, "Magic Padding", ivfc.MagicPadding, 1);
+                    f.AddListItem(0x004, 4, "Magic Number", ivfc.MagicPadding, 1);
                     f.AddListItem(0x008, 8, "Unknown 1", ivfc.Unknown1, 1);
                     f.AddListItem(0x010, 8, "FirstHash Offset", ivfc.FirstHashOffset, 1);
                     f.AddListItem(0x018, 8, "FirstHash Length", ivfc.FirstHashLength, 1);
@@ -731,7 +731,7 @@ namespace _3DSExplorer.Modules
                     f.AddListItem(0x070, 8, "Unknown 3 (?=0x78)", ivfc.Unknown3, 1);
 
                     f.AddListItem(0x000, 4, "Magic DPFS", dpfs.Magic, 2);
-                    f.AddListItem(0x004, 4, "Magic Padding", dpfs.MagicPadding, 2);
+                    f.AddListItem(0x004, 4, "Magic Number", dpfs.MagicPadding, 2);
                     f.AddListItem(0x008, 8, "First Table Offset", dpfs.FirstTableOffset, 2);
                     f.AddListItem(0x010, 8, "First Table Length", dpfs.FirstTableLength, 2);
                     f.AddListItem(0x018, 8, "First Table Block", dpfs.FirstTableBlock, 2);
@@ -753,8 +753,8 @@ namespace _3DSExplorer.Modules
 
                     if (j == 0)
                     {
-                        f.AddListItem(0x000, 4, "SAVE Magic", save.Magic, 4);
-                        f.AddListItem(0x004, 4, "Magic Padding", save.MagicPadding, 4);
+                        f.AddListItem(0x000, 4, "Magic SAVE", save.Magic, 4);
+                        f.AddListItem(0x004, 4, "Magic Number", save.MagicPadding, 4);
                         f.AddListItem(0x008, 8, "Unknown 1 (?=0x020)", save.Unknown1, 4);
                         f.AddListItem(0x010, 8, "Size of data Partition [medias]", save.PartitionSize, 4);
                         f.AddListItem(0x018, 4, "Partition Media Size", save.PartitionMediaSize, 4);

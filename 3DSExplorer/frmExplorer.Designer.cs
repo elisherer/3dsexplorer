@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewGroup listViewGroup15 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup20 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup21 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.lstInfo = new System.Windows.Forms.ListView();
@@ -70,16 +70,16 @@
             this.menuTools3DVideo = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsQuickCRC = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelpUpdateTitleDb = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuHelpSep1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuHelpCheckNow = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpCheckUpdates = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuHelpSep1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuHelpSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.menuHelpVisitGoogleCode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpVisit3DBrew = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpVisitNDev = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuHelpSep0 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuHelpUpdateTitleDb = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpSep2 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.bwUpdateTitleDb = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -103,28 +103,28 @@
             this.chHexValue});
             this.lstInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstInfo.FullRowSelect = true;
-            listViewGroup15.Header = "";
-            listViewGroup15.Name = "lvg0";
-            listViewGroup16.Header = "";
-            listViewGroup16.Name = "lvg1";
-            listViewGroup17.Header = "";
-            listViewGroup17.Name = "lvg2";
-            listViewGroup18.Header = "";
-            listViewGroup18.Name = "lvg3";
-            listViewGroup19.Header = "";
-            listViewGroup19.Name = "lvg4";
-            listViewGroup20.Header = "";
-            listViewGroup20.Name = "lvg5";
-            listViewGroup21.Header = "";
-            listViewGroup21.Name = "lvg6";
+            listViewGroup1.Header = "";
+            listViewGroup1.Name = "lvg0";
+            listViewGroup2.Header = "";
+            listViewGroup2.Name = "lvg1";
+            listViewGroup3.Header = "";
+            listViewGroup3.Name = "lvg2";
+            listViewGroup4.Header = "";
+            listViewGroup4.Name = "lvg3";
+            listViewGroup5.Header = "";
+            listViewGroup5.Name = "lvg4";
+            listViewGroup6.Header = "";
+            listViewGroup6.Name = "lvg5";
+            listViewGroup7.Header = "";
+            listViewGroup7.Name = "lvg6";
             this.lstInfo.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup15,
-            listViewGroup16,
-            listViewGroup17,
-            listViewGroup18,
-            listViewGroup19,
-            listViewGroup20,
-            listViewGroup21});
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3,
+            listViewGroup4,
+            listViewGroup5,
+            listViewGroup6,
+            listViewGroup7});
             this.lstInfo.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lstInfo.HideSelection = false;
             this.lstInfo.Location = new System.Drawing.Point(0, 0);
@@ -414,6 +414,18 @@
             this.menuHelp.Size = new System.Drawing.Size(43, 20);
             this.menuHelp.Text = "&Help";
             // 
+            // menuHelpUpdateTitleDb
+            // 
+            this.menuHelpUpdateTitleDb.Name = "menuHelpUpdateTitleDb";
+            this.menuHelpUpdateTitleDb.Size = new System.Drawing.Size(235, 22);
+            this.menuHelpUpdateTitleDb.Text = "Update title.db file...";
+            this.menuHelpUpdateTitleDb.Click += new System.EventHandler(this.menuHelpUpdateTitleDb_Click);
+            // 
+            // menuHelpSep1
+            // 
+            this.menuHelpSep1.Name = "menuHelpSep1";
+            this.menuHelpSep1.Size = new System.Drawing.Size(232, 6);
+            // 
             // menuHelpCheckNow
             // 
             this.menuHelpCheckNow.Name = "menuHelpCheckNow";
@@ -431,10 +443,10 @@
             this.menuHelpCheckUpdates.Text = "&Check for updates on startup";
             this.menuHelpCheckUpdates.Click += new System.EventHandler(this.menuHelpCheckUpdates_Click);
             // 
-            // menuHelpSep1
+            // menuHelpSep0
             // 
-            this.menuHelpSep1.Name = "menuHelpSep1";
-            this.menuHelpSep1.Size = new System.Drawing.Size(232, 6);
+            this.menuHelpSep0.Name = "menuHelpSep0";
+            this.menuHelpSep0.Size = new System.Drawing.Size(232, 6);
             // 
             // menuHelpVisitGoogleCode
             // 
@@ -457,10 +469,10 @@
             this.menuHelpVisitNDev.Text = "Visit &n-dev.net";
             this.menuHelpVisitNDev.Click += new System.EventHandler(this.menuHelpVisitNDev_Click);
             // 
-            // menuHelpSep0
+            // menuHelpSep2
             // 
-            this.menuHelpSep0.Name = "menuHelpSep0";
-            this.menuHelpSep0.Size = new System.Drawing.Size(232, 6);
+            this.menuHelpSep2.Name = "menuHelpSep2";
+            this.menuHelpSep2.Size = new System.Drawing.Size(232, 6);
             // 
             // menuHelpAbout
             // 
@@ -469,18 +481,6 @@
             this.menuHelpAbout.Size = new System.Drawing.Size(235, 22);
             this.menuHelpAbout.Text = "&About...";
             this.menuHelpAbout.Click += new System.EventHandler(this.menuHelpAbout_Click);
-            // 
-            // menuHelpUpdateTitleDb
-            // 
-            this.menuHelpUpdateTitleDb.Name = "menuHelpUpdateTitleDb";
-            this.menuHelpUpdateTitleDb.Size = new System.Drawing.Size(235, 22);
-            this.menuHelpUpdateTitleDb.Text = "Update title.db file...";
-            this.menuHelpUpdateTitleDb.Click += new System.EventHandler(this.menuHelpUpdateTitleDb_Click);
-            // 
-            // menuHelpSep2
-            // 
-            this.menuHelpSep2.Name = "menuHelpSep2";
-            this.menuHelpSep2.Size = new System.Drawing.Size(232, 6);
             // 
             // bwUpdateTitleDb
             // 

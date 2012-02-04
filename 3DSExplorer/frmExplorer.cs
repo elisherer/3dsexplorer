@@ -395,6 +395,8 @@ namespace _3DSExplorer
                 var reader = responseStream;
                 var readBytes = -1;
                 var buffer = new byte[0x400];
+                if (File.Exists(TitleDatabase.FilePath))
+                    File.Delete(TitleDatabase.FilePath);
                 var fs = File.OpenWrite(TitleDatabase.FilePath);
                 while (readBytes != 0)
                 {
@@ -412,7 +414,7 @@ namespace _3DSExplorer
 
         private void bwUpdateTitleDb_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if ((bool)e.Result)
+            if (e.Result != null && e.Result is Boolean && (bool)e.Result)
                 MessageBox.Show("Title.db file updated please restart application for changes to take effect.");
             else
                 MessageBox.Show("There was an error while trying to update the title.db file..");

@@ -252,7 +252,7 @@ namespace _3DSExplorer.Modules
                     f.SetGroupHeaders("Title", "Hash", "NCCH");
                     f.AddListItem(string.Empty, string.Empty, "Full Title (Name & Region)", string.Empty, TitleInfo.Title + " - " + TitleInfo.Region, 0);
                     f.AddListItem(string.Empty, string.Empty, "Title Type", string.Empty, TitleInfo.Type, 0);
-                    f.AddListItem(string.Empty, string.Empty, "Developer", string.Empty, TitleInfo.Developer, 0);
+                    f.AddListItem(string.Empty, string.Empty, "Publisher", string.Empty, TitleInfo.Developer, 0);
 
                     f.AddListItem(0x000, 0x100, "RSA-2048 signature of the NCCH header [SHA-256]", Header.NCCHHeaderSignature, 1);
 
