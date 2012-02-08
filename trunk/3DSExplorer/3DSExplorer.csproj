@@ -130,6 +130,7 @@
       <DependentUpon>frmImageBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Crypt\LZSS.cs" />
+    <Compile Include="Modules\mdlCBMD.cs" />
     <Compile Include="Modules\mdlICN.cs" />
     <Compile Include="Modules\IContext.cs" />
     <Compile Include="Modules\mdlBanner.cs" />
@@ -266,6 +267,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />
+    <None Include="Resources\watermark.png" />
     <None Include="Resources\code.png" />
     <None Include="Resources\cog.png" />
     <None Include="Resources\ico_3d_glasses_32.png" />

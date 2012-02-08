@@ -1,5 +1,4 @@
-﻿using System;
-namespace TreeListView
+﻿namespace _3DSExplorer.TreeListView
 {
     interface IColumnsProvider
     {

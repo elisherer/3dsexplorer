@@ -6,7 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Drawing.Design;
 
-namespace TreeListView
+namespace _3DSExplorer.TreeListView
 {
     public partial class TreeListViewControl : UserControl, IColumnsProvider
     {

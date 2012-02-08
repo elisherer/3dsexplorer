@@ -1,4 +1,4 @@
-﻿namespace TreeListView
+﻿namespace _3DSExplorer.TreeListView
 {
     partial class TreeListViewControl
     {

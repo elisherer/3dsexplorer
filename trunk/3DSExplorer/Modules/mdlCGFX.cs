@@ -7,6 +7,8 @@ using _3DSExplorer.Utils;
 
 namespace _3DSExplorer.Modules
 {
+    //Uses DATABlobHeader from mdlBanner.cs
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct CGFX
     {
