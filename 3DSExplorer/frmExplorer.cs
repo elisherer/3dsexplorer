@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Net;
@@ -33,6 +34,7 @@ namespace _3DSExplorer
         {
             Text = string.Format("{0} v.{1}",Application.ProductName,Application.ProductVersion);
             menuHelpCheckUpdates.Checked = Properties.Settings.Default.CheckForUpdatesOnStartup;
+            frmExplorer_Resize(null, null);
         }
 
         #region Info ListView Functions
@@ -152,6 +154,7 @@ namespace _3DSExplorer
         {
             var tag = (TreeViewContextTag) e.Node.Tag;
             tag.Context.View(this, tag.Type, tag.Values);
+            //BUG: lstInfo.SetListViewImage();
         }
 
         private void LoadText(string path)
@@ -280,12 +283,12 @@ namespace _3DSExplorer
             GoToUrl("http://www.n-dev.net");
         }
 
-        private void menuHelpAbout_Click(object sender, EventArgs e)
+        #endregion
+        
+        private void menuLogo_Click(object sender, EventArgs e)
         {
             (new frmAbout()).ShowDialog();
         }
-
-        #endregion
 
         #region CXTMENU FileContext
 
@@ -420,7 +423,10 @@ namespace _3DSExplorer
                 MessageBox.Show("There was an error while trying to update the title.db file..");
         }
 
- 
+        private void frmExplorer_Resize(object sender, EventArgs e)
+        {
+            menuLogo.Margin = new Padding(Width - 280,0,0,0);
+        }
     }
 
 }

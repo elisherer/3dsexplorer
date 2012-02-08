@@ -33,15 +33,17 @@ namespace _3DSExplorer
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAbout));
             this.openGLControl1 = new SharpGL.OpenGLControl();
-            this.lblTitle = new System.Windows.Forms.Label();
             this.lblAuthor = new System.Windows.Forms.Label();
             this.lblCred = new System.Windows.Forms.Label();
             this.btnThanks = new System.Windows.Forms.Button();
             this.lblDex = new System.Windows.Forms.Label();
             this.cmbDex = new System.Windows.Forms.ComboBox();
             this.picDex = new System.Windows.Forms.PictureBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.lblTitle = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.openGLControl1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picDex)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // openGLControl1
@@ -57,22 +59,13 @@ namespace _3DSExplorer
             this.openGLControl1.OpenGLInitialized += new System.EventHandler(this.openGLControl1_OpenGLInitialized);
             this.openGLControl1.OpenGLDraw += new System.Windows.Forms.PaintEventHandler(this.openGLControl1_OpenGLDraw);
             // 
-            // lblTitle
-            // 
-            this.lblTitle.AutoSize = true;
-            this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.lblTitle.Location = new System.Drawing.Point(167, 12);
-            this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(77, 13);
-            this.lblTitle.TabIndex = 1;
-            this.lblTitle.Text = "3DSExplorer";
-            // 
             // lblAuthor
             // 
             this.lblAuthor.AutoSize = true;
-            this.lblAuthor.Location = new System.Drawing.Point(167, 25);
+            this.lblAuthor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.lblAuthor.Location = new System.Drawing.Point(167, 29);
             this.lblAuthor.Name = "lblAuthor";
-            this.lblAuthor.Size = new System.Drawing.Size(60, 13);
+            this.lblAuthor.Size = new System.Drawing.Size(72, 13);
             this.lblAuthor.TabIndex = 2;
             this.lblAuthor.Text = "by elisherer";
             // 
@@ -126,11 +119,32 @@ namespace _3DSExplorer
             this.picDex.TabIndex = 8;
             this.picDex.TabStop = false;
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::_3DSExplorer.Properties.Resources.watermark;
+            this.pictureBox1.Location = new System.Drawing.Point(169, 12);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(110, 16);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox1.TabIndex = 9;
+            this.pictureBox1.TabStop = false;
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.lblTitle.Location = new System.Drawing.Point(284, 15);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(13, 13);
+            this.lblTitle.TabIndex = 1;
+            this.lblTitle.Text = "v";
+            // 
             // frmAbout
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(502, 162);
+            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.picDex);
             this.Controls.Add(this.cmbDex);
             this.Controls.Add(this.lblDex);
@@ -149,6 +163,7 @@ namespace _3DSExplorer
             this.Text = "About 3DSExplorer";
             ((System.ComponentModel.ISupportInitialize)(this.openGLControl1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picDex)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -157,13 +172,14 @@ namespace _3DSExplorer
         #endregion
 
         private OpenGLControl openGLControl1;
-        private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Label lblAuthor;
         private System.Windows.Forms.Label lblCred;
         private System.Windows.Forms.Button btnThanks;
         private System.Windows.Forms.Label lblDex;
         private System.Windows.Forms.ComboBox cmbDex;
         private System.Windows.Forms.PictureBox picDex;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Label lblTitle;
 
     }
 }

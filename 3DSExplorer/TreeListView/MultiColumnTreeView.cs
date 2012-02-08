@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace TreeListView
+namespace _3DSExplorer.TreeListView
 {
     internal partial class MultiColumnTreeView : TreeView
     {

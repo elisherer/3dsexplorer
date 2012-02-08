@@ -45,7 +45,7 @@ namespace _3DSExplorer
         public frmAbout()
         {
             InitializeComponent();
-            lblTitle.Text = @"3DS Explorer v." + Application.ProductVersion;
+            lblTitle.Text = 'v' + Application.ProductVersion;
             for (var i = 0; i < _pokedex.Length; i++)
                 cmbDex.Items.Add(i+1);
             _pokeBmp = new Bitmap(54,54);

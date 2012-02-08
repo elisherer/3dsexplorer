@@ -5,16 +5,41 @@ using System.Windows.Forms;
 
 namespace _3DSExplorer.Modules
 {
+    /*
+     * Available encoders:
+     * 
+     * 16-bit PCM encoder
+     * 8-bit PCM encoder
+     * DSP ADPCM encoder
+     * IMA ADPCM encoder
+     * 
+     */
+
+    //Uses DATABlobHeader from mdlBanner.cs
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-   public struct INFOBlobHeader
+    public struct CWAVINFO
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
         public char[] Magic;
         public uint InfoDataLength;
-        public uint NumOfChannles;
-        public ulong SamplesPerSec;
-        public ulong Unknown0;
-        public uint NumOf0x48Blocks;
+        public uint Type;
+        public uint SamplesPerSec;
+        public uint Unknown0;
+        public uint Unknown1;
+        public uint Unknown2;
+        public uint Channels;
+        public uint Unknown4;
+        public uint Unknown5;
+        public uint Unknown6;
+        public uint Unknown7;
+        public uint Unknown8;
+        public uint Unknown9;
+        public uint Unknown10;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x18)]
+        public byte[] Reserved;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0xC)]
+        public byte[] Unused;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -47,27 +72,21 @@ namespace _3DSExplorer.Modules
 
         private string errorMessage = string.Empty;
         public CWAV Wave;
-        public INFOBlobHeader InfoBlob;
-        public byte[][] InfoBlocks;
+        public CWAVINFO InfoBlob;
         public DATABlobHeader DataBlob;
         public byte[] WaveData;
         public byte[] MicrosoftWaveData;
         
         public bool Open(Stream fs)
         {
+            var WavStartPos = fs.Position;
             Wave = MarshalUtil.ReadStruct<CWAV>(fs);
-            fs.Seek(Wave.InfoChunkOffset, SeekOrigin.Begin);
-            InfoBlob = MarshalUtil.ReadStruct<INFOBlobHeader>(fs);
-            InfoBlocks = new byte[InfoBlob.NumOf0x48Blocks][];
-            for (var i = 0; i < InfoBlob.NumOf0x48Blocks; i++)
-            {
-                InfoBlocks[i] = new byte[0x48];
-                fs.Read(InfoBlocks[i], 0, InfoBlocks[i].Length);
-            }
-            fs.Seek(Wave.DataChunkOffset, SeekOrigin.Begin);
+            fs.Seek(WavStartPos + Wave.InfoChunkOffset, SeekOrigin.Begin);
+            InfoBlob = MarshalUtil.ReadStruct<CWAVINFO>(fs);
+            fs.Seek(WavStartPos + Wave.DataChunkOffset, SeekOrigin.Begin);
             DataBlob = MarshalUtil.ReadStruct<DATABlobHeader>(fs);
-            WaveData = new byte[DataBlob.Length - Marshal.SizeOf(DataBlob)];
-            fs.Read(WaveData, 0, WaveData.Length);
+            //WaveData = new byte[DataBlob.Length - Marshal.SizeOf(DataBlob)];
+            //fs.Read(WaveData, 0, WaveData.Length);
             /* BUG
             var wf = new WaveFormat
                         {
@@ -116,12 +135,21 @@ namespace _3DSExplorer.Modules
                     
                     f.AddListItem(0, 4, "Magic", InfoBlob.Magic, 1);
                     f.AddListItem(4, 4, "Info Data Length", InfoBlob.InfoDataLength, 1);
-                    f.AddListItem(8, 4, "Number of channles", InfoBlob.NumOfChannles, 1);
-                    f.AddListItem(0x0C, 8, "Samples per second", InfoBlob.SamplesPerSec, 1);
-                    f.AddListItem(0x14, 8, "Unknown 0", InfoBlob.Unknown0, 1);
-                    f.AddListItem(0x1C, 4, "Number of 0x48 blocks", InfoBlob.NumOf0x48Blocks, 1);
-                    for (var i = 0; i < InfoBlob.NumOf0x48Blocks;i++ )
-                        f.AddListItem(0, 0x48, "Block " + i, InfoBlocks[i], 1);
+                    f.AddListItem(8, 4, "Type", InfoBlob.Type, 1);
+                    f.AddListItem(12, 4, "Samples per second", InfoBlob.SamplesPerSec, 1);
+                    f.AddListItem(16, 4, "Unknown 0", InfoBlob.Unknown0, 1);
+                    f.AddListItem(20, 4, "Unknown 1", InfoBlob.Unknown1, 1);
+                    f.AddListItem(24, 4, "Unknown 2", InfoBlob.Unknown2, 1);
+                    f.AddListItem(28, 4, "Channels", InfoBlob.Channels, 1);
+                    f.AddListItem(32, 4, "Unknown 4", InfoBlob.Unknown4, 1);
+                    f.AddListItem(36, 4, "Unknown 5", InfoBlob.Unknown5, 1);
+                    f.AddListItem(40, 4, "Unknown 6", InfoBlob.Unknown6, 1);
+                    f.AddListItem(44, 4, "Unknown 7", InfoBlob.Unknown7, 1);
+                    f.AddListItem(48, 4, "Unknown 8", InfoBlob.Unknown8, 1);
+                    f.AddListItem(52, 4, "Unknown 9", InfoBlob.Unknown9, 1);
+                    f.AddListItem(56, 4, "Unknown 10", InfoBlob.Unknown10, 1);
+                    f.AddListItem(60, 0x18, "Reserved", InfoBlob.Reserved, 1);
+                    f.AddListItem(0x54, 0x0C, "Unused", InfoBlob.Unused, 1);
 
                     f.AddListItem(0, 4, "Magic", DataBlob.Magic, 2);
                     f.AddListItem(4, 4, "Length", DataBlob.Length, 2);

@@ -9,6 +9,7 @@ namespace _3DSExplorer.Modules
         Unknown = -1,
         Banner = 0,
         CIA,
+        CBMD,
         CGFX,
         CWAV,
         ICN,
@@ -25,15 +26,16 @@ namespace _3DSExplorer.Modules
     {
         //TODO: get this from the modules
         public const string OpenString = 
-            @"All Supported|*.3ds;*.cci;*.cxi;*.csu;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx;*.icn;*.zip;*.7z|" +
+            @"All Supported|*.3ds;*.cci;*.cxi;*.csu;*.cbmd;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx;*.icn;*.zip;*.7z|" +
             "CTR Cartridge Images (*.cci/3ds/csu)|*.3ds;*.cci;*.csu|"+
             "Archived CCI (zip/7z)|*.zip;*.7z|" +
             "CTR Executable (*.cxi)|*.cxi|" +
-            "CTR Importable Archives (*.cia)|*.cia|"+
+            "CTR Banners (*.bnr)|*.bnr|" +
+            "CTR Banner Model Data (*.cbmd)|*.cbmd|" +
+            "CTR Graphics (*.cgfx)|*.cgfx|" +
             "CTR Icons (*.icn)|*.icn|" +
-            "CTR Banners (*.bnr)|*.bnr|"+
+            "CTR Importable Archives (*.cia)|*.cia|"+
             "CTR Waves (*.b/cwav)|*.bcwav;*.cwav|"+
-            "CTR Graphics (*.cgfx)|*.cgfx|"+
             "Save Flash Files (*.sav/bin)|*.bin;*.sav|" +
             "Title Metadata (*.tmd)|*.tmd|" +
             "MPO (3D Images) Files (*.mpo)|*.mpo|" +
@@ -47,6 +49,8 @@ namespace _3DSExplorer.Modules
                     return new BannerContext();
                 case ModuleType.CGFX:
                     return new CGFXContext();
+                case ModuleType.CBMD:
+                    return new CBMDContext();
                 case ModuleType.CIA:
                     return new CIAContext();
                 case ModuleType.CWAV:
@@ -89,6 +93,9 @@ namespace _3DSExplorer.Modules
                 case ".3ds":
                     type = ModuleType.CCI;
                     break;
+                case ".cbmd":
+                    type = ModuleType.CBMD;
+                    break;
                 case ".cxi":
                     type = ModuleType.CXI;
                     break;
@@ -129,8 +136,8 @@ namespace _3DSExplorer.Modules
                         type = ModuleType.CIA;
                     else if (magic[0] == 0xFF && magic[1] == 0xD8 && magic[2] == 0xFF && magic[3] == 0xE1)
                         type = ModuleType.MPO;
-                    else if (magic[0] == 'C' && magic[1] == 'B' && magic[2] == 'M' && magic[3] == 'D')
-                        type = ModuleType.Banner;
+                    else if (magic[0] == 'C' && magic[1] == 'B' && magic[2] == 'M' && magic[3] == 'D') //can be Banner but can't know
+                        type = ModuleType.CBMD;
                     else if (magic[0] == 'C' && magic[1] == 'G' && magic[2] == 'F' && magic[3] == 'X')
                         type = ModuleType.CGFX;
                     else if (magic[0] == 'C' && magic[1] == 'W' && magic[2] == 'A' && magic[3] == 'V')

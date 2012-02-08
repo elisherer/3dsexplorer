@@ -7,8 +7,6 @@ D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmHashTool.resources
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.ImageBox.resources
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.InputBox.resources
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.Properties.Resources.resources
-D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\TreeListView.MultiColumnTreeView.resources
-D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\TreeListView.TreeListViewControl.resources
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.exe
 D:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\3DSExplorer.pdb
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\ResolveAssemblyReference.cache
@@ -43,4 +41,5 @@ D:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmCheckSum.resources
 D:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.Modules.ProgressDialog.resources
 d:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.Modules.ProgressDialog.resources
 d:\dev\3DS\3DSExplorer\3DSExplorer\bin\SharpCompress.dll
-d:\dev\3DSExplorer\3DSExplorer\bin\SharpCompress.dll
+d:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.TreeListView.MultiColumnTreeView.resources
+d:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.TreeListView.TreeListViewControl.resources
