@@ -14,8 +14,25 @@ namespace _3DSExplorer.Modules
      * IMA ADPCM encoder
      * 
      */
+    // Thanks Ris312 for investigating the file's structure
 
     //Uses DATABlobHeader from mdlBanner.cs
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct CWAVChannelDataPointer
+    {
+        public uint Flags;
+        public uint Offset;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct CWAVChannelData
+    {
+        public uint Flags;
+        public ulong Offset;
+        public uint FFs;
+        public uint Padding;
+    }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct CWAVINFO
@@ -24,22 +41,11 @@ namespace _3DSExplorer.Modules
         public char[] Magic;
         public uint InfoDataLength;
         public uint Type;
-        public uint SamplesPerSec;
+        public uint SampleRate;
         public uint Unknown0;
-        public uint Unknown1;
+        public uint NumberOfSamples;
         public uint Unknown2;
         public uint Channels;
-        public uint Unknown4;
-        public uint Unknown5;
-        public uint Unknown6;
-        public uint Unknown7;
-        public uint Unknown8;
-        public uint Unknown9;
-        public uint Unknown10;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x18)]
-        public byte[] Reserved;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0xC)]
-        public byte[] Unused;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -72,9 +78,12 @@ namespace _3DSExplorer.Modules
 
         private string errorMessage = string.Empty;
         public CWAV Wave;
+        public byte BitsPerSample;
         public CWAVINFO InfoBlob;
+        public CWAVChannelDataPointer[] ChannelDataPointers;
+        public CWAVChannelData[] ChannelDatas;
         public DATABlobHeader DataBlob;
-        public byte[] WaveData;
+        public byte[][] ChannelsRawData;
         public byte[] MicrosoftWaveData;
         
         public bool Open(Stream fs)
@@ -83,22 +92,30 @@ namespace _3DSExplorer.Modules
             Wave = MarshalUtil.ReadStruct<CWAV>(fs);
             fs.Seek(WavStartPos + Wave.InfoChunkOffset, SeekOrigin.Begin);
             InfoBlob = MarshalUtil.ReadStruct<CWAVINFO>(fs);
+            BitsPerSample = (byte)(InfoBlob.Type == 1 ? 16 : 8);
+            
+            var ChannelsBaseOffset = fs.Position - 4;
+            //read the channel data pointers based on the number of channels
+            ChannelDataPointers = new CWAVChannelDataPointer[InfoBlob.Channels];
+            for (var i = 0; i < InfoBlob.Channels;i++ ) 
+                ChannelDataPointers[i] = MarshalUtil.ReadStruct<CWAVChannelDataPointer>(fs);
+            //read the channel data fron the offsets
+            ChannelDatas = new CWAVChannelData[InfoBlob.Channels];
+            for (var i = 0; i < InfoBlob.Channels; i++)
+            {
+                fs.Seek(ChannelsBaseOffset + ChannelDataPointers[i].Offset, SeekOrigin.Begin);
+                ChannelDatas[i] = MarshalUtil.ReadStruct<CWAVChannelData>(fs);
+            }
             fs.Seek(WavStartPos + Wave.DataChunkOffset, SeekOrigin.Begin);
             DataBlob = MarshalUtil.ReadStruct<DATABlobHeader>(fs);
-            //WaveData = new byte[DataBlob.Length - Marshal.SizeOf(DataBlob)];
-            //fs.Read(WaveData, 0, WaveData.Length);
-            /* BUG
-            var wf = new WaveFormat
-                        {
-                            cbSize = 0,
-                            nAvgBytesPerSec = (ushort)(InfoBlob.SamplesPerSec * (InfoBlob.NumOfChannles * (16 / 8))),
-                            nBlockAlign = (ushort)(InfoBlob.NumOfChannles * (16 / 8)),
-                            nChannels = (ushort)InfoBlob.NumOfChannles,
-                            nSamplesPerSec = (ushort)InfoBlob.SamplesPerSec,
-                            wBitsPerSample = 16,
-                            wFormatTag = 1
-                        };
-            MicrosoftWaveData = WinMM.WriteWAVFile(wf, WaveData);*/
+            var DataBaseOffset = fs.Position - 4;
+            ChannelsRawData = new byte[InfoBlob.Channels][];
+            for (var i = 0; i < InfoBlob.Channels; i++)
+            {
+                fs.Seek(DataBaseOffset + (long)ChannelDatas[i].Offset, SeekOrigin.Begin);
+                ChannelsRawData[i] = new byte[InfoBlob.NumberOfSamples * (BitsPerSample / 8)];
+                fs.Read(ChannelsRawData[i], 0, ChannelsRawData[i].Length);
+            }
             return true;
         }
 
@@ -118,7 +135,7 @@ namespace _3DSExplorer.Modules
             switch ((CWAVView)view)
             {
                 case CWAVView.CWAV:
-                    f.SetGroupHeaders("CWAV","INFO","DATA");
+                    f.SetGroupHeaders("CWAV","INFO","Channels", "DATA");
                     f.AddListItem(0, 4, "Magic", Wave.Magic, 0);
                     f.AddListItem(4, 2, "Endianess", Wave.Endianess, 0);
                     f.AddListItem(6, 2, "Struct length", Wave.StructLength, 0);
@@ -136,23 +153,22 @@ namespace _3DSExplorer.Modules
                     f.AddListItem(0, 4, "Magic", InfoBlob.Magic, 1);
                     f.AddListItem(4, 4, "Info Data Length", InfoBlob.InfoDataLength, 1);
                     f.AddListItem(8, 4, "Type", InfoBlob.Type, 1);
-                    f.AddListItem(12, 4, "Samples per second", InfoBlob.SamplesPerSec, 1);
+                    f.AddListItem(12, 4, "Samples per second", InfoBlob.SampleRate, 1);
                     f.AddListItem(16, 4, "Unknown 0", InfoBlob.Unknown0, 1);
-                    f.AddListItem(20, 4, "Unknown 1", InfoBlob.Unknown1, 1);
+                    f.AddListItem(20, 4, "NumberOfSamples", InfoBlob.NumberOfSamples, 1);
                     f.AddListItem(24, 4, "Unknown 2", InfoBlob.Unknown2, 1);
                     f.AddListItem(28, 4, "Channels", InfoBlob.Channels, 1);
-                    f.AddListItem(32, 4, "Unknown 4", InfoBlob.Unknown4, 1);
-                    f.AddListItem(36, 4, "Unknown 5", InfoBlob.Unknown5, 1);
-                    f.AddListItem(40, 4, "Unknown 6", InfoBlob.Unknown6, 1);
-                    f.AddListItem(44, 4, "Unknown 7", InfoBlob.Unknown7, 1);
-                    f.AddListItem(48, 4, "Unknown 8", InfoBlob.Unknown8, 1);
-                    f.AddListItem(52, 4, "Unknown 9", InfoBlob.Unknown9, 1);
-                    f.AddListItem(56, 4, "Unknown 10", InfoBlob.Unknown10, 1);
-                    f.AddListItem(60, 0x18, "Reserved", InfoBlob.Reserved, 1);
-                    f.AddListItem(0x54, 0x0C, "Unused", InfoBlob.Unused, 1);
-
-                    f.AddListItem(0, 4, "Magic", DataBlob.Magic, 2);
-                    f.AddListItem(4, 4, "Length", DataBlob.Length, 2);
+                    for (var i = 0; i < ChannelDataPointers.Length; i++)
+                    {
+                        f.AddListItem(0, 4, "Channel " + i + " Ptr Flags", ChannelDataPointers[i].Flags, 2);
+                        f.AddListItem(0, 4, "Channel " + i + " Ptr Offset", ChannelDataPointers[i].Offset, 2);
+                        f.AddListItem(0, 4, "Channel " + i + " Data Flags", ChannelDatas[i].Flags, 2);
+                        f.AddListItem(0, 8, "Channel " + i + " Data Offset", ChannelDatas[i].Offset, 2);
+                        f.AddListItem(0, 4, "Channel " + i + " Data FFs", ChannelDatas[i].FFs, 2);
+                        f.AddListItem(0, 4, "Channel " + i + " Data Padding", ChannelDatas[i].Padding, 2);
+                    }
+                    f.AddListItem(0, 4, "Magic", DataBlob.Magic, 3);
+                    f.AddListItem(4, 4, "Length", DataBlob.Length, 3);
                     break;
             }
             f.AutoAlignColumns();
@@ -168,11 +184,25 @@ namespace _3DSExplorer.Modules
             switch (type)
             {
                 case 0:
-                    MessageBox.Show("Experimental: still doesn't work!");
-                    /* BUG
-                    var ms = new MemoryStream(cxt.MicrosoftWaveData);
-                    var sm = new SoundPlayer(ms);
-                    sm.Play();*/
+                    var saveFileDialog = new SaveFileDialog() { Filter = "WAV Files|*.wav", FileName = Path.GetFileName(filePath) + ".wav" };
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        if (MicrosoftWaveData == null)
+                        {
+                            var blockAlign = InfoBlob.Channels * (BitsPerSample / 8);
+                            var wf = new WaveFormat
+                            {
+                                ByteRate = (ushort)(InfoBlob.SampleRate * blockAlign),
+                                BlockAlign = (ushort)blockAlign,
+                                Channels = (ushort)InfoBlob.Channels,
+                                SampleRate = (ushort)InfoBlob.SampleRate,
+                                BitsPerSample = BitsPerSample,
+                                FormatTag = (ushort)WaveFormats.PCM
+                            };
+                            MicrosoftWaveData = WinMM.WriteWAVFile(wf, ChannelsRawData);
+                        }
+                        File.WriteAllBytes(saveFileDialog.FileName,MicrosoftWaveData);
+                    }
                     break;
             }
         }
@@ -193,9 +223,8 @@ namespace _3DSExplorer.Modules
         {
             var topNode = new TreeNode("CWAV", 1, 1);
             topNode.Nodes.Add(
-                new TreeNode(TreeListView.TreeListViewControl.CreateMultiColumnNodeText("Wave.cwav",
-                                                                                        WaveData.Length.ToString()))
-                    {Tag = new[] {TreeViewContextTag.Create(this,0,"Play")}});
+                new TreeNode(TreeListView.TreeListViewControl.CreateMultiColumnNodeText("Wave.wav"))
+                    {Tag = new[] {TreeViewContextTag.Create(this,0,"Save")}});
             return topNode;
         }
     }
