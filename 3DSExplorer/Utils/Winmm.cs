@@ -5,7 +5,7 @@ using System.Text;
 
 namespace _3DSExplorer
 {
-    public enum WaveFormats
+    public enum WaveFormats : ushort
     {
         PCM = 1,
         ADPCM = 2,
@@ -16,18 +16,18 @@ namespace _3DSExplorer
     [StructLayout(LayoutKind.Sequential)]
     public struct WaveFormat
     {
-        public ushort wFormatTag;
-        public ushort nChannels;
-        public uint nSamplesPerSec;
-        public uint nAvgBytesPerSec;
-        public ushort nBlockAlign;
-        public ushort wBitsPerSample;
-        public ushort cbSize;
+        public ushort FormatTag;
+        public ushort Channels;
+        public uint SampleRate;
+        public uint ByteRate;
+        public ushort BlockAlign;
+        public ushort BitsPerSample;
+        //public ushort cbSize;
     }
 
     public class WinMM
     {
-        // consts
+        /* consts
         public const int FRAMELEN = 256;
         public const int FRAMELEN2 = FRAMELEN*2;
         public const int MAXPNAMELEN = 32;
@@ -57,7 +57,7 @@ namespace _3DSExplorer
         #region Callbacks
         public delegate void WaveDelegate(IntPtr hdrvr, int uMsg, int dwUser, ref WaveHdr wavhdr, int dwParam2);
         #endregion
-
+        */
         #region Structs
         [StructLayout(LayoutKind.Sequential)]
         public struct WaveHdr
@@ -71,7 +71,7 @@ namespace _3DSExplorer
             public IntPtr lpNext; // PWaveHdr, reserved for driver
             public int reserved; // reserved for driver
         }
-
+        /*
         public struct WaveInCaps
         {
             public short wMid;
@@ -80,16 +80,19 @@ namespace _3DSExplorer
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = WinMM.MAXPNAMELEN)] public string szPname;
             public int dwFormats;
             public short wChannels;
-        }
+        }*/
 
         #endregion
 
-        public static byte[] WriteWAVFile(WaveFormat wf, byte[] rawData)
+        public static byte[] WriteWAVFile(WaveFormat wf, byte[][] rawData)
         {
             var bw = new MemoryStream();
+            var rawSize = 0;
+            for (var j = 0; j < rawData.Length; j++)
+                rawSize += rawData[j].Length;
             //RIFF HEADER
             bw.Write(Encoding.ASCII.GetBytes("RIFF"), 0, 4);
-            bw.Write(BitConverter.GetBytes(rawData.Length + 36), 0, 4);
+            bw.Write(BitConverter.GetBytes(rawSize + 36), 0, 4);
             bw.Write(Encoding.ASCII.GetBytes("WAVE".ToCharArray()), 0, 4);
 
             // SUBCHUNK
@@ -100,13 +103,53 @@ namespace _3DSExplorer
 
             // DATA CHUNK
             bw.Write(Encoding.ASCII.GetBytes("data".ToCharArray()), 0, 4);
-            bw.Write(BitConverter.GetBytes(rawData.Length), 0, 4);
-            bw.Write(rawData, 0, rawData.Length);
+            bw.Write(BitConverter.GetBytes(rawSize), 0, 4);
+            for (var i = 0; i < rawData[0].Length; i += wf.BitsPerSample / 8 )
+            {
+                for (var j = 0; j < rawData.Length; j++ )
+                {
+                    bw.WriteByte(rawData[j][i]);
+                    if (wf.BitsPerSample == 16)
+                        bw.WriteByte(rawData[j][i+1]);
+                }
+            }
 
             return bw.ToArray();
         }
 
+        public static void WriteWAVFile(string filePath, WaveFormat wf, byte[][] rawData)
+        {
+            var fileStream = File.OpenWrite(filePath);
+            var rawSize = 0;
+            for (var j = 0; j < rawData.Length; j++)
+                rawSize += rawData[j].Length;
+            //RIFF HEADER
+            fileStream.Write(Encoding.ASCII.GetBytes("RIFF"), 0, 4);
+            fileStream.Write(BitConverter.GetBytes(rawSize + 36), 0, 4);
+            fileStream.Write(Encoding.ASCII.GetBytes("WAVE".ToCharArray()), 0, 4);
 
+            // SUBCHUNK
+            fileStream.Write(Encoding.ASCII.GetBytes("fmt ".ToCharArray()), 0, 4);
+            fileStream.Write(BitConverter.GetBytes(16), 0, 4);
+            var chunk = MarshalUtil.StructureToByteArray(wf);
+            fileStream.Write(chunk, 0, chunk.Length);
+
+            // DATA CHUNK
+            fileStream.Write(Encoding.ASCII.GetBytes("data".ToCharArray()), 0, 4);
+            fileStream.Write(BitConverter.GetBytes(rawSize), 0, 4);
+            for (var i = 0; i < rawData[0].Length; i += wf.BitsPerSample / 8)
+            {
+                for (var j = 0; j < rawData.Length; j++)
+                {
+                    fileStream.WriteByte(rawData[j][i]);
+                    if (wf.BitsPerSample == 16)
+                        fileStream.WriteByte(rawData[j][i + 1]);
+                }
+            }
+
+            fileStream.Close();
+        }
+/*
         #region WINMM.DLL functions
 
         private const string mmdll = "winmm.dll";
@@ -181,5 +224,6 @@ namespace _3DSExplorer
         public static extern int waveInStop(IntPtr hwi);
 
         #endregion
+ */
     }
 }
