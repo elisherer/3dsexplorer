@@ -37,10 +37,12 @@ namespace _3DSExplorer.Modules
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
         public byte[] ProgramID;
-        public char TempFlag;
+        public ulong TempFlag;
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 47)]
-        public byte[] Reserved1;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
+        public byte[] Unknown0_0;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
+        public byte[] Unknown0_1;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
         public char[] ProductCode;
@@ -49,29 +51,26 @@ namespace _3DSExplorer.Modules
         public byte[] ExtendedHeaderHash;
         public uint ExtendedHeaderSize;
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-        public byte[] Reserved2;
-
-        public ulong Flags;
+        public uint Unknown1;
+        public uint Unknown2;
+        public uint Flags;
         public uint PlainRegionOffset;
         public uint PlainRegionSize;
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
-        public byte[] Reserved3;
+        public uint Unknown3;
+        public uint Unknown4;
 
         public uint ExeFSOffset;
         public uint ExeFSLength;
         public uint ExeFSHashRegionSize;
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-        public byte[] Reserved4;
+        public uint Unknown5;
 
         public uint RomFSOffset;
         public uint RomFSLength;
         public uint RomFSHashRegionSize;
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-        public byte[] Reserved5;
+        public uint Unknown6;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x20)]
         public byte[] ExeFSSuperBlockhash;
@@ -262,19 +261,27 @@ namespace _3DSExplorer.Modules
                     f.AddListItem(0x110, 2, "Maker Code", Header.MakerCode, 2);
                     f.AddListItem(0x112, 2, "Version", Header.Version, 2);
                     f.AddListItem(0x118, 8, "Program ID", Header.ProgramID, 2);
-                    f.AddListItem(0x120, 1, "Temp Flag", Header.TempFlag, 2);
+                    f.AddListItem(0x120, 8, "Temp Flag", Header.TempFlag, 2);
+                    f.AddListItem(0x124, 20, "Unknown 0_0", Header.Unknown0_0, 2);
+                    f.AddListItem(0x144, 20, "Unknown 0_1", Header.Unknown0_1, 2);
                     f.AddListItem(0x150, 0x10, "Product Code", Header.ProductCode, 2);
                     f.AddListItem(0x160, 0x20, "Extended Header Hash", Header.ExtendedHeaderHash, 2);
                     f.AddListItem(0x180, 4, "Extended header size", Header.ExtendedHeaderSize, 2);
-                    f.AddListItem(0x188, 8, "Flags", Header.Flags, 2);
+                    f.AddListItem(0x184, 4, "Unknown 1", Header.Unknown1, 2);
+                    f.AddListItem(0x188, 4, "Unknown 2", Header.Unknown2, 2);
+                    f.AddListItem(0x18C, 4, "Flags", Header.Flags, 2);
                     f.AddListItem(0x190, 4, "Plain region offset [medias]", Header.PlainRegionOffset, 2);
                     f.AddListItem(0x194, 4, "Plain region length [medias]", Header.PlainRegionSize, 2);
+                    f.AddListItem(0x198, 4, "Unknown 3", Header.Unknown3, 2);
+                    f.AddListItem(0x19C, 4, "Unknown 4", Header.Unknown4, 2);
                     f.AddListItem(0x1A0, 4, "ExeFS offset [medias]", Header.ExeFSOffset, 2);
                     f.AddListItem(0x1A4, 4, "ExeFS length [medias]", Header.ExeFSLength, 2);
                     f.AddListItem(0x1A8, 4, "ExeFS hash region length [medias]", Header.ExeFSHashRegionSize, 2);
+                    f.AddListItem(0x1AC, 4, "Unknown 5", Header.Unknown5, 2);
                     f.AddListItem(0x1B0, 4, "RomFS offset [medias]", Header.RomFSOffset, 2);
                     f.AddListItem(0x1B4, 4, "RomFS length [medias]", Header.RomFSLength, 2);
                     f.AddListItem(0x1B8, 4, "RomFS hash region length [medias]", Header.RomFSHashRegionSize, 2);
+                    f.AddListItem(0x1BC, 4, "Unknown 6", Header.Unknown6, 2);
                     f.AddListItem(0x1C0, 0x20, "ExeFS superblock hash", Header.ExeFSSuperBlockhash, 2);
                     f.AddListItem(0x1E0, 0x20, "RomFS superblock hash", Header.RomFSSuperBlockhash, 2);
                     break;
