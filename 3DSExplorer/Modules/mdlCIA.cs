@@ -195,7 +195,10 @@ namespace _3DSExplorer.Modules
         public TreeNode GetFileSystemTopNode()
         {
             var topNode = new TreeNode("CIA", 1, 1);
-            topNode.Nodes.Add(ICN.GetFileSystemTopNode());
+            if (Header.BannerLength > 0)
+            {
+                topNode.Nodes.Add(ICN.GetFileSystemTopNode());
+            }
             return topNode;
         }
     }
