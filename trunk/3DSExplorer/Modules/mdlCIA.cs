@@ -1,10 +1,7 @@
 ﻿using System.Collections;
 using System.IO;
-using System.Text;
 using System.Runtime.InteropServices;
-using System.Drawing;
 using System.Windows.Forms;
-using _3DSExplorer.Utils;
 
 namespace _3DSExplorer.Modules
 {
@@ -15,12 +12,12 @@ namespace _3DSExplorer.Modules
         public uint CertificateChainLength;
         public uint TicketLength;
         public uint TMDLength;
-        public uint BannerLength;
-        public ulong AppLength;
+        public uint MetaLength;
+        public ulong ContentLength;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct CIABannerHeaderEntry
+    public struct CIAMetaHeaderEntry
     {
         public byte Type;
         public byte Index;
@@ -36,8 +33,8 @@ namespace _3DSExplorer.Modules
         public long CertificateChainOffset;
         public long TicketOffset;
         public long TMDOffset;
-        public long AppOffset;
-        public long BannerOffset;
+        public long ContentOffset;
+        public long MetaOffset;
 
         //public ArrayList Certificates; //of CertificateEntry
         //public Ticket Ticket;
@@ -46,13 +43,13 @@ namespace _3DSExplorer.Modules
         public TicketContext TicketContext;
         public TMDContext TMDContext;
 
-        public ArrayList BannerHeaderEntries; //of CIABannerHeaderEntry
+        public ArrayList MetaHeaderEntries; //of CIAMetaHeaderEntry
         public ICNContext ICN;
 
         public enum CIAView
         {
             CIA,
-            Banner
+            Meta
         };
 
         public bool Open(Stream fs)
@@ -67,12 +64,12 @@ namespace _3DSExplorer.Modules
             TMDOffset = TicketOffset + Header.TicketLength;
             if (TMDOffset % 64 != 0)
                 TMDOffset += (64 - TMDOffset % 64);
-            AppOffset = TMDOffset + Header.TMDLength; ;
-            if (AppOffset % 64 != 0)
-                AppOffset += (64 - AppOffset % 64);
-            BannerOffset = AppOffset + (long)Header.AppLength;
-            if (BannerOffset % 64 != 0)
-                BannerOffset += (64 - BannerOffset % 64);
+            ContentOffset = TMDOffset + Header.TMDLength; ;
+            if (ContentOffset % 64 != 0)
+                ContentOffset += (64 - ContentOffset % 64);
+            MetaOffset = ContentOffset + (long)Header.ContentLength;
+            if (MetaOffset % 64 != 0)
+                MetaOffset += (64 - MetaOffset % 64);
 
             fs.Seek(TicketOffset, SeekOrigin.Begin);
             TicketContext = new TicketContext();
@@ -96,17 +93,17 @@ namespace _3DSExplorer.Modules
                 return false;
             }
 
-            if (Header.BannerLength > 0)
+            if (Header.MetaLength > 0)
             {
-                fs.Seek(BannerOffset, SeekOrigin.Begin);
-                BannerHeaderEntries = new ArrayList();
-                var bannerHeaderEntry = MarshalUtil.ReadStruct<CIABannerHeaderEntry>(fs);
-                while (bannerHeaderEntry.Type != 0)
+                fs.Seek(MetaOffset, SeekOrigin.Begin);
+                MetaHeaderEntries = new ArrayList();
+                var metaHeaderEntry = MarshalUtil.ReadStruct<CIAMetaHeaderEntry>(fs);
+                while (metaHeaderEntry.Type != 0)
                 {
-                    BannerHeaderEntries.Add(bannerHeaderEntry);
-                    bannerHeaderEntry = MarshalUtil.ReadStruct<CIABannerHeaderEntry>(fs);
+                    MetaHeaderEntries.Add(metaHeaderEntry);
+                    metaHeaderEntry = MarshalUtil.ReadStruct<CIAMetaHeaderEntry>(fs);
                 }
-                fs.Seek(BannerOffset + 0x400, SeekOrigin.Begin); //Jump to the header
+                fs.Seek(MetaOffset + 0x400, SeekOrigin.Begin); //Jump to the header
                 ICN = new ICNContext();
                 ICN.Open(fs);
             }
@@ -136,21 +133,21 @@ namespace _3DSExplorer.Modules
                     f.AddListItem(8, 4, "Certificate Chain Length", cia.CertificateChainLength, 0);
                     f.AddListItem(12, 4, "Ticket Length", cia.TicketLength, 0);
                     f.AddListItem(16, 4, "TMD Length", cia.TMDLength, 0);
-                    f.AddListItem(20, 4, "Banner Length", cia.BannerLength, 0);
-                    f.AddListItem(24, 8, "App Length", cia.AppLength, 0);
+                    f.AddListItem(20, 4, "Meta Length", cia.MetaLength, 0);
+                    f.AddListItem(24, 8, "Content Length", cia.ContentLength, 0);
 
                     f.AddListItem(0, 8, "Certificate Chain Offset", (ulong)CertificateChainOffset, 1);
                     f.AddListItem(0, 8, "Ticket Offset", (ulong)TicketOffset, 1);
                     f.AddListItem(0, 8, "TMD Offset", (ulong)TMDOffset, 1);
-                    f.AddListItem(0, 8, "App Offset", (ulong)AppOffset, 1);
-                    f.AddListItem(0, 8, "Banner Offset", (ulong)BannerOffset, 1);
+                    f.AddListItem(0, 8, "Content Offset", (ulong)ContentOffset, 1);
+                    f.AddListItem(0, 8, "Meta Offset", (ulong)MetaOffset, 1);
                     break;
-                case CIAView.Banner:
-                    CIABannerHeaderEntry entry;
-                    f.SetGroupHeaders("CIA Banner");
-                    for (var i = 0; i < BannerHeaderEntries.Count; i++)
+                case CIAView.Meta:
+                    CIAMetaHeaderEntry entry;
+                    f.SetGroupHeaders("CIA Meta");
+                    for (var i = 0; i < MetaHeaderEntries.Count; i++)
                     {
-                        entry = (CIABannerHeaderEntry)BannerHeaderEntries[i];
+                        entry = (CIAMetaHeaderEntry)MetaHeaderEntries[i];
                         f.AddListItem(i, 2, "Type " + entry.Type, entry.Index, 0);
                         f.AddListItem(i, 4, "Magic", entry.Magic, 0);
                     }
@@ -161,12 +158,38 @@ namespace _3DSExplorer.Modules
 
         public bool CanCreate()
         {
-            return Header.BannerLength > 0;
+            return Header.MetaLength > 0;
         }
 
         public void Activate(string filePath, int type, object[] values)
         {
-            throw new System.NotImplementedException();
+            var saveFileDialog = new SaveFileDialog { Filter = @"All Files|*.*" };
+            var chunk = (TMDContentChunkRecord)values[0];
+            var offset = (long)values[1];
+            saveFileDialog.FileName = string.Format("content.{0}.{1:X}.bin", chunk.ContentIndex, chunk.ContentID);
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    var fs = File.OpenRead(filePath);
+                    fs.Seek(offset, SeekOrigin.Begin);
+                    var buffer = new byte[chunk.ContentSize];
+                    fs.Read(buffer, 0, buffer.Length);
+                    fs.Close();
+                    /*/decrypt
+                    var iv = new byte[0x10];
+                    iv[0] = (byte) ((chunk.ContentIndex >> 8) & 0xff);
+                    iv[1] = (byte) (chunk.ContentIndex & 0xff);
+                    var key = TicketContext.Ticket.EncryptedTitleKey;
+                    var aes = new Aes128Ctr(key, iv);
+                    aes.TransformBlock(buffer);*/
+                    File.WriteAllBytes(saveFileDialog.FileName, buffer);
+                }
+                catch
+                {
+                    MessageBox.Show(@"Error saving file!");
+                }
+            }
         }
 
         public string GetFileFilter()
@@ -183,9 +206,9 @@ namespace _3DSExplorer.Modules
                 tNode.Nodes.Add(TicketContext.GetExplorerTopNode());
             if (TMDContext != null)
                 tNode.Nodes.Add(TMDContext.GetExplorerTopNode());
-            if (Header.BannerLength > 0)
+            if (Header.MetaLength > 0)
             {
-                var bNode = new TreeNode("Banner") {Tag = TreeViewContextTag.Create(this, (int) CIAView.Banner)};
+                var bNode = new TreeNode("Meta") {Tag = TreeViewContextTag.Create(this, (int) CIAView.Meta)};
                 bNode.Nodes.Add(ICN.GetExplorerTopNode());
                 tNode.Nodes.Add(bNode);
             }
@@ -195,9 +218,28 @@ namespace _3DSExplorer.Modules
         public TreeNode GetFileSystemTopNode()
         {
             var topNode = new TreeNode("CIA", 1, 1);
-            if (Header.BannerLength > 0)
+            if (Header.MetaLength > 0)
             {
                 topNode.Nodes.Add(ICN.GetFileSystemTopNode());
+            }
+            if (TMDContext != null && TMDContext.Chunks.Length > 0) //add content files
+            {
+
+                var contentNode = new TreeNode("Content", 1, 1);
+                topNode.Nodes.Add(contentNode);
+                var offset = (ulong)ContentOffset;
+                for (var i = 0; i < TMDContext.Chunks.Length; i++)
+                {
+                    var filename = string.Format("content.{0}.{1:X}.bin", TMDContext.Chunks[i].ContentIndex,TMDContext.Chunks[i].ContentID);
+                    contentNode.Nodes.Add(
+                        new TreeNode(
+                            TreeListView.TreeListViewControl.CreateMultiColumnNodeText(
+                                filename,TMDContext.Chunks[i].ContentSize.ToString(),"0x" + offset.ToString("X")))
+                            {
+                                Tag = new[] { TreeViewContextTag.Create(this, 0, "Save...",new object[] {TMDContext.Chunks[i], (long)offset}) }
+                            });
+                    offset += TMDContext.Chunks[i].ContentSize;
+                }
             }
             return topNode;
         }
