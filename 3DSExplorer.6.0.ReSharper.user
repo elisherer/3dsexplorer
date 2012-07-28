@@ -1,9 +1,6 @@
 <Configuration>
   <RecentFiles>
     <RecentFiles>
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:Winmm.cs" caret="352" fromTop="0" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:WaveUtil.cs" caret="0" fromTop="0" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:IContext.cs" caret="0" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmImageBox.cs" caret="0" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmInputBox.cs" caret="0" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmXORTool.cs" caret="3603" fromTop="64" />
@@ -13,7 +10,6 @@
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlArchivedCCI.cs" caret="535" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Utils/f:TitleInfo.cs" caret="270" fromTop="9" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:Crc32.cs" caret="0" fromTop="0" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="8988" fromTop="255" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Crypt/f:RSA.cs" caret="2372" fromTop="64" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:TreeListView/f:IColumnsProvider.cs" caret="0" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:TreeListView/f:MultiColumnTreeView.cs" caret="192" fromTop="8" />
@@ -24,45 +20,49 @@
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmAbout.cs" caret="3395" fromTop="19" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:Program.cs" caret="714" fromTop="21" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="447" fromTop="13" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="7352" fromTop="33" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="4160" fromTop="21" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlSaveFlash.cs" caret="8988" fromTop="21" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCIA.cs" caret="7182" fromTop="23" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCGFX.cs" caret="775" fromTop="28" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="945" fromTop="33" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Properties/f:AssemblyInfo.cs" caret="107" fromTop="3" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlICN.cs" caret="0" fromTop="0" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="2434" fromTop="3" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="18112" fromTop="407" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="677" fromTop="26" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCBMD.cs" caret="774" fromTop="32" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlBanner.cs" caret="489" fromTop="21" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlSaveFlash.cs" caret="8988" fromTop="21" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="4160" fromTop="21" />
     </RecentFiles>
     <RecentEdits>
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="3383" fromTop="15" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="5348" fromTop="21" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlBanner.cs" caret="2883" fromTop="26" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlBanner.cs" caret="3173" fromTop="34" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="2403" fromTop="19" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="641" fromTop="23" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:ModuleHelper.cs" caret="1036" fromTop="25" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCBMD.cs" caret="3670" fromTop="28" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCBMD.cs" caret="733" fromTop="21" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCBMD.cs" caret="719" fromTop="19" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCBMD.cs" caret="4398" fromTop="26" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCBMD.cs" caret="4380" fromTop="23" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCBMD.cs" caret="3602" fromTop="10" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlBanner.cs" caret="980" fromTop="27" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlBanner.cs" caret="2115" fromTop="16" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="304" fromTop="10" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="269" fromTop="11" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="172" fromTop="8" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="434" fromTop="11" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="1137" fromTop="30" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="2085" fromTop="25" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="2499" fromTop="35" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="2665" fromTop="5" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="6164" fromTop="33" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="5313" fromTop="25" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="598" fromTop="10" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="758" fromTop="3" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="5716" fromTop="21" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="6307" fromTop="29" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCWAV.cs" caret="976" fromTop="34" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="1836" fromTop="30" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="1981" fromTop="36" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="2127" fromTop="34" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="11429" fromTop="29" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="11048" fromTop="25" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="10667" fromTop="21" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="10192" fromTop="16" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="1638" fromTop="20" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="1315" fromTop="13" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="9658" fromTop="22" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="1316" fromTop="15" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCIA.cs" caret="7589" fromTop="23" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Properties/f:AssemblyInfo.cs" caret="107" fromTop="3" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="2267" fromTop="26" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="7848" fromTop="25" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="1531" fromTop="24" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="1111" fromTop="13" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="4628" fromTop="23" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="5028" fromTop="29" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="2434" fromTop="18" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="16880" fromTop="36" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="7029" fromTop="22" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="12499" fromTop="18" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="14726" fromTop="18" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="16336" fromTop="19" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="15838" fromTop="21" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCXI.cs" caret="18112" fromTop="407" />
     </RecentEdits>
   </RecentFiles>
   <CompletionStatisticsManager>
@@ -217,7 +217,7 @@
       <Item value="outMs" priority="95" />
       <Item value="CWAV`0" priority="31" />
       <Item value="CGFX`0" priority="31" />
-      <Item value="Marshal`0" priority="223" />
+      <Item value="Marshal`0" priority="282" />
       <Item value="imagPos" priority="31" />
       <Item value="params" priority="95" />
       <Item value="IContext`0" priority="159" />
@@ -979,7 +979,7 @@
       <Item value="Length" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:@System.Runtime.InteropServices.Marshal">
-      <Item value="SizeOf`0" priority="107" />
+      <Item value="SizeOf`0" priority="161" />
       <Item value="OffsetOf`0" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:System.Windows.Forms.TreeNodeCollection">
@@ -1363,6 +1363,7 @@
       <Item value="ProgramID" priority="27" />
       <Item value="ExeFSOffset" priority="26" />
       <Item value="ExeFSSize" priority="26" />
+      <Item value="Reserved1" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:_3DSExplorer.Modules.ICNContext">
       <Item value="Open`0" priority="26" />
@@ -1403,6 +1404,7 @@
       <Item value="Unknown0" priority="27" />
       <Item value="CXITitleIDs" priority="22" />
       <Item value="Unknown2" priority="27" />
+      <Item value="UnknownZeros0" priority="27" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:_3DSExplorer.Modules.CCICXIEntry">
       <Item value="Length" priority="26" />

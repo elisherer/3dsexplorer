@@ -22,19 +22,28 @@ namespace _3DSExplorer.Modules
         public uint CCILength;
         public ulong MainTitleID;
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-        public byte[] Unknown0;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+        public byte[] PartitionFStype;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
+        public byte[] PartitionCrypttype;
         
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 13)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
         public CCICXIEntry[] CXIEntries;
-        
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 40)]
+        public byte[] UnknownZeros0;
+
         public ulong CXIFlags;
         //CXI Flags: 
         // byte[5]-byte[7] indicate content type ( system update, application, ... )
         // byte[6] size of media units ( 512*2^byte[6] ) and encryption
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 13)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
         public ulong[] CXITitleIDs;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 40)]
+        public byte[] UnknownZeros1;
 
         public ulong Unknown1;
 
@@ -65,13 +74,13 @@ namespace _3DSExplorer.Modules
 
         private enum CCIActivation
         {
-            SaveCXI
+            SaveNCCH
         };
 
         public bool Open(Stream fs)
         {
             Header = MarshalUtil.ReadStruct<CCIHeader>(fs);
-            CXIContexts = new CXIContext[13];
+            CXIContexts = new CXIContext[8];
             // Read the CXIs
             for (var i = 0; i < CXIContexts.Length;i++ )
                 if (Header.CXIEntries[i].Length > 0)
@@ -107,19 +116,22 @@ namespace _3DSExplorer.Modules
                     f.SetGroupHeaders("Hash", "NCSD");
                     f.AddListItem(0x000, 0x100, "RSA-2048 signature of the NCSD header [SHA-256]", Header.NCSDHeaderSignature, 0);
                     f.AddListItem(0x100, 4, "Magic (='NCSD')", Header.Magic, 1);
-                    f.AddListItem(0x104, 4, "CCI length [medias]", Header.CCILength, 1);
+                    f.AddListItem(0x104, 4, "NCSD length [medias]", Header.CCILength, 1);
                     f.AddListItem(0x108, 8, "Main Title ID", Header.MainTitleID, 1);
-                    f.AddListItem(0x110, 16, "Unknown 0", Header.Unknown0, 1);
-                    for (var i = 0; i < Header.CXIEntries.Length; i++)
+                    f.AddListItem(0x110, 8, "Partitions FS Type", Header.PartitionFStype, 1);
+                    f.AddListItem(0x118, 8, "Partitions Crypt Type", Header.PartitionCrypttype, 1);
+                    for (var i = 0; i < 8; i++)
                     {
-                        f.AddListItem(0x120 + i * 8, 4, "CXI " + i + " offset [medias]", Header.CXIEntries[i].Offset, 1);
-                        f.AddListItem(0x124 + i * 8, 4, "CXI " + i + " length [medias]", Header.CXIEntries[i].Length, 1);
+                        f.AddListItem(0x120 + i * 8, 4, "NCCH " + i + " offset [medias]", Header.CXIEntries[i].Offset, 1);
+                        f.AddListItem(0x124 + i * 8, 4, "NCCH " + i + " length [medias]", Header.CXIEntries[i].Length, 1);
                     }
-                    f.AddListItem(0x188, 8, "CXI Flags", Header.CXIFlags, 1);
-                    for (var i = 0; i < Header.CXITitleIDs.Length; i++)
+                    f.AddListItem(0x160,40, "Unknown Zeros 0", Header.UnknownZeros0, 1);
+                    f.AddListItem(0x188, 8, "NCCH Flags", Header.CXIFlags, 1);
+                    for (var i = 0; i < 8; i++)
                     {
-                        f.AddListItem(0x190 + i * 8, 8, "CXI " + i + " Title ID", Header.CXITitleIDs[i], 1);
+                        f.AddListItem(0x190 + i * 8, 8, "NCCH " + i + " Title ID", Header.CXITitleIDs[i], 1);
                     }
+                    f.AddListItem(0x1D0, 40, "Unknown Zeros 1", Header.UnknownZeros1, 1);
                     f.AddListItem(0x1F8, 8, "Unknown 1", Header.Unknown1, 1);
                     f.AddListItem(0x200, 4, "Always 0xFFFFFFFF", Header.PaddingFF, 1);
                     f.AddListItem(0x204, 252, "Unknown 2", Header.Unknown2, 1);
@@ -141,14 +153,14 @@ namespace _3DSExplorer.Modules
         {
             switch ((CCIActivation)type)
             {
-                case CCIActivation.SaveCXI:
+                case CCIActivation.SaveNCCH:
                     var cxiIndex = (int)values[0];
                     var saveFileDialog = new SaveFileDialog() { Filter = CXIContexts[cxiIndex].GetFileFilter(), FileName = CXIContexts[cxiIndex].TitleInfo.ProductCode };
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         var infs = File.OpenRead(filePath);
                         infs.Seek(Header.CXIEntries[cxiIndex].Offset * 0x200, SeekOrigin.Begin);
-                        SaverProcess.Run("Saving CXI",infs,saveFileDialog.FileName,Header.CXIEntries[cxiIndex].Length*0x200);
+                        SaverProcess.Run("Saving NCCH",infs,saveFileDialog.FileName,Header.CXIEntries[cxiIndex].Length*0x200);
                     }
                     break;
             }
@@ -161,7 +173,7 @@ namespace _3DSExplorer.Modules
 
         public TreeNode GetExplorerTopNode()
         {
-            var tNode = new TreeNode("CCI") { Tag = TreeViewContextTag.Create(this, (int)CCIView.NCSD) };
+            var tNode = new TreeNode("NCSD") { Tag = TreeViewContextTag.Create(this, (int)CCIView.NCSD) };
             for (var i = 0; i < CXIContexts.Length; i++)
                 if (CXIContexts[i] != null)
                 {
@@ -174,13 +186,13 @@ namespace _3DSExplorer.Modules
 
         public TreeNode GetFileSystemTopNode()
         {
-            var tNode = new TreeNode("CCI", 1, 1);
+            var tNode = new TreeNode("NCSD", 1, 1);
             for (var i = 0; i < CXIContexts.Length; i++)
                 if (CXIContexts[i] != null)
                 {
                     var cxiNode = CXIContexts[i].GetFileSystemTopNode();
                     cxiNode.Text = cxiNode.Text + @" " + i;
-                    cxiNode.Tag = new[] {TreeViewContextTag.Create(this, (int) CCIActivation.SaveCXI, "Save CXI...",new object[] { i } )};
+                    cxiNode.Tag = new[] {TreeViewContextTag.Create(this, (int) CCIActivation.SaveNCCH, "Save NCCH...",new object[] { i } )};
                     tNode.Nodes.Add(cxiNode);
                 }
             return tNode;
