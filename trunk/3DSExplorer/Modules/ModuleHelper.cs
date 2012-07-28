@@ -16,6 +16,7 @@ namespace _3DSExplorer.Modules
         MPO,
         CCI,
         CXI,
+        CFA,
         SaveFlash_Decrypted,
         SaveFlash,
         Archive,
@@ -26,10 +27,11 @@ namespace _3DSExplorer.Modules
     {
         //TODO: get this from the modules
         public const string OpenString = 
-            @"All Supported|*.3ds;*.cci;*.cxi;*.csu;*.cbmd;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx;*.icn;*.zip;*.7z|" +
+            @"All Supported|*.3ds;*.cci;*.cxi;*.cfa;*.csu;*.cbmd;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx;*.icn;*.zip;*.7z|" +
             "CTR Cartridge Images (*.cci/3ds/csu)|*.3ds;*.cci;*.csu|"+
             "Archived CCI (zip/7z)|*.zip;*.7z|" +
-            "CTR Executable (*.cxi)|*.cxi|" +
+            "CTR Executable Images (*.cxi)|*.cxi|" +
+            "CTR File Archives (*.cfa)|*.cfa|" +
             "CTR Banners (*.bnr)|*.bnr|" +
             "CTR Banner Model Data (*.cbmd)|*.cbmd|" +
             "CTR Graphics (*.cgfx)|*.cgfx|" +
@@ -96,6 +98,7 @@ namespace _3DSExplorer.Modules
                 case ".cbmd":
                     type = ModuleType.CBMD;
                     break;
+                case ".cfa":
                 case ".cxi":
                     type = ModuleType.CXI;
                     break;

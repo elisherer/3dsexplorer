@@ -197,7 +197,7 @@ namespace _3DSExplorer.Modules
         public TitleInfo TitleInfo;
         //public CXIExtendedHeader ExtendedHeader;
 
-        public long OffsetInCCI;
+        public long OffsetInNCSD;
 
         public enum CXIView
         {
@@ -209,6 +209,7 @@ namespace _3DSExplorer.Modules
         {
             RomFS,
             ExeFS,
+            ExHeader,
             ReplaceRomFS,
             ReplaceExeFS
         }
@@ -217,10 +218,10 @@ namespace _3DSExplorer.Modules
         {
             PlainRegion = new CXIPlaingRegion();
             byte[] plainRegionBuffer;
-            OffsetInCCI = fs.Position;
+            OffsetInNCSD = fs.Position;
             Header = MarshalUtil.ReadStruct<CXIHeader>(fs);
             // get Plaing Region
-            fs.Seek(OffsetInCCI + Header.PlainRegionOffset * 0x200, SeekOrigin.Begin);
+            fs.Seek(OffsetInNCSD + Header.PlainRegionOffset * 0x200, SeekOrigin.Begin);
             plainRegionBuffer = new byte[Header.PlainRegionSize * 0x200];
             fs.Read(plainRegionBuffer, 0, plainRegionBuffer.Length);
             PlainRegion = CXIHeader.getPlainRegionStringsFrom(plainRegionBuffer);
@@ -256,11 +257,11 @@ namespace _3DSExplorer.Modules
                     f.AddListItem(0x000, 0x100, "RSA-2048 signature of the NCCH header [SHA-256]", Header.NCCHHeaderSignature, 1);
 
                     f.AddListItem(0x100, 4, "Magic (='NCCH')", Header.Magic, 2);
-                    f.AddListItem(0x104, 4, "CXI length [medias]", Header.CXILength, 2);
+                    f.AddListItem(0x104, 4, "NCCH length [medias]", Header.CXILength, 2);
                     f.AddListItem(0x108, 8, "Title ID", Header.TitleID, 2);
                     f.AddListItem(0x110, 2, "Maker Code", Header.MakerCode, 2);
                     f.AddListItem(0x112, 2, "Version", Header.Version, 2);
-                    f.AddListItem(0x118, 8, "Program ID", Header.ProgramID, 2);
+                    f.AddListItem(0x118, 8, "Program ID", Header.TitleID, 2);
                     f.AddListItem(0x120, 8, "Temp Flag", Header.TempFlag, 2);
                     f.AddListItem(0x124, 20, "Unknown 0_0", Header.Unknown0_0, 2);
                     f.AddListItem(0x144, 20, "Unknown 0_1", Header.Unknown0_1, 2);
@@ -305,7 +306,7 @@ namespace _3DSExplorer.Modules
             {
                 case CXIActivation.RomFS:
                 case CXIActivation.ExeFS:
-                    var isRom = (CXIActivation) type == CXIActivation.RomFS;
+                    var isRom = (CXIActivation)type == CXIActivation.RomFS;    
                     var saveFileDialog = new SaveFileDialog() { Filter = "Binary files (*.bin)|*.bin"};
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
@@ -320,7 +321,7 @@ namespace _3DSExplorer.Modules
                             else
                             {
                                 var infs = File.OpenRead(filePath);
-                                infs.Seek((OffsetInCCI + (isRom ? Header.RomFSOffset :Header.ExeFSOffset)) * 0x200, SeekOrigin.Begin);
+                                infs.Seek((OffsetInNCSD + (isRom ? Header.RomFSOffset :Header.ExeFSOffset)) * 0x200, SeekOrigin.Begin);
                                 var buffer = new byte[(isRom ? Header.RomFSLength : Header.ExeFSLength) * 0x200];
                                 infs.Read(buffer, 0, buffer.Length);
                                 infs.Close();
@@ -342,6 +343,43 @@ namespace _3DSExplorer.Modules
                         }
                     }
                     break;
+                case CXIActivation.ExHeader:
+                    saveFileDialog = new SaveFileDialog() { Filter = "Binary files (*.bin)|*.bin" };
+                    if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        var strKey = InputBox.ShowDialog("Please Enter Key:\nPress OK with empty key to save encrypted");
+                        if (strKey != null) //Cancel wasn't pressed
+                        {
+                            // returns (null if error, byte[0] on Empty, byte[16] on valid)
+                            var key = StringUtil.ParseKeyStringToByteArray(strKey);
+
+                            if (key == null)
+                                MessageBox.Show(@"Error parsing key string (must be a multiple of 2 and made of hex letters).");
+                            else
+                            {
+                                var infs = File.OpenRead(filePath);
+                                infs.Seek(OffsetInNCSD + Marshal.SizeOf(Header), SeekOrigin.Begin); //right after the header
+                                var buffer = new byte[Header.ExtendedHeaderSize];
+                                infs.Read(buffer, 0, buffer.Length);
+                                infs.Close();
+                                if (key.Length > 0)
+                                {
+                                    var iv = new byte[0x10];
+                                    for (var i = 0; i < 8; i++)
+                                        iv[i] = 0;
+                                    Buffer.BlockCopy(Header.ProgramID, 0, iv, 8, 8); //TODO: change to TitleID
+
+                                    var aes = new Aes128Ctr(key, iv);
+                                    aes.TransformBlock(buffer);
+                                }
+                                var outpath = saveFileDialog.FileName;
+                                var outfs = File.OpenWrite(outpath);
+                                outfs.Write(buffer, 0, buffer.Length);
+                                outfs.Close();
+                            }
+                        }
+                    }
+                    break;
             }
         }
 
@@ -352,7 +390,7 @@ namespace _3DSExplorer.Modules
 
         public TreeNode GetExplorerTopNode()
         {
-            var tNode = new TreeNode(string.Format("CXI ({0})", StringUtil.CharArrayToString(Header.ProductCode))) { Tag = TreeViewContextTag.Create(this, (int)CXIView.NCCH) };
+            var tNode = new TreeNode(string.Format("NCCH ({0})", StringUtil.CharArrayToString(Header.ProductCode))) { Tag = TreeViewContextTag.Create(this, (int)CXIView.NCCH) };
             if (Header.PlainRegionSize > 0) //Add PlainRegions
                 tNode.Nodes.Add("PlainRegion").Tag = TreeViewContextTag.Create(this, (int)CXIView.NCCHPlainRegion);
             return tNode;
@@ -360,14 +398,22 @@ namespace _3DSExplorer.Modules
 
         public TreeNode GetFileSystemTopNode()
         {
-            var tNode = new TreeNode(string.Format("CXI ({0})",StringUtil.CharArrayToString(Header.ProductCode)), 1, 1);
-                // Thanks to Ris312 for that fix!
+            var tNode = new TreeNode(string.Format("NCCH ({0})",StringUtil.CharArrayToString(Header.ProductCode)), 1, 1);
+                // Thanks to Ris312 for that fix! ExtendedHeaderSize
+            if (Header.ExtendedHeaderSize > 0)
+                tNode.Nodes.Add(new TreeNode(
+                    TreeListView.TreeListViewControl.CreateMultiColumnNodeText(
+                        "ExHeader.bin",
+                        (Header.ExtendedHeaderSize).ToString(),
+                        StringUtil.ToHexString(6, (ulong)(OffsetInNCSD + Marshal.SizeOf(Header)))
+                        )) { Tag = new[] { TreeViewContextTag.Create(this, (int)CXIActivation.ExHeader, "Save...") } });                
+
                 if (Header.ExeFSLength > 0)
                     tNode.Nodes.Add(new TreeNode(
                         TreeListView.TreeListViewControl.CreateMultiColumnNodeText(
                             "ExeFS.bin",
                             (Header.ExeFSLength * 0x200).ToString(),
-                            StringUtil.ToHexString(6, (ulong)OffsetInCCI + Header.ExeFSOffset * 0x200)
+                            StringUtil.ToHexString(6, (ulong)OffsetInNCSD + Header.ExeFSOffset * 0x200)
                             )) 
                             { Tag = new[] {TreeViewContextTag.Create(this, (int)CXIActivation.ExeFS,"Save...")} });
 
@@ -376,7 +422,7 @@ namespace _3DSExplorer.Modules
                             TreeListView.TreeListViewControl.CreateMultiColumnNodeText(
                                 "RomFS.bin",
                                 (Header.RomFSLength * 0x200).ToString(),
-                                StringUtil.ToHexString(6, (ulong)OffsetInCCI + Header.RomFSOffset * 0x200)
+                                StringUtil.ToHexString(6, (ulong)OffsetInNCSD + Header.RomFSOffset * 0x200)
                                 )) { Tag = new[] { TreeViewContextTag.Create(this, (int)CXIActivation.RomFS, "Save...") } });
             return tNode;
         }
