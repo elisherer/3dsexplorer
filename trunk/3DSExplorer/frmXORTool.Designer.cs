@@ -68,11 +68,14 @@
             // 
             // txtFirst
             // 
+            this.txtFirst.AllowDrop = true;
             this.txtFirst.Location = new System.Drawing.Point(12, 92);
             this.txtFirst.Name = "txtFirst";
             this.txtFirst.ReadOnly = true;
             this.txtFirst.Size = new System.Drawing.Size(221, 20);
             this.txtFirst.TabIndex = 0;
+            this.txtFirst.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileDragDrop);
+            this.txtFirst.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileDragEnter);
             // 
             // btnFirst
             // 
@@ -86,11 +89,14 @@
             // 
             // txtSecond
             // 
+            this.txtSecond.AllowDrop = true;
             this.txtSecond.Location = new System.Drawing.Point(12, 146);
             this.txtSecond.Name = "txtSecond";
             this.txtSecond.ReadOnly = true;
             this.txtSecond.Size = new System.Drawing.Size(221, 20);
             this.txtSecond.TabIndex = 2;
+            this.txtSecond.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileDragDrop);
+            this.txtSecond.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileDragEnter);
             // 
             // btnSecond
             // 

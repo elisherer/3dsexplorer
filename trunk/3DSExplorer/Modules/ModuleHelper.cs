@@ -8,6 +8,7 @@ namespace _3DSExplorer.Modules
     {
         Unknown = -1,
         Banner = 0,
+        DARC,
         CIA,
         CBMD,
         CGFX,
@@ -27,8 +28,9 @@ namespace _3DSExplorer.Modules
     {
         //TODO: get this from the modules
         public const string OpenString = 
-            @"All Supported|*.3ds;*.cci;*.cxi;*.cfa;*.csu;*.cbmd;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx;*.icn;*.zip;*.7z|" +
+            @"All Supported|*.darc;*.bcma;*.3ds;*.cci;*.cxi;*.cfa;*.csu;*.cbmd;*.bin;*.sav;*.tmd;*.cia;*.mpo;*.bnr;*.bcwav;*.cwav;*.cgfx;*.icn;*.zip;*.7z|" +
             "CTR Cartridge Images (*.cci/3ds/csu)|*.3ds;*.cci;*.csu|"+
+            "DArchives (darc) |*.darc;*.bcma|" +
             "Archived CCI (zip/7z)|*.zip;*.7z|" +
             "CTR Executable Images (*.cxi)|*.cxi|" +
             "CTR File Archives (*.cfa)|*.cfa|" +
@@ -47,6 +49,8 @@ namespace _3DSExplorer.Modules
         {
             switch (type)
             {
+                case ModuleType.DARC:
+                    return new DARCContext();
                 case ModuleType.Banner:
                     return new BannerContext();
                 case ModuleType.CGFX:
@@ -86,6 +90,9 @@ namespace _3DSExplorer.Modules
 
             switch (extension)
             {
+                case ".darc":
+                    type = ModuleType.DARC;
+                    break;
                 case ".zip":
                 case ".7z":
                     type = ModuleType.Archive;
@@ -149,6 +156,8 @@ namespace _3DSExplorer.Modules
                         type = ModuleType.ICN;
                     else if (magic[0] == 'N' && magic[1] == 'C' && magic[2] == 'C' && magic[3] == 'H')
                         type = ModuleType.CXI;
+                    else if (magic[0] == 'd' && magic[1] == 'a' && magic[2] == 'r' && magic[3] == 'c')
+                        type = ModuleType.DARC;
                     else if (fs.Length >= 0x104) // > 256+4
                     {
                         //CCI CHECK

@@ -32,13 +32,13 @@ namespace _3DSExplorer
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
-            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.splitContainerLeft = new System.Windows.Forms.SplitContainer();
@@ -46,6 +46,10 @@ namespace _3DSExplorer
             this.treeView = new System.Windows.Forms.TreeView();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.lblFileListTitle = new System.Windows.Forms.Label();
+            this.lvFileTree = new _3DSExplorer.TreeListView.TreeListViewControl();
+            this.cName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imlFS = new System.Windows.Forms.ImageList(this.components);
             this.lstInfo = new System.Windows.Forms.ListView();
             this.chOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -68,6 +72,7 @@ namespace _3DSExplorer
             this.menuToolsHashTool = new System.Windows.Forms.ToolStripMenuItem();
             this.menuTools3DVideo = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsQuickCRC = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuToolsDSDecmpGUI = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpUpdateTitleDb = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpSep1 = new System.Windows.Forms.ToolStripSeparator();
@@ -78,10 +83,6 @@ namespace _3DSExplorer
             this.menuHelpVisit3DBrew = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpVisitNDev = new System.Windows.Forms.ToolStripMenuItem();
             this.menuLogo = new System.Windows.Forms.ToolStripMenuItem();
-            this.lvFileTree = new _3DSExplorer.TreeListView.TreeListViewControl();
-            this.cName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -109,8 +110,8 @@ namespace _3DSExplorer
             // 
             this.splitContainer.Panel2.BackColor = System.Drawing.Color.White;
             this.splitContainer.Panel2.Controls.Add(this.lstInfo);
-            this.splitContainer.Size = new System.Drawing.Size(1076, 425);
-            this.splitContainer.SplitterDistance = 263;
+            this.splitContainer.Size = new System.Drawing.Size(1106, 425);
+            this.splitContainer.SplitterDistance = 322;
             this.splitContainer.SplitterWidth = 2;
             this.splitContainer.TabIndex = 2;
             // 
@@ -133,8 +134,8 @@ namespace _3DSExplorer
             this.splitContainerLeft.Panel2.BackgroundImage = global::_3DSExplorer.Properties.Resources.menuBack;
             this.splitContainerLeft.Panel2.Controls.Add(this.lblFileListTitle);
             this.splitContainerLeft.Panel2.Controls.Add(this.lvFileTree);
-            this.splitContainerLeft.Size = new System.Drawing.Size(263, 425);
-            this.splitContainerLeft.SplitterDistance = 199;
+            this.splitContainerLeft.Size = new System.Drawing.Size(322, 425);
+            this.splitContainerLeft.SplitterDistance = 133;
             this.splitContainerLeft.TabIndex = 2;
             // 
             // lblTreeViewTitle
@@ -160,7 +161,7 @@ namespace _3DSExplorer
             this.treeView.Location = new System.Drawing.Point(0, 23);
             this.treeView.Name = "treeView";
             this.treeView.SelectedImageIndex = 0;
-            this.treeView.Size = new System.Drawing.Size(261, 174);
+            this.treeView.Size = new System.Drawing.Size(320, 108);
             this.treeView.TabIndex = 0;
             this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
             // 
@@ -181,6 +182,39 @@ namespace _3DSExplorer
             this.lblFileListTitle.Text = "File List";
             this.lblFileListTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // lvFileTree
+            // 
+            this.lvFileTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvFileTree.AutoScroll = true;
+            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.cName,
+            this.cSize,
+            this.cOffset});
+            this.lvFileTree.ImageList = this.imlFS;
+            this.lvFileTree.Location = new System.Drawing.Point(0, 23);
+            this.lvFileTree.Name = "lvFileTree";
+            this.lvFileTree.SelectedNode = null;
+            this.lvFileTree.Size = new System.Drawing.Size(320, 264);
+            this.lvFileTree.TabIndex = 1;
+            this.lvFileTree.TreeDoubleClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeDoubleClicked);
+            this.lvFileTree.TreeMouseClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeMouseClicked);
+            // 
+            // cName
+            // 
+            this.cName.Text = "Name";
+            this.cName.Width = 190;
+            // 
+            // cSize
+            // 
+            this.cSize.Text = "Size";
+            this.cSize.Width = 50;
+            // 
+            // cOffset
+            // 
+            this.cOffset.Text = "Offset";
+            // 
             // imlFS
             // 
             this.imlFS.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imlFS.ImageStream")));
@@ -199,34 +233,34 @@ namespace _3DSExplorer
             this.chHexValue});
             this.lstInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstInfo.FullRowSelect = true;
-            listViewGroup8.Header = "";
-            listViewGroup8.Name = "lvg0";
-            listViewGroup9.Header = "";
-            listViewGroup9.Name = "lvg1";
-            listViewGroup10.Header = "";
-            listViewGroup10.Name = "lvg2";
-            listViewGroup11.Header = "";
-            listViewGroup11.Name = "lvg3";
-            listViewGroup12.Header = "";
-            listViewGroup12.Name = "lvg4";
-            listViewGroup13.Header = "";
-            listViewGroup13.Name = "lvg5";
-            listViewGroup14.Header = "";
-            listViewGroup14.Name = "lvg6";
+            listViewGroup1.Header = "";
+            listViewGroup1.Name = "lvg0";
+            listViewGroup2.Header = "";
+            listViewGroup2.Name = "lvg1";
+            listViewGroup3.Header = "";
+            listViewGroup3.Name = "lvg2";
+            listViewGroup4.Header = "";
+            listViewGroup4.Name = "lvg3";
+            listViewGroup5.Header = "";
+            listViewGroup5.Name = "lvg4";
+            listViewGroup6.Header = "";
+            listViewGroup6.Name = "lvg5";
+            listViewGroup7.Header = "";
+            listViewGroup7.Name = "lvg6";
             this.lstInfo.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup8,
-            listViewGroup9,
-            listViewGroup10,
-            listViewGroup11,
-            listViewGroup12,
-            listViewGroup13,
-            listViewGroup14});
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3,
+            listViewGroup4,
+            listViewGroup5,
+            listViewGroup6,
+            listViewGroup7});
             this.lstInfo.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lstInfo.HideSelection = false;
             this.lstInfo.Location = new System.Drawing.Point(0, 0);
             this.lstInfo.MultiSelect = false;
             this.lstInfo.Name = "lstInfo";
-            this.lstInfo.Size = new System.Drawing.Size(809, 423);
+            this.lstInfo.Size = new System.Drawing.Size(780, 423);
             this.lstInfo.TabIndex = 1;
             this.lstInfo.UseCompatibleStateImageBehavior = false;
             this.lstInfo.View = System.Windows.Forms.View.Details;
@@ -283,7 +317,7 @@ namespace _3DSExplorer
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.menuStrip.Size = new System.Drawing.Size(1076, 24);
+            this.menuStrip.Size = new System.Drawing.Size(1106, 24);
             this.menuStrip.TabIndex = 3;
             this.menuStrip.Text = "Main Menu";
             // 
@@ -334,7 +368,8 @@ namespace _3DSExplorer
             this.menuToolsXORTool,
             this.menuToolsHashTool,
             this.menuTools3DVideo,
-            this.menuToolsQuickCRC});
+            this.menuToolsQuickCRC,
+            this.menuToolsDSDecmpGUI});
             this.menuTools.Name = "menuTools";
             this.menuTools.Size = new System.Drawing.Size(48, 20);
             this.menuTools.Text = "&Tools";
@@ -371,6 +406,13 @@ namespace _3DSExplorer
             this.menuToolsQuickCRC.Size = new System.Drawing.Size(168, 22);
             this.menuToolsQuickCRC.Text = "&Quick CRC32";
             this.menuToolsQuickCRC.Click += new System.EventHandler(this.menuToolsQuickCRC_Click);
+            // 
+            // menuToolsDSDecmpGUI
+            // 
+            this.menuToolsDSDecmpGUI.Name = "menuToolsDSDecmpGUI";
+            this.menuToolsDSDecmpGUI.Size = new System.Drawing.Size(168, 22);
+            this.menuToolsDSDecmpGUI.Text = "DSDecmp GUI";
+            this.menuToolsDSDecmpGUI.Click += new System.EventHandler(this.menuToolsDSDecmpGUI_Click);
             // 
             // menuHelp
             // 
@@ -453,45 +495,12 @@ namespace _3DSExplorer
             this.menuLogo.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
             this.menuLogo.Click += new System.EventHandler(this.menuLogo_Click);
             // 
-            // lvFileTree
-            // 
-            this.lvFileTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvFileTree.AutoScroll = true;
-            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.cName,
-            this.cSize,
-            this.cOffset});
-            this.lvFileTree.ImageList = this.imlFS;
-            this.lvFileTree.Location = new System.Drawing.Point(0, 23);
-            this.lvFileTree.Name = "lvFileTree";
-            this.lvFileTree.SelectedNode = null;
-            this.lvFileTree.Size = new System.Drawing.Size(261, 198);
-            this.lvFileTree.TabIndex = 1;
-            this.lvFileTree.TreeDoubleClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeDoubleClicked);
-            this.lvFileTree.TreeMouseClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeMouseClicked);
-            // 
-            // cName
-            // 
-            this.cName.Text = "Name";
-            this.cName.Width = 150;
-            // 
-            // cSize
-            // 
-            this.cSize.Text = "Size";
-            this.cSize.Width = 50;
-            // 
-            // cOffset
-            // 
-            this.cOffset.Text = "Offset";
-            // 
             // frmExplorer
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1076, 449);
+            this.ClientSize = new System.Drawing.Size(1106, 449);
             this.Controls.Add(this.splitContainer);
             this.Controls.Add(this.menuStrip);
             this.Font = new System.Drawing.Font("Tahoma", 8.25F);
@@ -561,6 +570,7 @@ namespace _3DSExplorer
         private System.ComponentModel.BackgroundWorker bwUpdateTitleDb;
         private System.Windows.Forms.ListView lstInfo;
         private System.Windows.Forms.ToolStripMenuItem menuLogo;
+        private System.Windows.Forms.ToolStripMenuItem menuToolsDSDecmpGUI;
     }
 }
 

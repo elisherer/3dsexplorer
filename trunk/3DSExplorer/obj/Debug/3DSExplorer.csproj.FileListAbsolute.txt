@@ -44,3 +44,4 @@ d:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.TreeListView.TreeListV
 d:\dev\3DSExplorer\3DSExplorer\bin\SharpCompress.dll
 d:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.TreeListView.MultiColumnTreeView.resources
 d:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.TreeListView.TreeListViewControl.resources
+d:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmDSDecmpGUI.resources

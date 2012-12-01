@@ -89,6 +89,7 @@
     <Compile Include="Crypt\Aes128Ctr.cs" />
     <Compile Include="Crypt\Crc32.cs" />
     <Compile Include="Crypt\RSA.cs" />
+    <Compile Include="DSDecmp\CompositeCTRFormat.cs" />
     <Compile Include="DSDecmp\Exceptions\InputTooLargeException.cs" />
     <Compile Include="DSDecmp\Exceptions\NotEnoughDataException.cs" />
     <Compile Include="DSDecmp\Exceptions\StreamTooShortException.cs" />
@@ -123,6 +124,12 @@
     <Compile Include="frmCheckSum.Designer.cs">
       <DependentUpon>frmCheckSum.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmDSDecmpGUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDSDecmpGUI.Designer.cs">
+      <DependentUpon>frmDSDecmpGUI.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmImageBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -130,6 +137,7 @@
       <DependentUpon>frmImageBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Crypt\LZSS.cs" />
+    <Compile Include="Modules\mdlSaveFlash.cs" />
     <Compile Include="Modules\mdlCBMD.cs" />
     <Compile Include="Modules\mdlICN.cs" />
     <Compile Include="Modules\IContext.cs" />
@@ -142,7 +150,7 @@
     <Compile Include="Modules\mdlMPO.cs" />
     <Compile Include="Modules\mdlCCI.cs" />
     <Compile Include="Modules\mdlArchivedCCI.cs" />
-    <Compile Include="Modules\mdlSaveFlash.cs" />
+    <Compile Include="Modules\mdlDARC.cs" />
     <Compile Include="Modules\mdlTicket.cs" />
     <Compile Include="Modules\mdlTMD.cs" />
     <Compile Include="Crypt\CRC16.cs" />
@@ -196,6 +204,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmCheckSum.resx">
       <DependentUpon>frmCheckSum.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDSDecmpGUI.resx">
+      <DependentUpon>frmDSDecmpGUI.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmXORTool.resx">
       <DependentUpon>frmXORTool.cs</DependentUpon>

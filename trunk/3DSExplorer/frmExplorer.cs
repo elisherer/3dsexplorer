@@ -235,6 +235,12 @@ namespace _3DSExplorer
         {
             frmCheckSum.ShowDialog(_filePath);
         }
+
+        private void menuToolsDSDecmpGUI_Click(object sender, EventArgs e)
+        {
+            openForm<frmDSDecmpGUI>();
+        }
+
         #endregion
 
         #region MENU Help
