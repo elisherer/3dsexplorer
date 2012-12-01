@@ -50,14 +50,13 @@ namespace _3DSExplorer
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                var firstByteArray = File.ReadAllBytes(txtFirst.Text);
-                var secondByteArray = File.ReadAllBytes(txtSecond.Text);
-                var xored = new byte[Math.Max(firstByteArray.Length, secondByteArray.Length)];
-                XorBlock(xored, firstByteArray, secondByteArray);
-                File.WriteAllBytes(saveFileDialog.FileName, xored);
-            }
+            if (string.IsNullOrEmpty(txtFirst.Text) || string.IsNullOrEmpty(txtSecond.Text) ||
+                saveFileDialog.ShowDialog() != DialogResult.OK) return;
+            var firstByteArray = File.ReadAllBytes(txtFirst.Text);
+            var secondByteArray = File.ReadAllBytes(txtSecond.Text);
+            var xored = new byte[Math.Max(firstByteArray.Length, secondByteArray.Length)];
+            XorBlock(xored, firstByteArray, secondByteArray);
+            File.WriteAllBytes(saveFileDialog.FileName, xored);
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
@@ -105,5 +104,21 @@ namespace _3DSExplorer
             else
                 MessageBox.Show("Error with length (must be a multiple of 2 or key & iv must be 16 bytes)");
         }
+
+        #region Drag & Drop
+
+        private void FileDragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop, false))
+                e.Effect = DragDropEffects.All;
+        }
+
+        private void FileDragDrop(object sender, DragEventArgs e)
+        {
+            var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            ((TextBox)sender).Text = files[0];
+        }
+
+        #endregion
     }
 }

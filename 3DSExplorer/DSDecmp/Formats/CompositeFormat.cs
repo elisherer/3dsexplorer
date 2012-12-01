@@ -15,7 +15,7 @@ namespace DSDecmp.Formats
         /// <summary>
         /// The actual list of formats this format is somposed of.
         /// </summary>
-        private List<CompressionFormat> formats;
+        public List<CompressionFormat> formats;
 
 
         #region Constructors
@@ -44,7 +44,7 @@ namespace DSDecmp.Formats
         /// </summary>
         public override bool Supports(System.IO.Stream stream, long inLength)
         {
-            foreach (CompositeFormat fmt in this.formats)
+            foreach (CompressionFormat fmt in this.formats)
             {
                 if (fmt.Supports(stream, inLength))
                     return true;
