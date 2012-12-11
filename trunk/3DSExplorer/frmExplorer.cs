@@ -241,6 +241,11 @@ namespace _3DSExplorer
             openForm<frmDSDecmpGUI>();
         }
 
+        private void menuToolsQRTool_Click(object sender, EventArgs e)
+        {
+            openForm<frmQRTool>();
+        }
+
         #endregion
 
         #region MENU Help
@@ -433,6 +438,8 @@ namespace _3DSExplorer
         {
             menuLogo.Margin = new Padding(Width - 280,0,0,0);
         }
+
+
     }
 
 }

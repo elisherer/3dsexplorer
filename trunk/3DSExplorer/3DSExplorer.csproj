@@ -84,6 +84,9 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="zxing">
+      <HintPath>.\zxing.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Crypt\Aes128Ctr.cs" />
@@ -106,6 +109,12 @@
     <Compile Include="DSDecmp\Utils\IOUtils.cs" />
     <Compile Include="DSDecmp\Utils\LZUtil.cs" />
     <Compile Include="DSDecmp\Utils\SimpleReversePrioQueue.cs" />
+    <Compile Include="frmQRTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmQRTool.Designer.cs">
+      <DependentUpon>frmQRTool.cs</DependentUpon>
+    </Compile>
     <Compile Include="frm3DVideo.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -195,6 +204,9 @@
     <Compile Include="Utils\WaveUtil.cs" />
     <Compile Include="Utils\Winmm.cs" />
     <Compile Include="Utils\YouTube.cs" />
+    <EmbeddedResource Include="frmQRTool.resx">
+      <DependentUpon>frmQRTool.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frm3DVideo.resx">
       <DependentUpon>frm3DVideo.cs</DependentUpon>
     </EmbeddedResource>
@@ -278,6 +290,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />
+    <None Include="Resources\text_align_left.png" />
+    <None Include="Resources\page_white_zip.png" />
+    <None Include="Resources\barcode-2d.png" />
     <None Include="Resources\watermark.png" />
     <None Include="Resources\code.png" />
     <None Include="Resources\cog.png" />

@@ -1,9 +1,6 @@
 <Configuration>
   <RecentFiles>
     <RecentFiles>
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.Designer.cs" caret="28643" fromTop="0" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:Program.cs" caret="714" fromTop="21" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Properties/f:AssemblyInfo.cs" caret="107" fromTop="3" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlICN.cs" caret="0" fromTop="0" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlBanner.cs" caret="489" fromTop="21" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlCCI.cs" caret="0" fromTop="0" />
@@ -26,32 +23,22 @@
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:DSDecmp/d:Formats/d:Nitro/f:CompositeFormats.cs" caret="1532" fromTop="10" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmAbout.cs" caret="2100" fromTop="15" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:Modules/f:mdlSaveFlash.cs" caret="19994" fromTop="0" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="5944" fromTop="10" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmXORTool.cs" caret="4061" fromTop="29" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:DSDecmp/d:Formats/f:CompositeFormat.cs" caret="1558" fromTop="29" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:DSDecmp/f:CompositeCTRFormat.cs" caret="499" fromTop="11" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="785" fromTop="24" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.Designer.cs" caret="0" fromTop="0" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.Designer.cs" caret="7665" fromTop="14" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.cs" caret="3271" fromTop="80" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="14202" fromTop="15" />
     </RecentFiles>
     <RecentEdits>
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:DSDecmp/f:CompositeCTRFormat.cs" caret="717" fromTop="18" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:DSDecmp/f:CompositeCTRFormat.cs" caret="999" fromTop="26" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="1920" fromTop="20" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="1003" fromTop="18" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="15828" fromTop="16" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="8385" fromTop="26" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="877" fromTop="14" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:DSDecmp/f:CompositeCTRFormat.cs" caret="1628" fromTop="11" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="2184" fromTop="26" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="1544" fromTop="21" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="1711" fromTop="26" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="1801" fromTop="30" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="1300" fromTop="13" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:DSDecmp/f:CompositeCTRFormat.cs" caret="1588" fromTop="32" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:DSDecmp/d:Formats/f:CompositeFormat.cs" caret="602" fromTop="17" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="225" fromTop="10" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="386" fromTop="11" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="2088" fromTop="13" />
-      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="36946" fromTop="128" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="6299" fromTop="20" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="2960" fromTop="27" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="3635" fromTop="36" />
@@ -63,6 +50,19 @@
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="3590" fromTop="12" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmDSDecmpGUI.cs" caret="3543" fromTop="13" />
       <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/d:DSDecmp/d:Formats/f:CompositeFormat.cs" caret="1558" fromTop="29" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.cs" caret="317" fromTop="13" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="15964" fromTop="12" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="8517" fromTop="12" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.Designer.cs" caret="7665" fromTop="14" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.Designer.cs" caret="7665" fromTop="14" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.Designer.cs" caret="7665" fromTop="14" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmExplorer.cs" caret="15978" fromTop="15" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.cs" caret="3840" fromTop="17" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.cs" caret="5013" fromTop="10" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.cs" caret="1323" fromTop="20" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.cs" caret="5158" fromTop="20" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.cs" caret="413" fromTop="5" />
+      <File id="91B5ECFA-3A39-43D2-B8D3-60080AAC52BE/f:frmQRTool.cs" caret="2965" fromTop="9" />
     </RecentEdits>
   </RecentFiles>
   <CompletionStatisticsManager>
@@ -786,6 +786,7 @@
       <Item value="index" priority="31" />
       <Item value="cmbAlgorithm" priority="31" />
       <Item value="TextBox`0" priority="32" />
+      <Item value="txtQRText" priority="31" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:@System.TypedReference">
       <Item value="MakeTypedReference`0" priority="26" />
@@ -1218,7 +1219,7 @@
     </ItemStatistics>
     <ItemStatistics item="Qualified:System.Windows.Forms.TextBox">
       <Item value="Visible" priority="53" />
-      <Item value="Text" priority="539" />
+      <Item value="Text" priority="566" />
       <Item value="Enabled" priority="26" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:System.Windows.Forms.Button">
