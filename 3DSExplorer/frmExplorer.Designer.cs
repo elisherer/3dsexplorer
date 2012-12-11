@@ -73,6 +73,7 @@ namespace _3DSExplorer
             this.menuTools3DVideo = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsQuickCRC = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsDSDecmpGUI = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuToolsQRTool = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpUpdateTitleDb = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpSep1 = new System.Windows.Forms.ToolStripSeparator();
@@ -369,7 +370,8 @@ namespace _3DSExplorer
             this.menuToolsHashTool,
             this.menuTools3DVideo,
             this.menuToolsQuickCRC,
-            this.menuToolsDSDecmpGUI});
+            this.menuToolsDSDecmpGUI,
+            this.menuToolsQRTool});
             this.menuTools.Name = "menuTools";
             this.menuTools.Size = new System.Drawing.Size(48, 20);
             this.menuTools.Text = "&Tools";
@@ -409,10 +411,19 @@ namespace _3DSExplorer
             // 
             // menuToolsDSDecmpGUI
             // 
+            this.menuToolsDSDecmpGUI.Image = global::_3DSExplorer.Properties.Resources.page_white_zip;
             this.menuToolsDSDecmpGUI.Name = "menuToolsDSDecmpGUI";
             this.menuToolsDSDecmpGUI.Size = new System.Drawing.Size(168, 22);
             this.menuToolsDSDecmpGUI.Text = "DSDecmp GUI";
             this.menuToolsDSDecmpGUI.Click += new System.EventHandler(this.menuToolsDSDecmpGUI_Click);
+            // 
+            // menuToolsQRTool
+            // 
+            this.menuToolsQRTool.Image = global::_3DSExplorer.Properties.Resources.barcode_2d;
+            this.menuToolsQRTool.Name = "menuToolsQRTool";
+            this.menuToolsQRTool.Size = new System.Drawing.Size(168, 22);
+            this.menuToolsQRTool.Text = "Q&R Tool";
+            this.menuToolsQRTool.Click += new System.EventHandler(this.menuToolsQRTool_Click);
             // 
             // menuHelp
             // 
@@ -571,6 +582,7 @@ namespace _3DSExplorer
         private System.Windows.Forms.ListView lstInfo;
         private System.Windows.Forms.ToolStripMenuItem menuLogo;
         private System.Windows.Forms.ToolStripMenuItem menuToolsDSDecmpGUI;
+        private System.Windows.Forms.ToolStripMenuItem menuToolsQRTool;
     }
 }
 
