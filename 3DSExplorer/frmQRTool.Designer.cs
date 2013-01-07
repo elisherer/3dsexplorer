@@ -33,10 +33,10 @@
             this.btnBinToQR = new System.Windows.Forms.Button();
             this.lblor0 = new System.Windows.Forms.Label();
             this.lblor1 = new System.Windows.Forms.Label();
-            this.lblDragBinToQr = new System.Windows.Forms.Label();
-            this.lblDragQrToBin = new System.Windows.Forms.Label();
             this.ButtonFromText = new System.Windows.Forms.Button();
             this.txtQRText = new System.Windows.Forms.TextBox();
+            this.lblDragBinToQr = new System.Windows.Forms.Label();
+            this.lblDragQrToBin = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnQRToBin
@@ -77,6 +77,23 @@
             this.lblor1.TabIndex = 4;
             this.lblor1.Text = "or";
             // 
+            // ButtonFromText
+            // 
+            this.ButtonFromText.Location = new System.Drawing.Point(151, 89);
+            this.ButtonFromText.Name = "ButtonFromText";
+            this.ButtonFromText.Size = new System.Drawing.Size(62, 22);
+            this.ButtonFromText.TabIndex = 7;
+            this.ButtonFromText.Text = "From text";
+            this.ButtonFromText.UseVisualStyleBackColor = true;
+            this.ButtonFromText.Click += new System.EventHandler(this.ButtonFromTextClick);
+            // 
+            // txtQRText
+            // 
+            this.txtQRText.Location = new System.Drawing.Point(10, 90);
+            this.txtQRText.Name = "txtQRText";
+            this.txtQRText.Size = new System.Drawing.Size(139, 20);
+            this.txtQRText.TabIndex = 10;
+            // 
             // lblDragBinToQr
             // 
             this.lblDragBinToQr.AllowDrop = true;
@@ -110,23 +127,6 @@
             this.lblDragQrToBin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.lblDragQrToBin.DragDrop += new System.Windows.Forms.DragEventHandler(this.DragDrop);
             this.lblDragQrToBin.DragEnter += new System.Windows.Forms.DragEventHandler(this.DragEnter);
-            // 
-            // ButtonFromText
-            // 
-            this.ButtonFromText.Location = new System.Drawing.Point(156, 89);
-            this.ButtonFromText.Name = "ButtonFromText";
-            this.ButtonFromText.Size = new System.Drawing.Size(59, 22);
-            this.ButtonFromText.TabIndex = 7;
-            this.ButtonFromText.Text = "From text";
-            this.ButtonFromText.UseVisualStyleBackColor = true;
-            this.ButtonFromText.Click += new System.EventHandler(this.ButtonFromTextClick);
-            // 
-            // txtQRText
-            // 
-            this.txtQRText.Location = new System.Drawing.Point(10, 90);
-            this.txtQRText.Name = "txtQRText";
-            this.txtQRText.Size = new System.Drawing.Size(139, 20);
-            this.txtQRText.TabIndex = 10;
             // 
             // frmQRTool
             // 

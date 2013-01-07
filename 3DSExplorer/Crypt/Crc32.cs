@@ -8,9 +8,11 @@ namespace _3DSExplorer.Crypt
     {
         private const uint DefaultPolynomial = 0xedb88320;
         private const uint DefaultSeed = 0xffffffff;
+        private const uint DefaultXorout = 0;
 
         private uint _hash;
         private readonly uint _seed;
+        private readonly uint _xorout;
         private readonly uint[] _table;
         private static uint[] _defaultTable;
 
@@ -21,10 +23,11 @@ namespace _3DSExplorer.Crypt
             _hash = _seed;
         }
 
-        public Crc32(uint polynomial, uint seed)
+        public Crc32(uint polynomial, uint seed = 0, uint xorout = 0)
         {
             _table = InitializeTable(polynomial);
             _seed = seed;
+            _xorout = xorout;
             _hash = seed;
         }
 
@@ -35,7 +38,7 @@ namespace _3DSExplorer.Crypt
 
         protected override void HashCore(byte[] buffer, int start, int length)
         {
-            _hash = CalculateHash(_table, _hash, buffer, start, length);
+            _hash = CalculateHash(_table, _hash, _xorout, buffer, start, length);
         }
 
         protected override byte[] HashFinal()
@@ -52,17 +55,17 @@ namespace _3DSExplorer.Crypt
 
         public static uint Compute(byte[] buffer)
         {
-            return ~CalculateHash(InitializeTable(DefaultPolynomial), DefaultSeed, buffer, 0, buffer.Length);
+            return ~CalculateHash(InitializeTable(DefaultPolynomial), DefaultSeed, DefaultXorout, buffer, 0, buffer.Length);
         }
 
-        public static uint Compute(uint seed, byte[] buffer)
+        public static uint Compute(uint seed, uint xorout, byte[] buffer)
         {
-            return ~CalculateHash(InitializeTable(DefaultPolynomial), seed, buffer, 0, buffer.Length);
+            return ~CalculateHash(InitializeTable(DefaultPolynomial), seed, xorout, buffer, 0, buffer.Length);
         }
 
-        public static uint Compute(uint polynomial, uint seed, byte[] buffer)
+        public static uint Compute(uint polynomial, uint seed, uint xorout, byte[] buffer)
         {
-            return ~CalculateHash(InitializeTable(polynomial), seed, buffer, 0, buffer.Length);
+            return ~CalculateHash(InitializeTable(polynomial), seed, xorout, buffer, 0, buffer.Length);
         }
 
         private static uint[] InitializeTable(uint polynomial)
@@ -88,7 +91,7 @@ namespace _3DSExplorer.Crypt
             return createTable;
         }
 
-        private static uint CalculateHash(uint[] table, uint seed, byte[] buffer, int start, int size)
+        private static uint CalculateHash(uint[] table, uint seed, uint xorout, byte[] buffer, int start, int size)
         {
             var crc = seed;
             for (var i = start; i < size; i++)
@@ -96,7 +99,7 @@ namespace _3DSExplorer.Crypt
                 {
                     crc = (crc >> 8) ^ table[buffer[i] ^ crc & 0xff];
                 }
-            return crc;
+            return crc ^ xorout;
         }
 
         private byte[] uintToBigEndianBytes(uint x)
@@ -174,22 +177,22 @@ namespace _3DSExplorer.Crypt
         #endregion
 
         private readonly BackgroundWorker _bw;
-        private ProcessFinished _processFinished;
-        private ProgressChanged _progressChanged;
+        private readonly ProcessFinished _processFinished;
+        private readonly ProgressChanged _progressChanged;
 
         public QuickCrc32(ProgressChanged pc, ProcessFinished pf)
         {
             _processFinished = pf;
             _progressChanged = pc;
             _bw = new BackgroundWorker {WorkerReportsProgress = true, WorkerSupportsCancellation = true};
-            _bw.ProgressChanged += _bw_ProgressChanged;
-            _bw.RunWorkerCompleted += _bw_RunWorkerCompleted;
-            _bw.DoWork += _bw_DoWork;
+            _bw.ProgressChanged += BwProgressChanged;
+            _bw.RunWorkerCompleted += BwRunWorkerCompleted;
+            _bw.DoWork += BwDoWork;
         }
 
         #region Background Worker
 
-        private void _bw_DoWork(object sender, DoWorkEventArgs e)
+        private void BwDoWork(object sender, DoWorkEventArgs e)
         {
             var crc = 0xffffffff;
             var fs = File.OpenRead(e.Argument.ToString());
@@ -211,12 +214,12 @@ namespace _3DSExplorer.Crypt
             e.Result = crc ^ 0xffffffff;
         }
 
-        private void _bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BwRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             _processFinished(e.Cancelled ? 0 : (uint)e.Result);
         }
 
-        private void _bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void BwProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             _progressChanged(e.ProgressPercentage);
         }

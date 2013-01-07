@@ -48,3 +48,4 @@ d:\dev\3DS\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmDSDecmpGUI.resource
 d:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmQRTool.resources
 d:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmDSDecmpGUI.resources
 d:\dev\3DSExplorer\3DSExplorer\bin\zxing.dll
+d:\dev\3DSExplorer\3DSExplorer\obj\Debug\_3DSExplorer.frmParentalControl.resources

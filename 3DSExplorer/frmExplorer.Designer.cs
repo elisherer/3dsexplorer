@@ -32,13 +32,13 @@ namespace _3DSExplorer
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmExplorer));
-            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("", System.Windows.Forms.HorizontalAlignment.Left);
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.splitContainerLeft = new System.Windows.Forms.SplitContainer();
@@ -74,6 +74,7 @@ namespace _3DSExplorer
             this.menuToolsQuickCRC = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsDSDecmpGUI = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsQRTool = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuToolsParentalControlUnlocker = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpUpdateTitleDb = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpSep1 = new System.Windows.Forms.ToolStripSeparator();
@@ -234,28 +235,28 @@ namespace _3DSExplorer
             this.chHexValue});
             this.lstInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstInfo.FullRowSelect = true;
-            listViewGroup1.Header = "";
-            listViewGroup1.Name = "lvg0";
-            listViewGroup2.Header = "";
-            listViewGroup2.Name = "lvg1";
-            listViewGroup3.Header = "";
-            listViewGroup3.Name = "lvg2";
-            listViewGroup4.Header = "";
-            listViewGroup4.Name = "lvg3";
-            listViewGroup5.Header = "";
-            listViewGroup5.Name = "lvg4";
-            listViewGroup6.Header = "";
-            listViewGroup6.Name = "lvg5";
-            listViewGroup7.Header = "";
-            listViewGroup7.Name = "lvg6";
+            listViewGroup8.Header = "";
+            listViewGroup8.Name = "lvg0";
+            listViewGroup9.Header = "";
+            listViewGroup9.Name = "lvg1";
+            listViewGroup10.Header = "";
+            listViewGroup10.Name = "lvg2";
+            listViewGroup11.Header = "";
+            listViewGroup11.Name = "lvg3";
+            listViewGroup12.Header = "";
+            listViewGroup12.Name = "lvg4";
+            listViewGroup13.Header = "";
+            listViewGroup13.Name = "lvg5";
+            listViewGroup14.Header = "";
+            listViewGroup14.Name = "lvg6";
             this.lstInfo.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2,
-            listViewGroup3,
-            listViewGroup4,
-            listViewGroup5,
-            listViewGroup6,
-            listViewGroup7});
+            listViewGroup8,
+            listViewGroup9,
+            listViewGroup10,
+            listViewGroup11,
+            listViewGroup12,
+            listViewGroup13,
+            listViewGroup14});
             this.lstInfo.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lstInfo.HideSelection = false;
             this.lstInfo.Location = new System.Drawing.Point(0, 0);
@@ -371,7 +372,8 @@ namespace _3DSExplorer
             this.menuTools3DVideo,
             this.menuToolsQuickCRC,
             this.menuToolsDSDecmpGUI,
-            this.menuToolsQRTool});
+            this.menuToolsQRTool,
+            this.menuToolsParentalControlUnlocker});
             this.menuTools.Name = "menuTools";
             this.menuTools.Size = new System.Drawing.Size(48, 20);
             this.menuTools.Text = "&Tools";
@@ -380,7 +382,7 @@ namespace _3DSExplorer
             // 
             this.menuToolsXORTool.Image = global::_3DSExplorer.Properties.Resources.select_by_intersection;
             this.menuToolsXORTool.Name = "menuToolsXORTool";
-            this.menuToolsXORTool.Size = new System.Drawing.Size(168, 22);
+            this.menuToolsXORTool.Size = new System.Drawing.Size(212, 22);
             this.menuToolsXORTool.Text = "&XOR Tool";
             this.menuToolsXORTool.Click += new System.EventHandler(this.menuToolsXORTool_Click);
             // 
@@ -388,7 +390,7 @@ namespace _3DSExplorer
             // 
             this.menuToolsHashTool.Image = global::_3DSExplorer.Properties.Resources.magnifier;
             this.menuToolsHashTool.Name = "menuToolsHashTool";
-            this.menuToolsHashTool.Size = new System.Drawing.Size(168, 22);
+            this.menuToolsHashTool.Size = new System.Drawing.Size(212, 22);
             this.menuToolsHashTool.Text = "&Hash Tool";
             this.menuToolsHashTool.Click += new System.EventHandler(this.menuToolsHashTool_Click);
             // 
@@ -396,7 +398,7 @@ namespace _3DSExplorer
             // 
             this.menuTools3DVideo.Image = global::_3DSExplorer.Properties.Resources.ico_3d_glasses_32;
             this.menuTools3DVideo.Name = "menuTools3DVideo";
-            this.menuTools3DVideo.Size = new System.Drawing.Size(168, 22);
+            this.menuTools3DVideo.Size = new System.Drawing.Size(212, 22);
             this.menuTools3DVideo.Text = "3D &Video Creator";
             this.menuTools3DVideo.Click += new System.EventHandler(this.menuTools3DVideo_Click);
             // 
@@ -405,7 +407,7 @@ namespace _3DSExplorer
             this.menuToolsQuickCRC.Enabled = false;
             this.menuToolsQuickCRC.Image = global::_3DSExplorer.Properties.Resources.code;
             this.menuToolsQuickCRC.Name = "menuToolsQuickCRC";
-            this.menuToolsQuickCRC.Size = new System.Drawing.Size(168, 22);
+            this.menuToolsQuickCRC.Size = new System.Drawing.Size(212, 22);
             this.menuToolsQuickCRC.Text = "&Quick CRC32";
             this.menuToolsQuickCRC.Click += new System.EventHandler(this.menuToolsQuickCRC_Click);
             // 
@@ -413,17 +415,25 @@ namespace _3DSExplorer
             // 
             this.menuToolsDSDecmpGUI.Image = global::_3DSExplorer.Properties.Resources.page_white_zip;
             this.menuToolsDSDecmpGUI.Name = "menuToolsDSDecmpGUI";
-            this.menuToolsDSDecmpGUI.Size = new System.Drawing.Size(168, 22);
-            this.menuToolsDSDecmpGUI.Text = "DSDecmp GUI";
+            this.menuToolsDSDecmpGUI.Size = new System.Drawing.Size(212, 22);
+            this.menuToolsDSDecmpGUI.Text = "&DSDecmp GUI";
             this.menuToolsDSDecmpGUI.Click += new System.EventHandler(this.menuToolsDSDecmpGUI_Click);
             // 
             // menuToolsQRTool
             // 
             this.menuToolsQRTool.Image = global::_3DSExplorer.Properties.Resources.barcode_2d;
             this.menuToolsQRTool.Name = "menuToolsQRTool";
-            this.menuToolsQRTool.Size = new System.Drawing.Size(168, 22);
+            this.menuToolsQRTool.Size = new System.Drawing.Size(212, 22);
             this.menuToolsQRTool.Text = "Q&R Tool";
             this.menuToolsQRTool.Click += new System.EventHandler(this.menuToolsQRTool_Click);
+            // 
+            // menuToolsParentalControlUnlocker
+            // 
+            this.menuToolsParentalControlUnlocker.Image = global::_3DSExplorer.Properties.Resources.parental;
+            this.menuToolsParentalControlUnlocker.Name = "menuToolsParentalControlUnlocker";
+            this.menuToolsParentalControlUnlocker.Size = new System.Drawing.Size(212, 22);
+            this.menuToolsParentalControlUnlocker.Text = "Parental &Control Unlocker";
+            this.menuToolsParentalControlUnlocker.Click += new System.EventHandler(this.menuToolsParentalControlUnlocker_Click);
             // 
             // menuHelp
             // 
@@ -583,6 +593,7 @@ namespace _3DSExplorer
         private System.Windows.Forms.ToolStripMenuItem menuLogo;
         private System.Windows.Forms.ToolStripMenuItem menuToolsDSDecmpGUI;
         private System.Windows.Forms.ToolStripMenuItem menuToolsQRTool;
+        private System.Windows.Forms.ToolStripMenuItem menuToolsParentalControlUnlocker;
     }
 }
 

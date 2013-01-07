@@ -130,6 +130,9 @@
   <data name="cube_d" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\cube_d.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="page_white_zip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\page_white_zip.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="cube_s" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\cube_s.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -157,6 +160,9 @@
   <data name="spinner" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\spinner.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="text_align_left" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\text_align_left.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="menuBack" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\menuBack.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -181,10 +187,7 @@
   <data name="cube_3" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\cube_3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="page_white_zip" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\page_white_zip.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="text_align_left" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\text_align_left.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="parental" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\parental.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

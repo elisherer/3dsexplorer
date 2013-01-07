@@ -246,6 +246,11 @@ namespace _3DSExplorer
             openForm<frmQRTool>();
         }
 
+        private void menuToolsParentalControlUnlocker_Click(object sender, EventArgs e)
+        {
+            openForm<frmParentalControl>();
+        }
+
         #endregion
 
         #region MENU Help
@@ -438,7 +443,6 @@ namespace _3DSExplorer
         {
             menuLogo.Margin = new Padding(Width - 280,0,0,0);
         }
-
 
     }
 
