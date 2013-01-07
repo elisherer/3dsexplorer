@@ -109,6 +109,12 @@
     <Compile Include="DSDecmp\Utils\IOUtils.cs" />
     <Compile Include="DSDecmp\Utils\LZUtil.cs" />
     <Compile Include="DSDecmp\Utils\SimpleReversePrioQueue.cs" />
+    <Compile Include="frmParentalControl.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmParentalControl.Designer.cs">
+      <DependentUpon>frmParentalControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmQRTool.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -204,6 +210,9 @@
     <Compile Include="Utils\WaveUtil.cs" />
     <Compile Include="Utils\Winmm.cs" />
     <Compile Include="Utils\YouTube.cs" />
+    <EmbeddedResource Include="frmParentalControl.resx">
+      <DependentUpon>frmParentalControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmQRTool.resx">
       <DependentUpon>frmQRTool.cs</DependentUpon>
     </EmbeddedResource>
@@ -290,6 +299,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="3ds_cube_icon.ico" />
+    <None Include="Resources\parental.png" />
     <None Include="Resources\text_align_left.png" />
     <None Include="Resources\page_white_zip.png" />
     <None Include="Resources\barcode-2d.png" />

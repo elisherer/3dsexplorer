@@ -193,6 +193,13 @@ namespace _3DSExplorer.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap parental {
+            get {
+                object obj = ResourceManager.GetObject("parental", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap select_by_intersection {
             get {
                 object obj = ResourceManager.GetObject("select_by_intersection", resourceCulture);
