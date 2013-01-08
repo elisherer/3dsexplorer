@@ -41,6 +41,7 @@ namespace _3DSExplorer.Utils
                     currentSection[line.Substring(0, eqPos).Trim()] = line.Substring(eqPos + 1).Trim();
                 }
             }
+            reader.Close();
             Loaded = true;
         }
 

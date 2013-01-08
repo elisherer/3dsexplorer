@@ -67,6 +67,18 @@ namespace _3DSExplorer
             lvi.Group = lstInfo.Groups[group];
             lstInfo.Items.Add(lvi);
         }
+
+        public void AddListItem(int offset, int size, string description, float value, int group)
+        {
+            var lvi = new ListViewItem("0x" + offset.ToString("X3"));
+            lvi.SubItems.Add(size.ToString());
+            lvi.SubItems.Add(description);
+            lvi.SubItems.Add(value.ToString());
+            lvi.SubItems.Add(StringUtil.ToHexString(size * 2, value));
+            lvi.Group = lstInfo.Groups[group];
+            lstInfo.Items.Add(lvi);
+        }
+
         public void AddListItem(int offset, int size, string description, byte[] value, int group)
         {
             var lvi = new ListViewItem("0x" + offset.ToString("X3"));
@@ -425,8 +437,9 @@ namespace _3DSExplorer
                 fs.Close();
                 e.Result = true;
             }
-            catch
+            catch (Exception ex)
             {
+                e.Result = ex.Message;
                 //No harm done...possibly no internet connection
             }
         }
@@ -436,7 +449,7 @@ namespace _3DSExplorer
             if (e.Result != null && e.Result is Boolean && (bool)e.Result)
                 MessageBox.Show("Title.db file updated please restart application for changes to take effect.");
             else
-                MessageBox.Show("There was an error while trying to update the title.db file..");
+                MessageBox.Show("There was an error while trying to update the title.db file.." + Environment.NewLine + e.Result);
         }
 
         private void frmExplorer_Resize(object sender, EventArgs e)

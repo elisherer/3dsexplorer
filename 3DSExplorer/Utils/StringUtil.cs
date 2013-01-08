@@ -7,6 +7,7 @@ namespace _3DSExplorer
     {
         public static string ByteArrayToString(byte[] array)
         {
+            if (array == null) return "NULL";
             int i;
             var arraystring = string.Empty;
             for (i = 0; i < array.Length && i < 40; i++)
@@ -28,6 +29,7 @@ namespace _3DSExplorer
 
         public static string CharArrayToString(char[] array)
         {
+            if (array == null) return string.Empty;
             int i;
             var arraystring = string.Empty;
             for (i = 0; i < array.Length; i++)
@@ -42,6 +44,13 @@ namespace _3DSExplorer
         {
             var formatString = "{0:X" + digits + "}";
             return "0x" + String.Format(formatString, number);
+        }
+
+        public static string ToHexString(int digits, float number)
+        {
+            var formatString = "{0:X" + digits + "}";
+            var unumber = BitConverter.ToUInt32(BitConverter.GetBytes(number),0);
+            return "0x" + String.Format(formatString, unumber);
         }
 
         public static byte[] ParseKeyStringToByteArray(string str)
