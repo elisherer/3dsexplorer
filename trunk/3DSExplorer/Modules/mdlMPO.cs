@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -21,13 +20,23 @@ namespace _3DSExplorer.Modules
     public struct NintendoNote
     {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
-        public char[] Magic;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x26)]
-        public byte[] Unknown;
+        public char[] Magic; //4
 
-        public ushort Parallax;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x14)]
-        public byte[] Unknown2;
+        public uint Type; //4
+        public uint TimeStamp; //4
+        public uint Padding0; //4
+        public uint TitleIDLow; // 4
+        public uint Flags; // 4
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x4)]
+        public byte[] ConsoleID; //4
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0xC)]
+        public byte[] Padding1; //12
+        public float Parallax; //4
+        public uint Padding2; //4
+        public ushort Categories; //2
+        public ushort Filters; //2
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0xC)]
+        public byte[] Padding3; //12
     }
 
     public class MPOContext : IContext
@@ -52,7 +61,6 @@ namespace _3DSExplorer.Modules
         
         private byte[] LeftImageBytes, RightImageBytes;
         private Image LeftImage, RightImage, AnaglyphImage, RightLaxxedImage, LeftLaxxedImage;
-        private int Parallax;
 
         private IFD[] _ifds;
         private byte[] _firstIFDData;
@@ -249,24 +257,26 @@ namespace _3DSExplorer.Modules
                         memStream.Seek(4, SeekOrigin.Current);
                         _firstIFDData = new byte[_ifds[0].CountValue];
                         memStream.Read(_firstIFDData, 0, _firstIFDData.Length);
-                        _nintendoNote = MarshalUtil.ReadStructBE<NintendoNote>(memStream);
+                        _nintendoNote = MarshalUtil.ReadStruct<NintendoNote>(memStream);
                         memStream.Close();
-                        Parallax = ExtractParallax(_nintendoNote.Parallax);
                         break;
                     }
                 }
+                var px = _nintendoNote.Parallax == 0 ? -10 : _nintendoNote.Parallax;
+
                 //make images for animation
-                LeftLaxxedImage = new Bitmap(LeftImage.Width + Parallax, LeftImage.Height);
-                RightLaxxedImage = new Bitmap(RightImage.Width + Parallax, RightImage.Height);
+                LeftLaxxedImage = new Bitmap(LeftImage.Width + (int)px, LeftImage.Height);
+                RightLaxxedImage = new Bitmap(RightImage.Width + (int)px, RightImage.Height);
                 var g = Graphics.FromImage(LeftLaxxedImage);
-                g.DrawImage(LeftImage, new Rectangle(0, 0, RightImage.Width + Parallax, RightImage.Height), new Rectangle(0, 0, LeftImage.Width + Parallax, LeftImage.Height), GraphicsUnit.Pixel);
+                g.DrawImage(LeftImage, new Rectangle(0, 0, RightImage.Width + (int)px, RightImage.Height), new Rectangle(0, 0, LeftImage.Width + (int)px, LeftImage.Height), GraphicsUnit.Pixel);
                 g.Dispose();
                 g = Graphics.FromImage(RightLaxxedImage);
-                g.DrawImage(RightImage, new Rectangle(0, 0, RightImage.Width + Parallax, RightImage.Height), new Rectangle(-Parallax, 0, RightImage.Width + Parallax, RightImage.Height), GraphicsUnit.Pixel);
+                g.DrawImage(RightImage, new Rectangle(0, 0, RightImage.Width + (int)px, RightImage.Height), new Rectangle(-(int)px, 0, RightImage.Width + (int)px, RightImage.Height), GraphicsUnit.Pixel);
                 g.Dispose();
 
                 //make anaglyph
-                AnaglyphImage = Anaglyph.MakeAnaglyph(LeftImage, RightImage, (new Anaglyph()).HalfColorAnaglyph, Parallax);
+
+                AnaglyphImage = Anaglyph.MakeAnaglyph(LeftImage, RightImage, (new Anaglyph()).HalfColorAnaglyph, (int)px);
 
                 return true;
             }
@@ -434,19 +444,31 @@ namespace _3DSExplorer.Modules
                 case MPOView.MPOExtensions:
                     break;
                 case MPOView.MakerNote:
-                    f.SetGroupHeaders("IFD","Nintendo MarkerNote","Extracted Data");
-                    f.AddListItem(0, 2, "IFD Count", (uint)_ifds.Length, 0);
-                    for (var i = 0; i < _ifds.Length;i++ )
-                        f.AddListItem((2+i*12).ToString(), "12", "IFD", "Tag = " + _ifds[i].Tag.ToString("X4"), string.Format("Type={0}, Count/Value={1}, Value/Offset={2}", _ifds[i].Type, _ifds[i].CountValue, _ifds[i].ValueOffset), 0);
+                    f.SetGroupHeaders("IFD","First IFD","Nintendo MarkerNote");
+                    if (_ifds != null)
+                    {
+                        f.AddListItem(0, 2, "IFD Count", (uint) _ifds.Length, 0);
+                        for (var i = 0; i < _ifds.Length; i++)
+                            f.AddListItem((2 + i*12).ToString(), "12", "IFD", "Tag = " + _ifds[i].Tag.ToString("X4"),
+                                          string.Format("Type={0}, Count/Value={1}, Value/Offset={2}", _ifds[i].Type,
+                                                        _ifds[i].CountValue, _ifds[i].ValueOffset), 0);
 
-                    
-                    f.AddListItem(0, _firstIFDData.Length, "First IFD data", _firstIFDData, 1);
-                    f.AddListItem(0, 4, "Magic", _nintendoNote.Magic, 1);
-                    f.AddListItem(0, 0x26, "Unknown 0", _nintendoNote.Unknown, 1);
-                    f.AddListItem(0, 2, "Encoded Parallax", _nintendoNote.Parallax, 1);
-                    f.AddListItem(0, 0x14, "Unknown 1", _nintendoNote.Unknown2, 1);
-
-                    f.AddListItem("", "4", "Parallax", Parallax.ToString(), "",2);
+                        f.AddListItem(0, _firstIFDData.Length, "First IFD data", _firstIFDData, 1);
+                    }
+                    f.AddListItem(0, 4, "Magic", _nintendoNote.Magic, 2);
+                    f.AddListItem(4, 4, "Type", _nintendoNote.Type, 2);
+                    f.AddListItem(8, 4, "Time stamp", _nintendoNote.TimeStamp, 2);
+                    f.AddListItem("","","","",(new DateTime(2000,1,1,0,0,0)).AddSeconds(_nintendoNote.TimeStamp).ToString(),2);
+                    f.AddListItem(12, 4, "Padding 0", _nintendoNote.Padding0, 2);
+                    f.AddListItem(16, 4, "Title ID Low", _nintendoNote.TitleIDLow, 2);
+                    f.AddListItem(20, 4, "Flags", _nintendoNote.Flags, 2);
+                    f.AddListItem(24, 4, "Console ID", _nintendoNote.ConsoleID, 2);
+                    f.AddListItem(28, 12, "Padding 1", _nintendoNote.Padding1, 2);
+                    f.AddListItem(40, 4, "Parallax", _nintendoNote.Parallax, 2);
+                    f.AddListItem(44, 4, "Padding 2", _nintendoNote.Padding2, 2);
+                    f.AddListItem(48, 2, "Categories", _nintendoNote.Categories, 2);
+                    f.AddListItem(50, 2, "Filters", _nintendoNote.Filters, 2);
+                    f.AddListItem(52, 12, "Padding 3", _nintendoNote.Padding3, 2);
                     break;
             }
             f.AutoAlignColumns();
