@@ -9,26 +9,22 @@ namespace _3DSExplorer.Crypt
         private const uint DefaultPolynomial = 0xedb88320;
         private const uint DefaultSeed = 0xffffffff;
         private const uint DefaultXorout = 0;
+        private const bool DefaultRev = false;
 
         private uint _hash;
+        private readonly bool _rev;
         private readonly uint _seed;
         private readonly uint _xorout;
         private readonly uint[] _table;
         private static uint[] _defaultTable;
 
-        public Crc32()
-        {
-            _table = InitializeTable(DefaultPolynomial);
-            _seed = DefaultSeed;
-            _hash = _seed;
-        }
-
-        public Crc32(uint polynomial, uint seed = 0, uint xorout = 0)
+        public Crc32(uint polynomial = 0xedb88320, uint seed = 0xffffffff, uint xorout = 0, bool rev = false)
         {
             _table = InitializeTable(polynomial);
             _seed = seed;
             _xorout = xorout;
             _hash = seed;
+            _rev = rev;
         }
 
         public override void Initialize()
@@ -38,7 +34,7 @@ namespace _3DSExplorer.Crypt
 
         protected override void HashCore(byte[] buffer, int start, int length)
         {
-            _hash = CalculateHash(_table, _hash, _xorout, buffer, start, length);
+            _hash = CalculateHash(_table, _hash, _xorout, buffer, start, length, _rev);
         }
 
         protected override byte[] HashFinal()
@@ -55,17 +51,17 @@ namespace _3DSExplorer.Crypt
 
         public static uint Compute(byte[] buffer)
         {
-            return ~CalculateHash(InitializeTable(DefaultPolynomial), DefaultSeed, DefaultXorout, buffer, 0, buffer.Length);
+            return CalculateHash(InitializeTable(DefaultPolynomial), DefaultSeed, DefaultXorout, buffer, 0, buffer.Length, DefaultRev);
         }
 
         public static uint Compute(uint seed, uint xorout, byte[] buffer)
         {
-            return ~CalculateHash(InitializeTable(DefaultPolynomial), seed, xorout, buffer, 0, buffer.Length);
+            return CalculateHash(InitializeTable(DefaultPolynomial), seed, xorout, buffer, 0, buffer.Length, DefaultRev);
         }
 
-        public static uint Compute(uint polynomial, uint seed, uint xorout, byte[] buffer)
+        public static uint Compute(uint polynomial, uint seed, uint xorout, byte[] buffer, bool rev = false)
         {
-            return ~CalculateHash(InitializeTable(polynomial), seed, xorout, buffer, 0, buffer.Length);
+            return CalculateHash(InitializeTable(polynomial), seed, xorout, buffer, 0, buffer.Length, rev);
         }
 
         private static uint[] InitializeTable(uint polynomial)
@@ -91,7 +87,7 @@ namespace _3DSExplorer.Crypt
             return createTable;
         }
 
-        private static uint CalculateHash(uint[] table, uint seed, uint xorout, byte[] buffer, int start, int size)
+        private static uint CalculateHash(uint[] table, uint seed, uint xorout, byte[] buffer, int start, int size, bool rev)
         {
             var crc = seed;
             for (var i = start; i < size; i++)
@@ -99,7 +95,8 @@ namespace _3DSExplorer.Crypt
                 {
                     crc = (crc >> 8) ^ table[buffer[i] ^ crc & 0xff];
                 }
-            return crc ^ xorout;
+            crc ^= xorout;
+            return rev ? ~crc : crc;
         }
 
         private byte[] uintToBigEndianBytes(uint x)
