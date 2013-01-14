@@ -27,14 +27,14 @@ namespace _3DSExplorer
             var array = Encoding.ASCII.GetBytes(str);
 
             var poly = comboAlgorithm.SelectedIndex == 0 ? 0xEDBA6320 : 0xEDB88320;
-            var crc = ~Crc32.Compute(poly, 0xFFFFFFFF, 0x0000AAAA, array);
+            var crc = Crc32.Compute(poly, 0xFFFFFFFF, 0x0000AAAA, array);
             crc += (uint) (comboAlgorithm.SelectedIndex == 0 ? 0x00001657 : 0x000014C1);
             if (comboAlgorithm.SelectedIndex == 0)
             {
-                ulong yll = (crc + 1)*0xA7C5AC47;
-                var yhi = (uint) (yll >> 48); //shl 6 bytes
-                yhi *= 0xFFFFF3CB;
-                crc += (yhi << 5);
+                var crclong = (crc + 1)*(ulong)0xA7C5AC47;
+                var crchi = (uint)(crclong >> 48); //shr 6 bytes
+                crchi *= 0xFFFFF3CB;
+                crc += (crchi << 5);
             }
             crc = crc % 100000;
 
