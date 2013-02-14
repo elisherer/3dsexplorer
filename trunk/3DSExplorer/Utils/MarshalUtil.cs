@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Reflection;
 
 namespace _3DSExplorer
 {
@@ -53,57 +54,58 @@ namespace _3DSExplorer
 
             fs.Read(buffer, 0, Marshal.SizeOf(typeof(T)));
             var handle = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-            var temp = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
+            var typedObject = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
             handle.Free();
-            var t = temp.GetType();
-            var fieldInfo = t.GetFields();
+            var type = typedObject.GetType();
+            var fieldInfo = type.GetFields();
+			var typedReference = TypedReference.MakeTypedReference(typedObject, fieldInfo);
+			
             foreach (var fi in fieldInfo)
             {
                 if (fi.FieldType == typeof(Int16))
                 {
-                    var i16 = (Int16)fi.GetValue(temp);
+                    var i16 = (Int16)fi.GetValue(typedObject);
                     var b16 = BitConverter.GetBytes(i16);
                     var b16R = b16.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToInt16(b16R, 0));
+                    fi.SetValueDirect(typedReference, BitConverter.ToInt16(b16R, 0));
                 }
                 else if (fi.FieldType == typeof(Int32))
                 {
-                    var i32 = (Int32)fi.GetValue(temp);
+                    var i32 = (Int32)fi.GetValue(typedObject);
                     var b32 = BitConverter.GetBytes(i32);
                     var b32R = b32.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToInt32(b32R, 0));
+                    fi.SetValueDirect(typedReference, BitConverter.ToInt32(b32R, 0));
                 }
                 else if (fi.FieldType == typeof(Int64))
                 {
-                    var i64 = (Int64)fi.GetValue(temp);
+                    var i64 = (Int64)fi.GetValue(typedObject);
                     var b64 = BitConverter.GetBytes(i64);
                     var b64R = b64.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToInt64(b64R, 0));
+                    fi.SetValueDirect(typedReference, BitConverter.ToInt64(b64R, 0));
                 }
                 else if (fi.FieldType == typeof(UInt16))
                 {
-                    var i16 = (UInt16)fi.GetValue(temp);
+                    var i16 = (UInt16)fi.GetValue(typedObject);
                     var b16 = BitConverter.GetBytes(i16);
                     var b16R = b16.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToUInt16(b16R, 0));
+                    fi.SetValueDirect(typedReference, BitConverter.ToUInt16(b16R, 0));
                 }
                 else if (fi.FieldType == typeof(UInt32))
                 {
-                    var i32 = (UInt32)fi.GetValue(temp);
+                    var i32 = (UInt32)fi.GetValue(typedObject);
                     var b32 = BitConverter.GetBytes(i32);
                     var b32R = b32.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToUInt32(b32R, 0));
+                    fi.SetValueDirect(typedReference, BitConverter.ToUInt32(b32R, 0));
                 }
                 else if (fi.FieldType == typeof(UInt64))
                 {
-                    var i64 = (UInt64)fi.GetValue(temp);
+                    var i64 = (UInt64)fi.GetValue(typedObject);
                     var b64 = BitConverter.GetBytes(i64);
                     var b64R = b64.Reverse().ToArray();
-                    fi.SetValueDirect(__makeref(temp), BitConverter.ToUInt64(b64R, 0));
+                    fi.SetValueDirect(typedReference, BitConverter.ToUInt64(b64R, 0));
                 }
             }
-            return temp;
+            return typedObject;
         }
-
     }
 }
