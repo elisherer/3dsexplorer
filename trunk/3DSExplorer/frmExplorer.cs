@@ -141,6 +141,7 @@ namespace _3DSExplorer
                 fs.Close();
                 return;
             }
+            var fileSize = fs.Length;
             fs.Close();
 
             //Start the open process
@@ -158,8 +159,33 @@ namespace _3DSExplorer
             _currentContext = tempContext;
             treeView.SelectedNode = treeView.Nodes[0];
 
+            menuCci.Visible = false;
+            if (type == ModuleType.CCI) //Enable ROM tool by 3DSGuy
+                handleCciMenu(fileSize);
+
             menuFileSave.Enabled = _currentContext.CanCreate();
             menuToolsQuickCRC.Enabled = true;
+        }
+
+        private void handleCciMenu(long fileSize)
+        {
+            menuCci.Visible = true;
+            var cciContext = (CCIContext)_currentContext;
+            var usedSize = cciContext.Header.UsedRomLength;
+            if (fileSize > usedSize)
+            {
+                menuCciTrim.Text = "&Trim...";
+                menuCciSuperTrim.Visible = true;
+            }
+            else if (fileSize < usedSize)
+            {
+                menuCciTrim.Text = "<File is Super-Trimmed>";
+            }
+            else
+            {
+                menuCciTrim.Text = "Un-&Trim...";
+                menuCciSuperTrim.Visible = true;
+            }
         }
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
@@ -211,6 +237,55 @@ namespace _3DSExplorer
             outStream.Close();
         }
 
+        private void menuCciTrim_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you wan't to trim/untrim this file? (It might be a good idea to backup first)" + Environment.NewLine +
+                "--Idea by 3DSGuy (a.k.a ps3hen)","Trim / Un-Trim",MessageBoxButtons.YesNo)==DialogResult.No)
+                return;
+
+            var cciContext = (CCIContext)_currentContext;
+            if (cciContext == null)
+            {
+                MessageBox.Show("How did you get here?");
+                return;
+            }
+            try
+            {
+                var fs = File.OpenWrite(_filePath);
+                cciContext.ToggleTrimmed(fs);
+                menuCciTrim.Text = menuCciTrim.Text.StartsWith("T") ? "Un-&Trim..." : "&Trim...";
+                fs.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
+        }
+
+        private void menuFileSuperTrim_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you wan't to super-trim this file (this is un-reversable)? (It might be a good idea to backup first)" + Environment.NewLine +
+                "--Idea by 3DSGuy (a.k.a ps3hen)", "Super-Trim", MessageBoxButtons.YesNo) == DialogResult.No)
+                return;
+
+            var cciContext = (CCIContext)_currentContext;
+            if (cciContext == null)
+            {
+                MessageBox.Show("How did you get here?");
+                return;
+            }
+            try
+            {
+
+                var fs = File.OpenWrite(_filePath);
+                cciContext.SuperTrim(fs);
+                fs.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
+        }
         private void menuFileExit_Click(object sender, EventArgs e)
         {
             Close();

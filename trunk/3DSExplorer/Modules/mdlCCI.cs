@@ -64,8 +64,9 @@ namespace _3DSExplorer.Modules
     public class CCIContext : IContext
     {
         private string _errorMessage = string.Empty;
-        private CCIHeader Header;
+        public CCIHeader Header;
         private CXIContext[] CXIContexts;
+        private long _romSize;
 
         private enum CCIView
         {
@@ -80,6 +81,7 @@ namespace _3DSExplorer.Modules
         public bool Open(Stream fs)
         {
             Header = MarshalUtil.ReadStruct<CCIHeader>(fs);
+            _romSize = Header.CCILength * 512;
             CXIContexts = new CXIContext[8];
             // Read the CXIs
             for (var i = 0; i < CXIContexts.Length;i++ )
@@ -94,6 +96,54 @@ namespace _3DSExplorer.Modules
                     CXIContexts[i].Open(fs);
                 }
             return true;
+        }
+
+        private static void Fill(Stream stream, byte value, int count)
+        {
+            var buffer = new byte[64];
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = value;
+            }
+            while (count > buffer.Length)
+            {
+                stream.Write(buffer, 0, buffer.Length);
+                count -= buffer.Length;
+            }
+            stream.Write(buffer, 0, count);
+        }
+
+        public void ToggleTrimmed(Stream fs)
+        {
+            if (fs.Length <= Header.UsedRomLength) //Trimmed
+            {
+                fs.SetLength(_romSize);
+                fs.Seek(Header.UsedRomLength, SeekOrigin.Begin);
+                Fill(fs, 0xFF, (int)(_romSize - Header.UsedRomLength));
+            }
+            else
+            {
+                fs.SetLength(Header.UsedRomLength);
+            }
+        }
+
+        public void SuperTrim(Stream fs)
+        {
+            var newLength = Header.CXIEntries[7].Offset * 512;
+            if (newLength == 0 || fs.Length <= newLength) //can't be trimmed
+            {
+                throw new Exception("This file can't be trimmed any more!");
+            }
+            else
+            {
+                fs.SetLength(newLength);
+                //delete last ncch from table
+                var empty64 = new byte[8];
+                fs.Seek(0x158, SeekOrigin.Begin);
+                fs.Write(empty64, 0, 8);
+                fs.Seek(0x1C8, SeekOrigin.Begin);
+                fs.Write(empty64, 0, 8);
+            }
         }
 
         public string GetErrorMessage()

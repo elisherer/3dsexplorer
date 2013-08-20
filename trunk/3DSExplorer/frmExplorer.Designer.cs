@@ -46,10 +46,6 @@ namespace _3DSExplorer
             this.treeView = new System.Windows.Forms.TreeView();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.lblFileListTitle = new System.Windows.Forms.Label();
-            this.lvFileTree = new _3DSExplorer.TreeListView.TreeListViewControl();
-            this.cName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.cOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.imlFS = new System.Windows.Forms.ImageList(this.components);
             this.lstInfo = new System.Windows.Forms.ListView();
             this.chOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -67,6 +63,9 @@ namespace _3DSExplorer
             this.menuFileSave = new System.Windows.Forms.ToolStripMenuItem();
             this.menuFileSep0 = new System.Windows.Forms.ToolStripSeparator();
             this.menuFileExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuCci = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuCciTrim = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuCciSuperTrim = new System.Windows.Forms.ToolStripMenuItem();
             this.menuTools = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsXORTool = new System.Windows.Forms.ToolStripMenuItem();
             this.menuToolsHashTool = new System.Windows.Forms.ToolStripMenuItem();
@@ -85,6 +84,10 @@ namespace _3DSExplorer
             this.menuHelpVisit3DBrew = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelpVisitNDev = new System.Windows.Forms.ToolStripMenuItem();
             this.menuLogo = new System.Windows.Forms.ToolStripMenuItem();
+            this.lvFileTree = new _3DSExplorer.TreeListView.TreeListViewControl();
+            this.cName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cSize = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.cOffset = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -153,9 +156,9 @@ namespace _3DSExplorer
             // 
             // treeView
             // 
-            this.treeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.treeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.treeView.HideSelection = false;
             this.treeView.ImageIndex = 0;
@@ -183,39 +186,6 @@ namespace _3DSExplorer
             this.lblFileListTitle.TabIndex = 2;
             this.lblFileListTitle.Text = "File List";
             this.lblFileListTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // lvFileTree
-            // 
-            this.lvFileTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.lvFileTree.AutoScroll = true;
-            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.cName,
-            this.cSize,
-            this.cOffset});
-            this.lvFileTree.ImageList = this.imlFS;
-            this.lvFileTree.Location = new System.Drawing.Point(0, 23);
-            this.lvFileTree.Name = "lvFileTree";
-            this.lvFileTree.SelectedNode = null;
-            this.lvFileTree.Size = new System.Drawing.Size(320, 264);
-            this.lvFileTree.TabIndex = 1;
-            this.lvFileTree.TreeDoubleClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeDoubleClicked);
-            this.lvFileTree.TreeMouseClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeMouseClicked);
-            // 
-            // cName
-            // 
-            this.cName.Text = "Name";
-            this.cName.Width = 190;
-            // 
-            // cSize
-            // 
-            this.cSize.Text = "Size";
-            this.cSize.Width = 50;
-            // 
-            // cOffset
-            // 
-            this.cOffset.Text = "Offset";
             // 
             // imlFS
             // 
@@ -313,6 +283,7 @@ namespace _3DSExplorer
             this.menuStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Visible;
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
+            this.menuCci,
             this.menuTools,
             this.menuHelp,
             this.menuLogo});
@@ -331,14 +302,14 @@ namespace _3DSExplorer
             this.menuFileSep0,
             this.menuFileExit});
             this.menuFile.Name = "menuFile";
-            this.menuFile.Size = new System.Drawing.Size(36, 20);
+            this.menuFile.Size = new System.Drawing.Size(37, 20);
             this.menuFile.Text = "&File";
             // 
             // menuFileOpen
             // 
             this.menuFileOpen.Image = global::_3DSExplorer.Properties.Resources.folder;
             this.menuFileOpen.Name = "menuFileOpen";
-            this.menuFileOpen.Size = new System.Drawing.Size(127, 22);
+            this.menuFileOpen.Size = new System.Drawing.Size(121, 22);
             this.menuFileOpen.Text = "&Open...";
             this.menuFileOpen.Click += new System.EventHandler(this.menuFileOpen_Click);
             // 
@@ -347,22 +318,47 @@ namespace _3DSExplorer
             this.menuFileSave.Enabled = false;
             this.menuFileSave.Image = global::_3DSExplorer.Properties.Resources.disk;
             this.menuFileSave.Name = "menuFileSave";
-            this.menuFileSave.Size = new System.Drawing.Size(127, 22);
+            this.menuFileSave.Size = new System.Drawing.Size(121, 22);
             this.menuFileSave.Text = "&Save as...";
             this.menuFileSave.Click += new System.EventHandler(this.menuFileSave_Click);
             // 
             // menuFileSep0
             // 
             this.menuFileSep0.Name = "menuFileSep0";
-            this.menuFileSep0.Size = new System.Drawing.Size(124, 6);
+            this.menuFileSep0.Size = new System.Drawing.Size(118, 6);
             // 
             // menuFileExit
             // 
             this.menuFileExit.Image = global::_3DSExplorer.Properties.Resources.door_in;
             this.menuFileExit.Name = "menuFileExit";
-            this.menuFileExit.Size = new System.Drawing.Size(127, 22);
+            this.menuFileExit.Size = new System.Drawing.Size(121, 22);
             this.menuFileExit.Text = "&Exit";
             this.menuFileExit.Click += new System.EventHandler(this.menuFileExit_Click);
+            // 
+            // menuCci
+            // 
+            this.menuCci.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuCciTrim,
+            this.menuCciSuperTrim});
+            this.menuCci.Name = "menuCci";
+            this.menuCci.Size = new System.Drawing.Size(38, 20);
+            this.menuCci.Text = "&CCI";
+            this.menuCci.Visible = false;
+            // 
+            // menuCciTrim
+            // 
+            this.menuCciTrim.Name = "menuCciTrim";
+            this.menuCciTrim.Size = new System.Drawing.Size(152, 22);
+            this.menuCciTrim.Text = "&Trim...";
+            this.menuCciTrim.Click += new System.EventHandler(this.menuCciTrim_Click);
+            // 
+            // menuCciSuperTrim
+            // 
+            this.menuCciSuperTrim.Name = "menuCciSuperTrim";
+            this.menuCciSuperTrim.Size = new System.Drawing.Size(152, 22);
+            this.menuCciSuperTrim.Text = "&Super-Trim...";
+            this.menuCciSuperTrim.Visible = false;
+            this.menuCciSuperTrim.Click += new System.EventHandler(this.menuFileSuperTrim_Click);
             // 
             // menuTools
             // 
@@ -382,7 +378,7 @@ namespace _3DSExplorer
             // 
             this.menuToolsXORTool.Image = global::_3DSExplorer.Properties.Resources.select_by_intersection;
             this.menuToolsXORTool.Name = "menuToolsXORTool";
-            this.menuToolsXORTool.Size = new System.Drawing.Size(212, 22);
+            this.menuToolsXORTool.Size = new System.Drawing.Size(210, 22);
             this.menuToolsXORTool.Text = "&XOR Tool";
             this.menuToolsXORTool.Click += new System.EventHandler(this.menuToolsXORTool_Click);
             // 
@@ -390,7 +386,7 @@ namespace _3DSExplorer
             // 
             this.menuToolsHashTool.Image = global::_3DSExplorer.Properties.Resources.magnifier;
             this.menuToolsHashTool.Name = "menuToolsHashTool";
-            this.menuToolsHashTool.Size = new System.Drawing.Size(212, 22);
+            this.menuToolsHashTool.Size = new System.Drawing.Size(210, 22);
             this.menuToolsHashTool.Text = "&Hash Tool";
             this.menuToolsHashTool.Click += new System.EventHandler(this.menuToolsHashTool_Click);
             // 
@@ -398,7 +394,7 @@ namespace _3DSExplorer
             // 
             this.menuTools3DVideo.Image = global::_3DSExplorer.Properties.Resources.ico_3d_glasses_32;
             this.menuTools3DVideo.Name = "menuTools3DVideo";
-            this.menuTools3DVideo.Size = new System.Drawing.Size(212, 22);
+            this.menuTools3DVideo.Size = new System.Drawing.Size(210, 22);
             this.menuTools3DVideo.Text = "3D &Video Creator";
             this.menuTools3DVideo.Click += new System.EventHandler(this.menuTools3DVideo_Click);
             // 
@@ -407,7 +403,7 @@ namespace _3DSExplorer
             this.menuToolsQuickCRC.Enabled = false;
             this.menuToolsQuickCRC.Image = global::_3DSExplorer.Properties.Resources.code;
             this.menuToolsQuickCRC.Name = "menuToolsQuickCRC";
-            this.menuToolsQuickCRC.Size = new System.Drawing.Size(212, 22);
+            this.menuToolsQuickCRC.Size = new System.Drawing.Size(210, 22);
             this.menuToolsQuickCRC.Text = "&Quick CRC32";
             this.menuToolsQuickCRC.Click += new System.EventHandler(this.menuToolsQuickCRC_Click);
             // 
@@ -415,7 +411,7 @@ namespace _3DSExplorer
             // 
             this.menuToolsDSDecmpGUI.Image = global::_3DSExplorer.Properties.Resources.page_white_zip;
             this.menuToolsDSDecmpGUI.Name = "menuToolsDSDecmpGUI";
-            this.menuToolsDSDecmpGUI.Size = new System.Drawing.Size(212, 22);
+            this.menuToolsDSDecmpGUI.Size = new System.Drawing.Size(210, 22);
             this.menuToolsDSDecmpGUI.Text = "&DSDecmp GUI";
             this.menuToolsDSDecmpGUI.Click += new System.EventHandler(this.menuToolsDSDecmpGUI_Click);
             // 
@@ -423,7 +419,7 @@ namespace _3DSExplorer
             // 
             this.menuToolsQRTool.Image = global::_3DSExplorer.Properties.Resources.barcode_2d;
             this.menuToolsQRTool.Name = "menuToolsQRTool";
-            this.menuToolsQRTool.Size = new System.Drawing.Size(212, 22);
+            this.menuToolsQRTool.Size = new System.Drawing.Size(210, 22);
             this.menuToolsQRTool.Text = "Q&R Tool";
             this.menuToolsQRTool.Click += new System.EventHandler(this.menuToolsQRTool_Click);
             // 
@@ -431,7 +427,7 @@ namespace _3DSExplorer
             // 
             this.menuToolsParentalControlUnlocker.Image = global::_3DSExplorer.Properties.Resources.parental;
             this.menuToolsParentalControlUnlocker.Name = "menuToolsParentalControlUnlocker";
-            this.menuToolsParentalControlUnlocker.Size = new System.Drawing.Size(212, 22);
+            this.menuToolsParentalControlUnlocker.Size = new System.Drawing.Size(210, 22);
             this.menuToolsParentalControlUnlocker.Text = "Parental &Control Unlocker";
             this.menuToolsParentalControlUnlocker.Click += new System.EventHandler(this.menuToolsParentalControlUnlocker_Click);
             // 
@@ -447,25 +443,25 @@ namespace _3DSExplorer
             this.menuHelpVisit3DBrew,
             this.menuHelpVisitNDev});
             this.menuHelp.Name = "menuHelp";
-            this.menuHelp.Size = new System.Drawing.Size(43, 20);
+            this.menuHelp.Size = new System.Drawing.Size(44, 20);
             this.menuHelp.Text = "&Help";
             // 
             // menuHelpUpdateTitleDb
             // 
             this.menuHelpUpdateTitleDb.Name = "menuHelpUpdateTitleDb";
-            this.menuHelpUpdateTitleDb.Size = new System.Drawing.Size(235, 22);
+            this.menuHelpUpdateTitleDb.Size = new System.Drawing.Size(227, 22);
             this.menuHelpUpdateTitleDb.Text = "Update title.db file...";
             this.menuHelpUpdateTitleDb.Click += new System.EventHandler(this.menuHelpUpdateTitleDb_Click);
             // 
             // menuHelpSep1
             // 
             this.menuHelpSep1.Name = "menuHelpSep1";
-            this.menuHelpSep1.Size = new System.Drawing.Size(232, 6);
+            this.menuHelpSep1.Size = new System.Drawing.Size(224, 6);
             // 
             // menuHelpCheckNow
             // 
             this.menuHelpCheckNow.Name = "menuHelpCheckNow";
-            this.menuHelpCheckNow.Size = new System.Drawing.Size(235, 22);
+            this.menuHelpCheckNow.Size = new System.Drawing.Size(227, 22);
             this.menuHelpCheckNow.Text = "Check for &updates...";
             this.menuHelpCheckNow.Click += new System.EventHandler(this.menuHelpCheckNow_Click);
             // 
@@ -475,33 +471,33 @@ namespace _3DSExplorer
             this.menuHelpCheckUpdates.CheckOnClick = true;
             this.menuHelpCheckUpdates.CheckState = System.Windows.Forms.CheckState.Checked;
             this.menuHelpCheckUpdates.Name = "menuHelpCheckUpdates";
-            this.menuHelpCheckUpdates.Size = new System.Drawing.Size(235, 22);
+            this.menuHelpCheckUpdates.Size = new System.Drawing.Size(227, 22);
             this.menuHelpCheckUpdates.Text = "&Check for updates on startup";
             this.menuHelpCheckUpdates.Click += new System.EventHandler(this.menuHelpCheckUpdates_Click);
             // 
             // menuHelpSep0
             // 
             this.menuHelpSep0.Name = "menuHelpSep0";
-            this.menuHelpSep0.Size = new System.Drawing.Size(232, 6);
+            this.menuHelpSep0.Size = new System.Drawing.Size(224, 6);
             // 
             // menuHelpVisitGoogleCode
             // 
             this.menuHelpVisitGoogleCode.Name = "menuHelpVisitGoogleCode";
-            this.menuHelpVisitGoogleCode.Size = new System.Drawing.Size(235, 22);
+            this.menuHelpVisitGoogleCode.Size = new System.Drawing.Size(227, 22);
             this.menuHelpVisitGoogleCode.Text = "Visit &Google code site";
             this.menuHelpVisitGoogleCode.Click += new System.EventHandler(this.menuHelpVisitGoogleCode_Click);
             // 
             // menuHelpVisit3DBrew
             // 
             this.menuHelpVisit3DBrew.Name = "menuHelpVisit3DBrew";
-            this.menuHelpVisit3DBrew.Size = new System.Drawing.Size(235, 22);
+            this.menuHelpVisit3DBrew.Size = new System.Drawing.Size(227, 22);
             this.menuHelpVisit3DBrew.Text = "&Visit 3DBrew.org";
             this.menuHelpVisit3DBrew.Click += new System.EventHandler(this.menuHelpVisit3DBrew_Click);
             // 
             // menuHelpVisitNDev
             // 
             this.menuHelpVisitNDev.Name = "menuHelpVisitNDev";
-            this.menuHelpVisitNDev.Size = new System.Drawing.Size(235, 22);
+            this.menuHelpVisitNDev.Size = new System.Drawing.Size(227, 22);
             this.menuHelpVisitNDev.Text = "Visit &n-dev.net";
             this.menuHelpVisitNDev.Click += new System.EventHandler(this.menuHelpVisitNDev_Click);
             // 
@@ -515,6 +511,39 @@ namespace _3DSExplorer
             this.menuLogo.Text = "toolStripMenuItem1";
             this.menuLogo.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
             this.menuLogo.Click += new System.EventHandler(this.menuLogo_Click);
+            // 
+            // lvFileTree
+            // 
+            this.lvFileTree.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvFileTree.AutoScroll = true;
+            this.lvFileTree.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.cName,
+            this.cSize,
+            this.cOffset});
+            this.lvFileTree.ImageList = this.imlFS;
+            this.lvFileTree.Location = new System.Drawing.Point(0, 23);
+            this.lvFileTree.Name = "lvFileTree";
+            this.lvFileTree.SelectedNode = null;
+            this.lvFileTree.Size = new System.Drawing.Size(320, 264);
+            this.lvFileTree.TabIndex = 1;
+            this.lvFileTree.TreeDoubleClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeDoubleClicked);
+            this.lvFileTree.TreeMouseClicked += new System.Windows.Forms.MouseEventHandler(this.lvFileTree_TreeMouseClicked);
+            // 
+            // cName
+            // 
+            this.cName.Text = "Name";
+            this.cName.Width = 190;
+            // 
+            // cSize
+            // 
+            this.cSize.Text = "Size";
+            this.cSize.Width = 50;
+            // 
+            // cOffset
+            // 
+            this.cOffset.Text = "Offset";
             // 
             // frmExplorer
             // 
@@ -594,6 +623,9 @@ namespace _3DSExplorer
         private System.Windows.Forms.ToolStripMenuItem menuToolsDSDecmpGUI;
         private System.Windows.Forms.ToolStripMenuItem menuToolsQRTool;
         private System.Windows.Forms.ToolStripMenuItem menuToolsParentalControlUnlocker;
+        private System.Windows.Forms.ToolStripMenuItem menuCci;
+        private System.Windows.Forms.ToolStripMenuItem menuCciTrim;
+        private System.Windows.Forms.ToolStripMenuItem menuCciSuperTrim;
     }
 }
 
