@@ -138,11 +138,11 @@ namespace _3DSExplorer.Modules
             {
                 fs.SetLength(newLength);
                 //delete last ncch from table
-                var empty64 = new byte[8];
+                /*var empty64 = new byte[8];
                 fs.Seek(0x158, SeekOrigin.Begin);
                 fs.Write(empty64, 0, 8);
                 fs.Seek(0x1C8, SeekOrigin.Begin);
-                fs.Write(empty64, 0, 8);
+                fs.Write(empty64, 0, 8);*/
             }
         }
 
